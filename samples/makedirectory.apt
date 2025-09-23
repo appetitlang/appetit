@@ -1,0 +1,12 @@
+minver 1
+
+- In this script, we are going to create a directory. This is not a
+- particularly complicated script as the makedirectory statement only takes
+- one value: the diretctory to create.
+
+set dir = "test"
+
+- Let's notify the user that we are making a directory in their home
+writeln "Making a directory called \"#dir\" in #b_home"
+- And then let's make that directory
+makedirectory "#b_home/#dir"

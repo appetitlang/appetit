@@ -1,0 +1,4 @@
+minver 1
+
+- Move a directory from one place to another
+movedirectory "#b_home/Downloads/helasuno" to "#b_home/Desktop/helasuno"

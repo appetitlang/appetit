@@ -1,0 +1,6 @@
+minver 1
+
+- Create a file
+- In this case, let's create a text file
+
+makefile "test_file.txt"

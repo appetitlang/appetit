@@ -1,0 +1,97 @@
+{
+    "Ask": {
+        "prefix": "ask",
+        "body": ["ask \"$1\" to \"$0\""],
+        "description": "Ask the user a question and store the result in a variable"
+    },
+    "Comment": {
+        "prefix": "co",
+        "body": ["- $0"],
+        "description": "Insert a comment"
+    },
+    "Copy Directory": {
+        "prefix": "cd",
+        "body": ["copydirectory \"$1\" to \"$0\""],
+        "description": "Copy a directory from one place to another"
+    },
+    "Copy File": {
+        "prefix": "cp",
+        "body": ["copyfile \"$1\" to \"$0\""],
+        "description": "Copy a file from one place to another"
+    },
+    "Delete Directory": {
+        "prefix": "dd",
+        "body": ["deletedirectory \"$0\""],
+        "description": "Delete a directory"
+    },
+    "Delete File": {
+        "prefix": "df",
+        "body": ["deletefile \"$0\""],
+        "description": "Delete a file"
+    },
+    "Download": {
+        "prefix": "dl",
+        "body": ["download \"$1\" to \"$0\""],
+        "description": "Download a file from one place and save it locally"
+    },
+    "Execute": {
+        "prefix": "ex",
+        "body": ["execute \"$0\""],
+        "description": "Execute a system command"
+    },
+    "Make Directory": {
+        "prefix": "mkd",
+        "body": ["makedirectory \"$0\""],
+        "description": "Make a directory"
+    },
+    "Make File": {
+        "prefix": "mkf",
+        "body": ["makefile \"$0\""],
+        "description": "Make a file"
+    },
+    "Minver": {
+        "prefix": "mi",
+        "body": ["minver $0"],
+        "description": "Set a minimum version for the script"
+    },
+    "Move Directory": {
+        "prefix": "mvd",
+        "body": ["movedirectory \"$1\" to \"$0\""],
+        "description": "Move a directory"
+    },
+    "Move File": {
+        "prefix": "mvf",
+        "body": ["movefile \"$1\" to \"$0\""],
+        "description": "Move a file from one place to another"
+    },
+    "Pause": {
+        "prefix": "pa",
+        "body": ["pause $0"],
+        "description": "Move a file from one place to another"
+    },
+    "Set": {
+        "prefix": "se",
+        "body": ["set $1 = \"$0\""],
+        "description": "Set a variable."
+    },
+    "Write": {
+        "prefix": "wr",
+        "body": ["write \"$0\""],
+        "description": "Write text to the console without a trailing newline."
+    },
+    "Write Line": {
+        "prefix": "wrl",
+        "body": ["writeln \"$0\""],
+        "description": "Write a line of text to the console."
+    },
+    "Zip Directory": {
+        "prefix": "zd",
+        "body": ["zipdirectory \"$1\" to \"$0\""],
+        "description": "Zip a directory and save it to a specific place and name."
+    },
+    "Zip File": {
+        "prefix": "zf",
+        "body": ["zipfile \"$1\" to \"$0\""],
+        "description": "Zip a file and save it to a specific place and name."
+    }
+}

@@ -1,0 +1,81 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Appetit",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#statacts"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#strings"
+		}
+	],
+	"repository": {
+		"comments": {
+			"name": "comment.line.appetit",
+			"begin": "-[^>]",
+			"end": "\\n"
+		},
+		"statacts": {
+			"patterns": [
+				{
+					"name": "support.class.appetit",
+					"match": "\\b(to)\\b"
+				},
+				{
+					"name": "variable.language.appetit",
+					"begin": " =",
+					"end": " "
+				}
+			]
+		},
+		"comments_old": {
+			"patterns": [
+				{
+					"name": "comment.line.appetit",
+					"match": "-[^>] [A-Za-z]+ \"(?:[^\"]|\"\")*\""
+				},
+				{
+					"name": "comment.line.appetit",
+					"match": "-[^>] ([A-Za-z0-9]+( [A-Za-z0-9]+)+)"
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.appetit",
+					"match": "\\b(ask|copydirectory|copyfile|download|deletedirectory|deletefile|execute|minver|makefile|makedirectory|movedirectory|movefile|pause|set|write|writeln|zipdirectory|zipfile)\\b"
+				}
+			]
+		},
+		"numbers": {
+			"patterns": [
+				{
+					"match": "[0-9]+",
+					"name": "constant.numeric.appetit"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.appetit",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.appetit",
+					"match": "\\\\."
+				}
+			]
+		}
+	},
+	"scopeName": "source.appetit"
+}

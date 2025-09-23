@@ -1,0 +1,12 @@
+minver 1
+
+- In this script, we're going to look at the execute statement. This one
+- requires you to run the interpreter with the -allowexec flag:
+-   appetit -allowexec execute.btl
+
+- Let's notify the user that we are getting the contents of the current
+- directory
+writeln "Getting the contents of the current directory!"
+
+- Now, let's execute the ls command from *nix systems.
+execute "ls"

@@ -1,0 +1,3 @@
+minver 1
+- Delete the script
+deletefile ".DS_Store"

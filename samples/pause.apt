@@ -1,0 +1,8 @@
+minver 1
+
+- Write Hello World without a new line at the end
+write "Hello "
+- Pause the script for two seconds
+pause 2.0
+- Write Hello World without a new line at the end
+write "World!"

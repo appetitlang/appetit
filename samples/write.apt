@@ -1,0 +1,14 @@
+#!/usr/bin/appetit
+minver 1
+- Set the minimum version to version 1
+- This is not required but can help to ensure that your script requires a specific version under the hood.
+
+- Write Hello World to the screen, effectively completing the canonical Hello World
+writeln "Hello World!"
+- Write Hello World without a new line at the end
+write "Hello World"
+
+- To see that it worked, let's write out something else. You'll notice that
+- this follows on quite neatly from the last Hello World. This also showcases
+- the d/m/y format and variable substitutions more broadly.
+write ". \nI see that you're quite spherical today which is #b_date_dmy."

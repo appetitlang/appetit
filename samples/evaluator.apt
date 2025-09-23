@@ -1,0 +1,88 @@
+- Let's get started. You can run this by doing the following:
+-   go run main.go -allowexec ../samples/evaluator.apt
+- The -allowexec flag is needed here because of the execute statement call
+#!/usr/bin/appetit
+minver 1
+- This is the evaluator script that tests the functionality of the interpreter
+- and the respective statements. Every statement has a place in this script as
+- the script that checks every statement's functionality. This should work
+- without any errors unless there are those triggered by things beyond the
+- language (eg. a lack of write privileges)
+
+- This will work on a non-Windows system only as there is a call to ls. If you
+- want to run this on Windows, you will need to ensure that you're running this
+- in PowerShell as cmd will not recognise the ls -l command.
+
+- ask
+ask "[Testing ask] What is your name? " to name
+writeln "Hello #name"
+
+- copydirectory
+writeln "[Testing copydirectory] Copying the samples to #b_home/Downloads/"
+copydirectory "../samples" to "#b_home/Downloads/"
+
+- copyfile
+writeln "[Testing copyfile] Copying the LICENCE to #b_home/Downloads/"
+copyfile "LICENCE" to "#b_home/Downloads/"
+
+- makedirectory
+writeln "[Testing makedirectory] Making testdir2 in #b_home/Downloads/"
+makedirectory "#b_home/Downloads/testdir2"
+
+- makefile
+writeln "[Testing makefile] Making testdir2.txt in #b_home/Downloads/"
+makefile "#b_home/Downloads/testdir2.txt"
+
+- movedirectory
+writeln "[Testing movedirectory] Moving testdir2 in #b_home/Downloads/ to the Desktop"
+movedirectory "#b_home/Downloads/testdir2" to "#b_home/Desktop/testdir2"
+
+- movefile
+writeln "[Testing movefile] Moving testdir2 in #b_home/Downloads/ to the Desktop"
+movefile "#b_home/Downloads/testdir2.txt" to "#b_home/Desktop/testdir2.txt"
+
+- deletedirectory
+writeln "[Testing deletedirectory] Deleting #b_home/Desktop/testdir2"
+deletedirectory "#b_home/Desktop/testdir2"
+
+- deletefile
+writeln "[Testing deletefile] Deleting #b_home/Desktop/testdir2.txt"
+deletefile "#b_home/Desktop/testdir2.txt"
+
+- download (a picture)
+writeln "[Testing download] Downloading sample file"
+download "http://upload.wikimedia.org/wikipedia/commons/0/02/La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg" to "#b_home/Desktop/del.jpg"
+
+- execute (something simple)
+writeln "[Testing execute] Listing the current directory's contents"
+execute "ls -l"
+
+- pause
+writeln "[Testing pause] Pausing for three seconds"
+pause 3
+
+- set
+writeln "[Testing set] Setting a variable and writing it out"
+set name = "Appetit"
+writeln "The language is called #name"
+
+- zipdirectory
+writeln "[Testing zipdirectory] Zipping a directory"
+zipdirectory "../samples/" to "samples.zip"
+
+- zipfile
+writeln "[Testing zipfile] Zipping a file"
+zipfile "../samples/ask.apt" to "ask.zip"
+
+- Reserved variables
+writeln "Architecture: #b_arch"
+writeln "CPU Cores: #b_cpu"
+writeln "dmy_date: #b_date_dmy"
+writeln "date_ymd: #b_date_ymd"
+writeln "Home: #b_home"
+writeln "Hostname: #b_hostname"
+writeln "IPv4 Address: #b_ipv4"
+writeln "OS: #b_os"
+writeln "Temp Dir: #b_tempdir"
+writeln "User: #b_user"
+writeln "Working Directory: #b_wd"

@@ -1,0 +1,12 @@
+minver 1
+
+- This sample will show you how to copy a file to a new place. Here, we'll copy
+- this script to the home directory
+
+- Set the file that we want to copy. You may need to change this.
+set file_to_copy = "../samples/copyfile.btl"
+- Set where we want the file to go
+set dest = "#b_home/copyfile.btl"
+
+- Copy the file
+copyfile "#file_to_copy" to "#dest"

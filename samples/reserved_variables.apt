@@ -1,0 +1,23 @@
+minver 1
+
+writeln "Your architecture is #b_arch."
+
+writeln "Your cpu count is #b_cpu."
+
+writeln "The date in d/m/y format is #b_date_dmy."
+
+writeln "The date in y/m/d format is #b_date_ymd."
+
+writeln "Your home directory is #b_home."
+
+writeln "Your hostname is #b_hostname."
+
+writeln "Your IP address is #b_ipv4."
+
+writeln "Your operating system is #b_os."
+
+writeln "Your temporary directory is #b_tempdir."
+
+writeln "The user is #b_user."
+
+writeln "Your working directory is #b_wd."

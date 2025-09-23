@@ -1,0 +1,4 @@
+minver 1
+
+- Copy a directory from A to B
+copydirectory "#b_home/Downloads/est" to "/Volumes/Untitled"

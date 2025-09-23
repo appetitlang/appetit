@@ -1,0 +1,11 @@
+minver 1
+- This script showcases how to write a script with a variable.
+- First, we'll set the minver as is convention but not required
+
+- Next, we'll set up a variable
+set greeting = "Hello World!"
+
+- Finally, we'll write it to the screen. Notice here that the writeln statement
+- gets access to the variable by including the variable name prepended with a
+- # symbol.
+writeln "Greeting: #greeting"

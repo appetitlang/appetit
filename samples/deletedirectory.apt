@@ -1,0 +1,10 @@
+minver 1
+
+- This scripts deletes a directory.
+
+- First up, let's create a dummy path
+makedirectory "test"
+- Let's then wait 3 seconds
+pause 3
+- And then delete it
+deletedirectory "test"
