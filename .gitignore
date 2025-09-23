@@ -1,0 +1,15 @@
+# Exclude any dist folders that may be lingering
+src/dist/
+vscode/dist/
+
+# Sample scripts from the samples folder that shouldn't be available for public consumption
+samples/test.apt
+
+# Ignore DS_Store files
+**/.DS_Store
+
+# Ignore docs/videos as this has large files not needed in the Git repo.
+docs/videos
+
+# Apple Container for development script. This is for setting up a quick container to trial things on my development machine that ought not to be available for the public.
+container.sh
