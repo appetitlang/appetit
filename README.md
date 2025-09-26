@@ -4,6 +4,7 @@ Appetit is a solution to a problem that really doesn't need to be solved but I w
 At the end of the day, this is really a project being used to learn Go, less so a project that has the end goal of being viable for anything serious. In light of that, I'm happy to take on board any suggestions but note that this project is a hobby project of mine first and foremost so having fun is the most important focus here.
 
 Started: 11/05/2025.
+First public release: 24/09/2025.
 
 Homepage: https://bryanabsmith.com/.
 
@@ -38,7 +39,9 @@ With [fpm](https://fpm.readthedocs.io/en) installed, you can build installers li
 
 **Linux (rpm)**
 
-    clear && fpm -t rpm -p appetit.rpm
+    fpm -t rpm --rpm-os linux -a arm64 -p appetit.rpm [for ARM64 builds]
+
+    fpm -t rpm --rpm-os linux -p appetit.rpm [for x86_64 builds]
 
 
 ### Testing

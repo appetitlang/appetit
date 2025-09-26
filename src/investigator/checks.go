@@ -49,7 +49,6 @@ func CheckIsStatement(loc string, value_name string) bool {
 */
 func CheckVariablePrefix(
 	loc string, prefix string, variable_name string) error {
-
 	// If the prefix is the reserved variable prefix...
 	if prefix != values.RESERVED_VARIABLE_PREFIX {
 		return nil
@@ -73,7 +72,6 @@ func CheckVariablePrefix(
 	operator is valid.
 */
 func CheckValidAssignment(loc string, value_name string) error {
-
 	// If the value_name is not the ASSIGNMENT_OPERATOR...
 	if value_name != values.OPERATOR_ASSIGNMENT {
 		// Report back an error while providing the operator to use
@@ -95,7 +93,6 @@ func CheckValidAssignment(loc string, value_name string) error {
 */
 func ValidNumberOfTokens(
 	tokens []values.Token, required_number int) (bool, error) {
-	
 	/* Get the token count and subtracting one to account for the fact that the
 		line number is included.
 	*/

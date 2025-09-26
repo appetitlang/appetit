@@ -132,7 +132,21 @@ func PrintDevInfo() {
 		mem_stats.Alloc,
 		(mem_stats.Alloc/1024),
 	)
-	// Print out the grabage collections
+	// Print out the total allocated memory
+	fmt.Printf(
+		tools.ColouriseCyan(":: Total Allocated Memory: ") +
+		"%d bytes, %d kilobytes\n",
+		mem_stats.TotalAlloc,
+		(mem_stats.TotalAlloc/1024),
+	)
+	// Print out the memory requested from the OS
+	fmt.Printf(
+		tools.ColouriseCyan(":: Memory Requested: ") +
+		"%d bytes, %d kilobytes\n",
+		mem_stats.Sys,
+		(mem_stats.Sys/1024),
+	)
+	// Print out the garbage collections
 	fmt.Printf(
 		tools.ColouriseCyan(":: Garbage Collections: ") + "%d\n",
 		mem_stats.NumGC,
@@ -151,11 +165,13 @@ func main() {
 		"Allow execution of system commands.",
 	)
 
+	// Create a template script to work from
 	create_template_flag := flag.String(
 		"create",
 		"",
 		"Create a script at the path specified.",
 	)
+	
 	// Print out developer relevant information
 	dev_flag := flag.Bool(
 		"dev",
@@ -163,6 +179,7 @@ func main() {
 		"[Dev] See information relevant for developing the interpreter. If " +
 		"you are an enduser, this information will not be helpful.",
 	)
+
 	// Serve up the documentation
 	docs_flag := flag.Bool(
 		"docs",
@@ -337,6 +354,7 @@ func main() {
 		information.
 	*/
 	if *dev_flag {
+		// Start printing out the tokens
 		fmt.Println(tools.ColouriseYellow("\nTokens"))
 		Execute(contents, true)
 	} else {
