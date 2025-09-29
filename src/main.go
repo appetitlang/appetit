@@ -184,8 +184,9 @@ func main() {
 	docs_flag := flag.Bool(
 		"docs",
 		false,
-		"Serve up documentation for the language.",
+		"Serve up documentation for the language on port 8000.",
 	)
+
 	// Time the execution of the script
 	timer_flag := flag.Bool(
 		"timer",
@@ -280,7 +281,10 @@ func main() {
 			"Open up " + tools.ColouriseCyan("http://localhost:" + port) +
 			" in your browser.",
 		)
-		fmt.Println(values.ListReservedVariables())
+		fmt.Println(
+			"Press " + tools.ColouriseMagenta("Ctrl-C") + " to quit the " +
+			"server.",
+		)
 		// Set up a handler
 		http.HandleFunc("/", DocsHandler)
 		// Serve the documentation

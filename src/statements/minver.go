@@ -34,9 +34,11 @@ func MinVer(tokens []values.Token) int {
 			"issue here is excluding a version number or passing one as a " +
 			"string (eg. " + tools.ColouriseGreen("\"3\"") + "). An " +
 			"example of a working version check might be " +
-			tools.ColouriseCyan("minver") + tools.ColouriseYellow(" 3"),
+			tools.ColouriseCyan("minver") + tools.ColouriseYellow(" 3") +
+			" ( notice that there is an integer that is not in quotation " +
+			"marks).",
 			loc,
-			tokens[2].TokenPosition,
+			tokens[1].TokenPosition,
 			full_loc,
 		)
 	}

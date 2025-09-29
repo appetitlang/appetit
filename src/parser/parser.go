@@ -86,49 +86,8 @@ func Tokeniser(loc int, line_of_script string) []values.Token {
 
 	// Catch errors with the tokeniser and handle them
 	tokeniser.Error = func(s *scanner.Scanner, msg string) {
-		/*
-		Set up an elaborate switch/case to capture any anticipated errors
-		Parameters include the scanner and the message that gets reported.
-		Returns nothing.
-	*/
-		switch msg {
-		// Catch an unterminated literal
-		case "literal not terminated":
-			investigator.Report(
-				"Your line of code has an incomplete string. Did you forget " +
-				"an opening or closing quotation mark?\n\nSomething like " +
-				"the following line of code will trigger this error:\n" +
-				tools.ColouriseCyan("writeln ") +
-				tools.ColouriseGreen("\"Hello world") +
-				tools.ColouriseRed("_") + " <- (notice the lack of a " +
-				"closing quotation mark here).",
-				strconv.Itoa(loc),
-				"n/a",
-				"n/a",
-			)
-		// Catch an invalid char literal
-		case "invalid char literal":
-			investigator.Report(
-				"Your line of code use single quotation marks instead of " +
-				"the required double quotation marks. See the example:\n\n" +
-				tools.ColouriseCyan("writeln ") +
-				tools.ColouriseGreen("'Hello world'") + " <- (notice the" +
-				" lack of double quotation marks here).",
-				strconv.Itoa(loc),
-				"n/a",
-				"n/a",
-			)
-		default:
-			/* Report everything else in their "Go form." It is hoped that, some
-				day, this will not need to exist
-			*/
-			investigator.Report(
-				msg,
-				strconv.Itoa(loc),
-				"n/a",
-				"n/a",
-			)
-		}
+		// Call the investigators
+		investigator.ReportTokeniserErrors(msg, loc)
 	}
 
 	// Create a slice that houses tokens for each part of the line of code

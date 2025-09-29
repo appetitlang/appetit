@@ -15,7 +15,14 @@
     "Programming Languages",
     "Snippets"
   ],
+  "main": "./extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "bryansmith.appetit.commentlines",
+        "title": "Appetit: Comment Line(s)"
+      }
+    ],
     "languages": [{
       "id": "appetit",
       "aliases": ["Appetit", "appetit"],

@@ -1,15 +1,25 @@
 # Appetit
-Appetit is a solution to a problem that really doesn't need to be solved but I wanted to solve it anyway. In short, Appetit is a simple scripting language specifically designed to help with managing a system. It's like a shell scripting language that is way less powerful but has a nicer (human readable) syntax that works across platforms.
+Appetit is a solution to a problem that really doesn't need to be solved but I wanted to solve it anyway. In short, Appetit is a simple "scripting" language specifically designed to help with managing a system. It's like a shell scripting language that is way less powerful but has a nicer (human readable) syntax that works across platforms.
 
 At the end of the day, this is really a project being used to learn Go, less so a project that has the end goal of being viable for anything serious. In light of that, I'm happy to take on board any suggestions but note that this project is a hobby project of mine first and foremost so having fun is the most important focus here.
 
 Started: 11/05/2025.
+
 First public release: 24/09/2025.
 
 Homepage: https://bryanabsmith.com/.
 
+
+## Principles and About
+This language is guided by the following principles:
+- Everything in the language is a single line statement. Much like a recipe is a single instruction, an Appetit script is guided by single line instructions.
+- The language is an approximation of English statement. This will not always be perfect but the goal remains: to have statements that, read out loud, approximate an English sentence.
+- The language is meant to work across platforms. While there is functionality built in to leverage platform specific tools, the language is consistently revised to abstract users away from platform specific tools. In this way, a script written on a Mac should run on a FreeBSD machine.
+
 ### Should I use this?
 Probably not. You should not expect this to be reliable and in any shape that even approximates stable. In light of that, you are **strongly encouraged to run this in a virtual machine or on a machine where data loss is acceptable**.
+
+If you're still here, the `samples/` directory includes working samples for every statement in the language. The [project's website](https://bryanabsmith.com) also includes more comprehensive documentation as does the interpreter itself via the `-docs` flag.
 
 
 ## Building
@@ -43,6 +53,7 @@ With [fpm](https://fpm.readthedocs.io/en) installed, you can build installers li
 
     fpm -t rpm --rpm-os linux -p appetit.rpm [for x86_64 builds]
 
+This is not well tested so you shouldn't depend on this as a reliable way of making an installer.
 
 ### Testing
 Tests are rather haphazardly written so far but there are an increasing number coming. To run what's available, run `go test ./...` in the root of the `src/` directory.
@@ -91,23 +102,13 @@ Using the app is as simple as invoking it with the name of the script:
 
     appetit [script name.apt]
 
-### Flags
-There are a handful of flags:
+There are a handful of flags that are documented via the `-help` flag.
 
-| Flag | Description |
-|----|----|
-| -allowexec | Allow execution of system commands. This defaults to disabled. If you use the `execute` command. |
-| -create | Pass a file name to create a template script. Eg: `-create=~/Desktop/test.apt |
-| -dev | Prints out information relevant for development of the interpreter itself. |
-| -docs | Serves up a local copy of some lightweight documentation via a web server. |
-| -timer | Time the execution of the script. |
-| -verbose | Output details about steps when certain actions are performed but don't normally have output. Defaults to disabled. |
-| -version | Outputs the version number of the interpreter. |
 
 ## Language Syntax and Functionality
 The documentation is available in one of two places:
 1. [The project's homepage](https://bryanabsmith.com).
-2. Running the interpreter with the `-docs` flag.
+2. Running the interpreter with the `-docs` flag. This will deploy a local web server that will host the documentation on port 8000.
 
 
 ## Licence

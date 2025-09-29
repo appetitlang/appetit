@@ -1,8 +1,3 @@
-- Let's get started. You can run this by doing the following:
--   go run main.go -allowexec ../samples/evaluator.apt
-- The -allowexec flag is needed here because of the execute statement call
-#!/usr/bin/appetit
-minver 1
 - This is the evaluator script that tests the functionality of the interpreter
 - and the respective statements. Every statement has a place in this script as
 - the script that checks every statement's functionality. This should work
@@ -12,6 +7,17 @@ minver 1
 - This will work on a non-Windows system only as there is a call to ls. If you
 - want to run this on Windows, you will need to ensure that you're running this
 - in PowerShell as cmd will not recognise the ls -l command.
+
+- Let's get started. You can run this by doing the following:
+-   go run main.go -allowexec ../samples/evaluator.apt
+- If you're running this through a build, the following will work
+-   appetit -allowexec ../samples/evaluator.apt
+- The -allowexec flag is needed here because of the execute statement call
+
+- Let's start with a shebang for the *nix users.
+#!/usr/bin/appetit
+- Let's set the minimum version to the current version.
+minver 1
 
 - ask
 ask "[Testing ask] What is your name? " to name

@@ -5,6 +5,8 @@ This is a basic extension for Appetit for Visual Studio Code.
 Features:
 * Syntax highlighting support.
 * Snippet support for each implemented statement, often accessible via the first two letters of each statement.
+* Actions for Command Palette:
+    * Commenting for selected text (Appetit: Comment Line(s))
 
 ### Snippets
 `_` indicates a blank spot.

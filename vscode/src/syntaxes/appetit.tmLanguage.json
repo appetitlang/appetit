@@ -32,7 +32,7 @@
 				},
 				{
 					"name": "variable.language.appetit",
-					"begin": " =",
+					"begin": " = ",
 					"end": " "
 				}
 			]
