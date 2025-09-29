@@ -16,6 +16,9 @@
 		},
 		{
 			"include": "#strings"
+		},
+		{
+			"include": "#other"
 		}
 	],
 	"repository": {
@@ -29,23 +32,6 @@
 				{
 					"name": "support.class.appetit",
 					"match": "\\b(to)\\b"
-				},
-				{
-					"name": "variable.language.appetit",
-					"begin": " = ",
-					"end": " "
-				}
-			]
-		},
-		"comments_old": {
-			"patterns": [
-				{
-					"name": "comment.line.appetit",
-					"match": "-[^>] [A-Za-z]+ \"(?:[^\"]|\"\")*\""
-				},
-				{
-					"name": "comment.line.appetit",
-					"match": "-[^>] ([A-Za-z0-9]+( [A-Za-z0-9]+)+)"
 				}
 			]
 		},
@@ -73,6 +59,14 @@
 				{
 					"name": "constant.character.escape.appetit",
 					"match": "\\\\."
+				}
+			]
+		},
+		"other": {
+			"patterns": [
+				{
+					"name": "variable.parameter.appetit",
+					"match": "^#!(.*)$"
 				}
 			]
 		}

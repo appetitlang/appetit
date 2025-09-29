@@ -15,6 +15,10 @@
     "Programming Languages",
     "Snippets"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/appetitlang/appetit"
+  },
   "main": "./extension.js",
   "contributes": {
     "commands": [
