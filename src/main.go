@@ -40,53 +40,7 @@ func DocsHandler(writer http.ResponseWriter, request *http.Request) {
 	template.Execute(writer, nil)
 }
 
-/*
-	Start executing commands in a script by passing the lines to the tokeniser
-	and the delegator. The only parameter is the lines of the script. No
-	returns.
-*/
-func Execute(lines []string, dev_mode bool) {
-	// Loop over the lines
-	for line := range lines {
-		// Create a string version of the line
-		line_as_string := string(lines[line])
-		
-		// Hold the length of the line
-		line_length := len(line_as_string)
 
-		/* It's possible that the line has no length (ie. a blank line) so we
-			need to skip over them.
-		*/
-		if line_length > 0 {
-			/* Pass each line to the delegator. Here, we start by checking to
-			see what the first character of the line is to see if it's a
-			SYMBOL_COMMENT. If it is not (ie. it's a line that requires
-			parsing), we send the line to the tokeniser and the delegator.
-			*/
-			if string(line_as_string[0]) != values.SYMBOL_COMMENT {
-				/* Tokenise the line, adding one to the line number to account
-					for the starting from zero.
-				*/
-				tokenised_line := parser.Tokeniser(line+1, lines[line])
-				// If dev_mode is enabled
-				if dev_mode {
-					parser.PrintTokens(tokenised_line)
-				// If dev mode is not enabled, delegate execution
-				} else {
-					// Delegate to the statements package to start execution
-					parser.Delegator(tokenised_line)
-				}
-			}
-		} else if line_length == 0 {
-			/* Pass an empty string. This is needed; if we don't pass this
-				here, blank lines are skipped which results in line counts not
-				being accurate. This is held in nothing as the tokenised value
-				is irrelevant so we can dispense with this.
-			*/
-			_ = parser.Tokeniser(line+1, " ")
-		}
-	}
-}
 
 /*
 	Open up a script and produce a list of lines. The only parameter is the
@@ -353,6 +307,14 @@ func main() {
 	contents := OpenScript(file_name[0])
 	// Remove the comments from the script
 	contents = parser.RemoveComments(contents)
+	/* Do a quick check to make sure that the minver statement call, if
+		present, is the first language specific call.
+	*/
+	valid_minver, message := parser.CheckValidMinverLocationCount(contents)
+	// If it's not appropriately located in the script, error out
+	if !valid_minver {
+		investigator.Report(message, "n/a", "n/a", "n/a")
+	}
 
 	/* If the dev flag is set, run the script and report back developer
 		information.
@@ -360,9 +322,9 @@ func main() {
 	if *dev_flag {
 		// Start printing out the tokens
 		fmt.Println(tools.ColouriseYellow("\nTokens"))
-		Execute(contents, true)
+		parser.Start(contents, true)
 	} else {
-		Execute(contents, false)
+		parser.Start(contents, false)
 	}
 
 	// If the timer flag is true, print the results

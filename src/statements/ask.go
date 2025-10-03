@@ -26,13 +26,17 @@ func Ask(tokens []values.Token) string {
 	if err != nil {
 		investigator.Report(
 			"The " + tools.ColouriseCyan("ask") + " statement needs " +
-			"to follow the form " + tools.ColouriseCyan("ask") + " " +
-			tools.ColouriseGreen("\"[question/prompt]\"") + " to " +
-			tools.ColouriseYellow("\"[variable name]\"") + ". An example of " +
-			"a working version check might be " + tools.ColouriseCyan("ask") +
-			tools.ColouriseGreen("\"What is your name?\"") + " to " +
+			"to follow the form:\n\n\t" + tools.ColouriseCyan("ask") + " " +
+			tools.ColouriseGreen("\"[question/prompt]\"") +
+			tools.ColouriseMagenta(" to ") +
+			tools.ColouriseYellow("\"[variable name]\"") + "\n\nAn example " +
+			"of a working version check might be:\n\n\t" +
+			tools.ColouriseCyan("ask") + " " +
+			tools.ColouriseGreen("\"What is your name?\"") +
+			tools.ColouriseMagenta(" to ") +
 			tools.ColouriseGreen("\"name\"") + "\n\n" +
-			"Line of Code: " + tools.ColouriseMagenta(full_loc),
+			"Your line of code looks like the following:\n\n\t" +
+			tools.ColouriseRed(full_loc),
 			loc,
 			"n/a",
 			full_loc,

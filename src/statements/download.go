@@ -256,7 +256,6 @@ func Download(tokens []values.Token) {
 	// Move the temp file to where the user wants it
 	rename_err := os.Rename(temp_loc, save_name)
 	// If there was an error renaming the file, report that
-	// TODO: This will not work if the file is on a seperate partition.
 	if rename_err != nil {
 		/* Make the second token value set to the temp location so that we
 			can pass the tokens to the copyfile function. We also need to

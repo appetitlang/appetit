@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-// Test the Tokeniser() function.
-func TestTokeniser(t *testing.T) {
+// Test the Tokenise() function.
+func TestTokenise(t *testing.T) {
 	sample_tokens := []values.Token{
 		{
                 FullLineOfCode: "writeln \"Hello World!\"",
@@ -31,7 +31,7 @@ func TestTokeniser(t *testing.T) {
         },
 	}
 
-        results := Tokeniser(1, "writeln \"Hello World!\"")
+        results := Tokenise(1, "writeln \"Hello World!\"")
 
         for index := range results {
                 if results[index] != sample_tokens[index] {
@@ -42,5 +42,62 @@ func TestTokeniser(t *testing.T) {
                         )
                 }
         }
+
+}
+
+func TestValidMinverCalls(t *testing.T) {
+        simple_line_sets := []string{
+                "minver 1",
+                "writeln \"Hello World!\"",
+        }
+
+        duplicate_minvers := []string{
+                "minver 1",
+                "minver 3",
+                "write \"Hello World!\"",
+        }
+
+        incorrect_order_minvers := []string{
+                "write \"Hello World!\"",
+                "pause 3",
+                "minver 1",
+        }
+
+        // Check a basic minver check
+        simple_minver_check, _ := CheckValidMinverLocationCount(
+                simple_line_sets,
+        )
+        // Check that it calls duplicates of minver calls
+        duplicate_minver_check, _ := CheckValidMinverLocationCount(
+                duplicate_minvers,
+        )
+        /* Check for incorrectly ordered statement (ie. wrongly placed minver
+                calls)
+        */
+        incorrect_order_minver_check, _ := CheckValidMinverLocationCount(
+                incorrect_order_minvers,
+        )
+
+        if !simple_minver_check {
+                t.Errorf(
+                        "MinverCheck failed (simple), got false, " +
+                        "expected true",
+                )
+        }
+
+        if duplicate_minver_check {
+                t.Errorf(
+                        "MinverCheck failed (duplicate), got false, " + 
+                        "expected true",
+                )
+        }
+
+        if incorrect_order_minver_check {
+                t.Errorf(
+                        "MinverCheck failed (not first line), got false, " + 
+                        "expected true",
+                )
+        }
+
 
 }

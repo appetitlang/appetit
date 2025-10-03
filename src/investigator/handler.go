@@ -21,45 +21,14 @@ import (
 func Report(
 	error_message string,
 	line_number string, token_pos string, full_loc string) {
-	/*
-		For context, an error looks similar to the following:
 
-		[Error on line X] or [Error]
-		This is the error
-		[End of Error]
-	*/
 
-	// This holds the header
-	error_msg := ""
-
-	// If the line_number is N/A (ie. the error isn't specific to a line)
-	if line_number == "n/a" {
-		// Create a general error
-		error_msg = tools.ColouriseRed("\n[Error]\n")
-	} else if token_pos == "n/a" {
-		error_msg = tools.ColouriseRed(
-			"\n\n[Error on line " + line_number + "]\n",
-		)
-	} else {
-		// Otherwise, create a header with the line number
-		error_msg = tools.ColouriseRed(
-			"\n[Error on line " + line_number + ", position " + token_pos +
-			"]\n",
-		)
-		// If there is a line of code passed to 
-		if full_loc != "n/a" {
-			error_msg += tools.ColouriseYellow("\n[Line of Code]\n")
-			error_msg += fmt.Sprintf("%s\n\n", full_loc)
-		}
-	}
-	// Append the user error
-	error_msg += fmt.Sprintf(
-		"%s%s\n",
-		tools.ColouriseYellow("\n[Message]\n"),
-		error_message,
-	)
-	// Put it all together
-	fmt.Printf("%s\n", error_msg)
+	fmt.Println(tools.ColouriseRed("\n[Error]"))
+	fmt.Println(tools.ColouriseMagenta("Line of Code: ") + full_loc)
+	fmt.Println(tools.ColouriseMagenta("Line Number:  ") + line_number)
+	fmt.Println(tools.ColouriseMagenta("Position:     ") + token_pos)
+	fmt.Println(tools.ColouriseRed("\n[Message]"))
+	fmt.Print(error_message)
 	// Abandon ship
 	os.Exit(0)
 }

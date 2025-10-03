@@ -18,53 +18,51 @@ import (
 )
 
 /*
-	This function removes any comments from the slice that houses the lines of
-	code that are eventually passed to the tokeniser. Parameters include lines,
-	the lines of the script inclusive of any comments. Returns a slice of
-	strings that represents the script absent any lines of comments.
+	Start executing commands in a script by passing the lines to the tokeniser
+	and the delegator. The only parameter is the lines of the script. No
+	returns.
 */
-func RemoveComments(lines []string) []string {
-	// Hold the comment free lines
-	var comment_free_lines []string
+func Start(lines []string, dev_mode bool) {
 	// Loop over the lines
 	for line := range lines {
-		/* Create a version of the line of code as a string and strip off any
-		whitespace from the beginning and end.
-		*/
-		line_as_string := strings.TrimSpace(string(lines[line]))
-		/* Get the length of the line just in case it's zero (ie. there's a
-		   	blank line)
-		*/
-		length_of_line := len(line_as_string)
+		// Create a string version of the line
+		line_as_string := string(lines[line])
+		
+		// Hold the length of the line
+		line_length := len(line_as_string)
 
-		// If the length of the line is not zero (ie. it's not empty)
-		if length_of_line != 0 {
-			// If the first line is not a comment
-			if string(line_as_string[0]) != values.SYMBOL_COMMENT {
-				// Append the comment-less line to the list of comment_free_lines
-				comment_free_lines = append(comment_free_lines, lines[line])
-			} else {
-				/* Here, we're replacing the whole line with the comment with
-					just the symbol. We don't want to remove it entirely as
-					doing this throws off the line counting (which is helpful)
-					for error reporting. Further, we want to remove the
-					contents of the comment in case it would trigger a parsing
-					error (eg. '"Hello' which is an incomplete string) so we
-					replace it with something safe.
-				*/
-				comment_free_lines = append(
-					comment_free_lines, values.SYMBOL_COMMENT)
-			}
-		} else if length_of_line == 0 {
-			/* Otherwise, if the length of the line is zero (ie. it's an empty
-				line), add it as a blank line as this needs to be counted as a
-				meaningful line for error reporting.
+		/* It's possible that the line has no length (ie. a blank line) so we
+			need to skip over them.
+		*/
+		if line_length > 0 {
+			/* Pass each line to the delegator. Here, we start by checking to
+			see what the first character of the line is to see if it's a
+			SYMBOL_COMMENT. If it is not (ie. it's a line that requires
+			parsing), we send the line to the tokeniser and the delegator.
 			*/
-			comment_free_lines = append(comment_free_lines, " ")
+			if string(line_as_string[0]) != values.SYMBOL_COMMENT {
+				/* Tokenise the line, adding one to the line number to account
+					for the starting from zero.
+				*/
+				tokenised_line := Tokenise(line+1, lines[line])
+				// If dev_mode is enabled
+				if dev_mode {
+					PrintTokens(tokenised_line)
+				// If dev mode is not enabled, delegate execution
+				} else {
+					// Delegate to the statements package to start execution
+					Call(tokenised_line)
+				}
+			}
+		} else if line_length == 0 {
+			/* Pass an empty string. This is needed; if we don't pass this
+				here, blank lines are skipped which results in line counts not
+				being accurate. This is held in nothing as the tokenised value
+				is irrelevant so we can dispense with this.
+			*/
+			_ = Tokenise(line+1, " ")
 		}
 	}
-	// Return a slice of comment free lines
-	return comment_free_lines
 }
 
 /*
@@ -75,7 +73,7 @@ func RemoveComments(lines []string) []string {
 	element is the line number and each subsequent element is a token in the
 	line.
 */
-func Tokeniser(loc int, line_of_script string) []values.Token {
+func Tokenise(loc int, line_of_script string) []values.Token {
 	// Set up a text scanner to tokenise the script
 	var ls scanner.Scanner
 	// Initialise against a line of the script passed
@@ -114,7 +112,7 @@ func Tokeniser(loc int, line_of_script string) []values.Token {
 			TokenType: reflect.TypeOf(tokeniser.TokenText()).String(),
 		}
 		/* Append the token to the slice of tokens that will be passed to
-			statement modules in the Delegator()
+			statement modules in the Call()
 		*/
 		tokenised_line = append(tokenised_line, token)
 	}
@@ -128,7 +126,7 @@ func Tokeniser(loc int, line_of_script string) []values.Token {
 	actually executing functionality. Parameters include tokens, a slice of
 	strings that contains the tokens. Returns nothing.
 */
-func Delegator(tokens []values.Token) {
+func Call(tokens []values.Token) {
 	/* This will catch empty lines as the slice will have a line number but no
 		other elements. So, if the length is 1, we can assume that the only
 		element is the line number and nothing else.
