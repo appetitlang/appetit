@@ -7,42 +7,24 @@ import (
 
 // Test the Tokenise() function.
 func TestTokenise(t *testing.T) {
-	sample_tokens := []values.Token{
-		{
+	sample_tokens := values.Token{
                 FullLineOfCode: "writeln \"Hello World!\"",
                 LineNumber: 1,
                 TokenPosition: "0",
                 TokenValue: "",
                 TokenType: "string",
-        },
-        {
-                FullLineOfCode: "writeln \"Hello World!\"",
-                LineNumber: 1,
-                TokenPosition: "1",
-                TokenValue: "writeln",
-                TokenType: "string",
-        },
-        {
-                FullLineOfCode: "writeln \"Hello World!\"",
-                LineNumber: 1,
-                TokenPosition: "9",
-                TokenValue: "\"Hello World!\"",
-                TokenType: "string",
-        },
+                NonCommentLineNumber: 1,
 	}
 
-        results := Tokenise(1, "writeln \"Hello World!\"")
+        results := Tokenise("writeln \"Hello World!\"", 1, 1)
 
-        for index := range results {
-                if results[index] != sample_tokens[index] {
-                        t.Errorf(
-                                "Tokenisation failed, got %v, expected %v",
-                                results[index],
-                                sample_tokens[index],
-                        )
-                }
+        if results[0] != sample_tokens {
+                t.Errorf(
+                        "Tokenisation failed, got %v, expected %v",
+                        results[0],
+                        sample_tokens,
+                )
         }
-
 }
 
 func TestValidMinverCalls(t *testing.T) {

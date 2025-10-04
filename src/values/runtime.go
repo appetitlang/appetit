@@ -31,6 +31,9 @@ import (
 	TokenValue [string]: the actual string value of the token
 
 	TokenType [string]: the type of the token as a string
+
+	NonCommentLineNumber [int]: the line counter for lines that aren't
+	comments, that is, lines with statement calls
 */
 type Token struct {
 	FullLineOfCode string
@@ -38,6 +41,7 @@ type Token struct {
 	TokenPosition string
 	TokenValue string
 	TokenType string
+	NonCommentLineNumber int
 }
 
 /*

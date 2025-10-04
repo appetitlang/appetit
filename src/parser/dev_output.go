@@ -79,6 +79,14 @@ func PrintTokens(tokens []values.Token) {
 				dot_point,
 				tokens[token].LineNumber,
 			)
+			/* Print out the non-comment line number, the line counter that
+				counts the non-comment related lines
+			*/
+			fmt.Printf(
+				"%s Non Comment Line Number: %d\n",
+				dot_point,
+				tokens[token].NonCommentLineNumber,
+			)
 		}
 	}
 }

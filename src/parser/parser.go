@@ -23,6 +23,7 @@ import (
 	returns.
 */
 func Start(lines []string, dev_mode bool) {
+	non_comment_line_count := 1
 	// Loop over the lines
 	for line := range lines {
 		// Create a string version of the line
@@ -39,14 +40,23 @@ func Start(lines []string, dev_mode bool) {
 			see what the first character of the line is to see if it's a
 			SYMBOL_COMMENT. If it is not (ie. it's a line that requires
 			parsing), we send the line to the tokeniser and the delegator.
+			While the RemoveComments() function "removed" the comments, it only
+			did so as far as it stripped away all the characters instead of the
+			comment symbol so there are still comment line in that need to be
+			accounted for here.
 			*/
 			if string(line_as_string[0]) != values.SYMBOL_COMMENT {
 				/* Tokenise the line, adding one to the line number to account
 					for the starting from zero.
 				*/
-				tokenised_line := Tokenise(line+1, lines[line])
+				tokenised_line := Tokenise(
+					lines[line],
+					line+1, non_comment_line_count)
+				// Increment the non_comment_line_count
+				non_comment_line_count += 1
 				// If dev_mode is enabled
 				if dev_mode {
+					// Print the tokens
 					PrintTokens(tokenised_line)
 				// If dev mode is not enabled, delegate execution
 				} else {
@@ -60,20 +70,24 @@ func Start(lines []string, dev_mode bool) {
 				being accurate. This is held in nothing as the tokenised value
 				is irrelevant so we can dispense with this.
 			*/
-			_ = Tokenise(line+1, " ")
+			_ = Tokenise(" ", line+1, -1)
 		}
 	}
 }
 
 /*
-	Tokenise each line of the code a create a slice. Parameters include loc
-	(the line of code that we are working with) and line_of_script (the
-	non-tokenised line of the script that we are working to tokenise).
+	Tokenise each line of the code a create a slice. Parameters include
+	line_of_script (the non-tokenised line of the script that we are working to
+	tokenise) and loc, the lines of code that we are working with where:
+		- element 0 is the actual line of code;
+		- element 1 is the counter used to track non-comment lines of code,
+			those lines of code that are deemed significant (ie. those where
+			the line has a statement call).
 	Returns a slice of strings that represents a tokenised line where the first
 	element is the line number and each subsequent element is a token in the
 	line.
 */
-func Tokenise(loc int, line_of_script string) []values.Token {
+func Tokenise(line_of_script string, loc ...int) []values.Token {
 	// Set up a text scanner to tokenise the script
 	var ls scanner.Scanner
 	// Initialise against a line of the script passed
@@ -85,7 +99,7 @@ func Tokenise(loc int, line_of_script string) []values.Token {
 	// Catch errors with the tokeniser and handle them
 	tokeniser.Error = func(s *scanner.Scanner, msg string) {
 		// Call the investigators
-		investigator.ReportTokeniserErrors(msg, loc)
+		investigator.ReportTokeniserErrors(msg, loc[0])
 	}
 
 	// Create a slice that houses tokens for each part of the line of code
@@ -93,10 +107,11 @@ func Tokenise(loc int, line_of_script string) []values.Token {
 	// Create the line of code token
 	loc_token := values.Token{
 		FullLineOfCode: line_of_script,
-		LineNumber: loc,
+		LineNumber: loc[0],
 		TokenPosition: strconv.Itoa(tokeniser.Position.Column),
 		TokenValue: "",
 		TokenType: reflect.TypeOf(tokeniser.TokenText()).String(),
+		NonCommentLineNumber: loc[1],
 	}
 	// Add the line of code to the tokenised line
 	tokenised_line = append(tokenised_line, loc_token)
@@ -106,10 +121,11 @@ func Tokenise(loc int, line_of_script string) []values.Token {
 		// Create a token
 		token := values.Token{
 			FullLineOfCode: line_of_script,
-			LineNumber: loc,
+			LineNumber: loc[0],
 			TokenPosition: strconv.Itoa(tokeniser.Position.Column),
 			TokenValue: tokeniser.TokenText(),
 			TokenType: reflect.TypeOf(tokeniser.TokenText()).String(),
+			NonCommentLineNumber: loc[1],
 		}
 		/* Append the token to the slice of tokens that will be passed to
 			statement modules in the Call()
