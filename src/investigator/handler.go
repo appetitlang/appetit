@@ -22,9 +22,25 @@ func Report(
 	error_message string,
 	line_number string, token_pos string, full_loc string) {
 
+	// Get the token position and convert it to an integer
+	position, _ := strconv.Atoi(token_pos)
+	/* Set the header for the line of code header so that we can also get its
+		length
+	*/
+	loc_title := "Line of Code: "
+	/* Get the position but subtract one as we want to insert the error arrow
+		at the right place
+	*/
+	position += len(loc_title) - 1
+	// Set up the error arrow
+	error_arrow := tools.ColouriseRed("⇈")
 
 	fmt.Println(tools.ColouriseRed("\n[Error]"))
-	fmt.Println(tools.ColouriseMagenta("Line of Code: ") + full_loc)
+	fmt.Println(tools.ColouriseMagenta(loc_title) + full_loc)
+	fmt.Printf("%s%s\n",
+		strings.Repeat(" ", position),
+		error_arrow,
+	)
 	fmt.Println(tools.ColouriseMagenta("Line Number:  ") + line_number)
 	fmt.Println(tools.ColouriseMagenta("Position:     ") + token_pos)
 	fmt.Println(tools.ColouriseRed("\n[Message]"))

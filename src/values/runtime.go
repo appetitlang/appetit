@@ -69,7 +69,7 @@ var SHEBANG_PRESENT bool = false
 	The TOKEN_TREE holds the tokens in a "tree" which is a glorified list of
 	tokens.
 */
-var TOKEN_TREE []byte
+var TOKEN_TREE []Token
 
 /*
 	This houses the variables. This is prepopulated with the reserved

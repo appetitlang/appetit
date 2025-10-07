@@ -2,27 +2,46 @@ package parser
 
 import (
 	"appetit/values"
+	"reflect"
 	"testing"
 )
 
 // Test the Tokenise() function.
 func TestTokenise(t *testing.T) {
-	sample_tokens := values.Token{
-                FullLineOfCode: "writeln \"Hello World!\"",
-                LineNumber: 1,
-                TokenPosition: "0",
-                TokenValue: "",
-                TokenType: "string",
-                NonCommentLineNumber: 1,
+	sample_simple_tokens := []values.Token{
+                {
+                        FullLineOfCode: "writeln \"Hello World!\"",
+                        LineNumber: 1,
+                        TokenPosition: "0",
+                        TokenValue: "",
+                        TokenType: "string",
+                        NonCommentLineNumber: 1,
+                },
+                {
+                        FullLineOfCode: "writeln \"Hello World!\"",
+                        LineNumber: 1,
+                        TokenPosition: "1",
+                        TokenValue: "writeln",
+                        TokenType: "string",
+                        NonCommentLineNumber: 1,
+                },
+                {
+                        FullLineOfCode: "writeln \"Hello World!\"",
+                        LineNumber: 1,
+                        TokenPosition: "9",
+                        TokenValue: "\"Hello World!\"",
+                        TokenType: "string",
+                        NonCommentLineNumber: 1,
+                },
 	}
 
         results := Tokenise("writeln \"Hello World!\"", 1, 1)
-
-        if results[0] != sample_tokens {
+        tokenisation_equal := reflect.DeepEqual(results, sample_simple_tokens)
+        if !tokenisation_equal {
                 t.Errorf(
                         "Tokenisation failed, got %v, expected %v",
                         results[0],
-                        sample_tokens,
+                        sample_simple_tokens,
                 )
         }
 }

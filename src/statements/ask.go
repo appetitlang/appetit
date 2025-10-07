@@ -91,7 +91,7 @@ func Ask(tokens []values.Token) string {
 		investigator.ReportWithFixes(
 			var_prefix_error.Error(),
 			loc,
-			tokens[2].TokenPosition,
+			tokens[4].TokenPosition,
 			full_loc,
 		)
 	}

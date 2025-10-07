@@ -17,7 +17,7 @@ import (
 	the tokens on a line to be printed. Note that this does not, for obvious
 	reasons, print out a tokenised version of a blank line.
 */
-func PrintTokens(tokens []values.Token) {
+func PrintTokenInfo(tokens []values.Token) {
 
 	// Hold the "dot point" symbol from token properties
 	dot_point := tools.ColouriseMagenta("  ::")
@@ -25,10 +25,15 @@ func PrintTokens(tokens []values.Token) {
 	// Hold the current line
 	cur_line := 0
 
+	// Token counter
+	token_count := 0
+
 	// Loop over the tokens
 	for token := range tokens {
 		// If the token value isn't nothing (ie. it's something meaningful)
 		if tokens[token].TokenValue != "" {
+			// Increment the token counter
+			token_count += 1
 			/* If the current line doesn't equal cur_line (ie. we've
 				encountered a new line of tokens)
 			*/

@@ -96,6 +96,9 @@ In Visual Studio Code:
 3. Select the VSIX file in dist/
 4. Profit
 
+### Appetit Scheduler (aptsched)
+A connected project -- Appetit Scheduler (also called aptsched) -- is available [here](https://github.com/appetitlang/aptsched) that allows you to schedule the execution of scripts in the same vein as something like cron, systemd timers, and launchd. Like the Appetit project more generally, this tool is purposefull simple on purpose at the cost of functionality.
+
 
 ## Using
 Using the app is as simple as invoking it with the name of the script:

@@ -162,8 +162,14 @@ func ListReservedVariables() string {
 	}
 	// Sort the list of reserved variables
 	slices.Sort(reserved_var)
+
+	var var_names string
+	for _, var_name := range reserved_var {
+		var_names += "\n\t- " + var_name
+	}
+	return var_names
 	// Return a joined version of this list
-	return strings.Join(reserved_var, ", ")
+	// return strings.Join(reserved_var, ", ")
 }
 
 /*

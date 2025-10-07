@@ -20,6 +20,7 @@ import (
 	"strings"
 	"text/template"
 	"time"
+	"unsafe"
 )
 
 // This is set as the build date but this is changed with the Makefile
@@ -77,6 +78,33 @@ func PrintDevInfo() {
 	var mem_stats runtime.MemStats
 	runtime.ReadMemStats(&mem_stats)
 
+	// Print out memory info
+	fmt.Println(tools.ColouriseYellow("\n\nToken Summary"))
+	fmt.Printf(
+		tools.ColouriseCyan(":: Total Tokens (incl. line number tokens):") +
+		" %d",
+		len(values.TOKEN_TREE),
+	)
+
+	token_memory_size := unsafe.Sizeof(values.TOKEN_TREE[0])
+	memory_token_tree := uintptr(cap(values.TOKEN_TREE)) * token_memory_size
+	fmt.Printf(
+		tools.ColouriseCyan("\n:: Total Memory Usage of TOKEN_TREE:") +
+		" %d bytes",
+		memory_token_tree,
+	)
+	/*pretty_output, pretty_output_error := json.MarshalIndent(
+		values.TOKEN_TREE,
+		"",
+		"\t",
+	)
+	if pretty_output_error != nil {
+		fmt.Println(
+			tools.ColouriseRed("!! Error getting tokens for printing"),
+		)
+	}
+	fmt.Print(string(pretty_output))*/
+	
 	// Print out memory info
 	fmt.Println(tools.ColouriseYellow("\n\nMemory Information"))
 	// Print out the allocated memory

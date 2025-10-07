@@ -57,7 +57,7 @@ func Start(lines []string, dev_mode bool) {
 				// If dev_mode is enabled
 				if dev_mode {
 					// Print the tokens
-					PrintTokens(tokenised_line)
+					PrintTokenInfo(tokenised_line)
 				// If dev mode is not enabled, delegate execution
 				} else {
 					// Delegate to the statements package to start execution
@@ -132,6 +132,9 @@ func Tokenise(line_of_script string, loc ...int) []values.Token {
 		*/
 		tokenised_line = append(tokenised_line, token)
 	}
+
+	// Append the tokens to the TOKEN_TREE
+	values.TOKEN_TREE = append(values.TOKEN_TREE, tokenised_line...)
 
 	// Return the tokenised line
 	return tokenised_line
