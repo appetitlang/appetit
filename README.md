@@ -3,18 +3,27 @@ Appetit is a solution to a problem that really doesn't need to be solved but I w
 
 At the end of the day, this is really a project being used to learn Go, less so a project that has the end goal of being viable for anything serious. In light of that, I'm happy to take on board any suggestions but note that this project is a hobby project of mine first and foremost so having fun is the most important focus here.
 
-Started: 11/05/2025.
-
-First public release: 24/09/2025.
-
 Homepage: https://bryanabsmith.com/.
 
+- [Principles and About](#principles-and-about)
+    - [Should I use this?](#should-i-use-this)
+- [Building](#building)
+    - [Testing](#testing)
+    - [Visual Studio Code Extension](#visual-studio-code-extension)
+    - [Appetit Scheduler (aptsched)](#appetit-scheduler-aptsched)
+- [Using](#using)
+- [Language Syntax and Functionality](#language-syntax-and-functionality)
+- [Licences](#licences)
 
 ## Principles and About
 This language is guided by the following principles:
 - Everything in the language is a single line statement. Much like a recipe is a single instruction, an Appetit script is guided by single line instructions.
 - The language is an approximation of English statement. This will not always be perfect but the goal remains: to have statements that, read out loud, approximate an English sentence.
 - The language is meant to work across platforms. While there is functionality built in to leverage platform specific tools, the language is consistently revised to abstract users away from platform specific tools. In this way, a script written on a Mac should run on a FreeBSD machine.
+
+Started: 11/05/2025.
+
+First source release (on Github): 24/09/2025.
 
 ### Should I use this?
 Probably not. You should not expect this to be reliable and in any shape that even approximates stable. In light of that, you are **strongly encouraged to run this in a virtual machine or on a machine where data loss is acceptable**.
@@ -114,7 +123,7 @@ The documentation is available in one of two places:
 2. Running the interpreter with the `-docs` flag. This will deploy a local web server that will host the documentation on port 8000.
 
 
-## Licence
+## Licences
 
 ### Everything but the art/icons/ folder
 Copyright 2025 Bryan Smith.
