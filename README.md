@@ -1,14 +1,11 @@
 # Appetit
-Appetit is a solution to a problem that really doesn't need to be solved but I wanted to solve it anyway. In short, Appetit is a simple "scripting" language specifically designed to help with managing a system. It's like a shell scripting language that is way less powerful but has a nicer (human readable) syntax that works across platforms.
 
-At the end of the day, this is really a project being used to learn Go, less so a project that has the end goal of being viable for anything serious. In light of that, I'm happy to take on board any suggestions but note that this project is a hobby project of mine first and foremost so having fun is the most important focus here.
+![Screenshot of Appetit](art/screenshot.png "Screenshot")
+A simple "Hello World" with some variable substitution present.
 
-Homepage: https://bryanabsmith.com/.
-
+### Table of Contents
 - [Principles and About](#principles-and-about)
-    - [Should I use this?](#should-i-use-this)
 - [Building](#building)
-    - [Testing](#testing)
     - [Visual Studio Code Extension](#visual-studio-code-extension)
     - [Appetit Scheduler (aptsched)](#appetit-scheduler-aptsched)
 - [Using](#using)
@@ -16,36 +13,59 @@ Homepage: https://bryanabsmith.com/.
 - [Licences](#licences)
 
 ## Principles and About
-This language is guided by the following principles:
-- Everything in the language is a single line statement. Much like a recipe is a single instruction, an Appetit script is guided by single line instructions.
-- The language is an approximation of English statement. This will not always be perfect but the goal remains: to have statements that, read out loud, approximate an English sentence.
-- The language is meant to work across platforms. While there is functionality built in to leverage platform specific tools, the language is consistently revised to abstract users away from platform specific tools. In this way, a script written on a Mac should run on a FreeBSD machine.
+Appetit is a solution to an already solved problem: scripting simple actions on a computer. However, this project has some key principles that differentiate it from some other projects. The project was started on 11/05/2025 and the first source release on GitHub (and to the world) was on 24/09/2025.
 
-Started: 11/05/2025.
+**Language Design**
+- Everything in the language is a single line statement. Much like a recipe is a set of sequential instructions (hence the name of the language), an Appetit script is guided by single line instructions.
+- Each statement is an approximation of English statement. This will not always be perfect but the goal remains: to have statements that, read out loud, approximate an English sentence. The idea here is that someone new to the language can make sense of what is happening.
+- The language is meant to work across platforms. While there is functionality built in to leverage platform specific tools, the language is consistently revised to abstract users away from platform specific tools. In this way, a script written on a Mac should run on a FreeBSD machine assuming that you don't tap into platform-specific tools.
 
-First source release (on Github): 24/09/2025.
+**Project**
+- This project is designed as a way for me to learn about Go and some connected non-Go specific ideas (eg. parsing and tokenising text). As a non-professional programmer, this is first and foremost a hobby project so having fun is the most important thing.
+- As an educator professionally, I offer up this project as a basis for others to learn. This includes critiques and I am very happy for this project to serve as the basis for people to learn what to do and what not to do.
 
-### Should I use this?
-Probably not. You should not expect this to be reliable and in any shape that even approximates stable. In light of that, you are **strongly encouraged to run this in a virtual machine or on a machine where data loss is acceptable**.
+More information about the language can be found at the project's homepage [here](https://bryanabsmith.com/). 
 
-If you're still here, the `samples/` directory includes working samples for every statement in the language. The [project's website](https://bryanabsmith.com) also includes more comprehensive documentation as does the interpreter itself via the `-docs` flag.
+Before we dive in to using the language and getting started, we need to answer a simple question: *should I use this?*
+The short answer is probably not, at least for now. You should not expect this to be reliable and in any shape that even approximates stable at this point in time. In light of that, you are **strongly encouraged to run this in a virtual machine or on a machine where data loss is acceptable**. That said, the goal long term is to make this reliable enough for me to run this on my home server where I have data that matters to me.
+
 
 
 ## Building
-
-### App
-This is just a regular Go application so simply do a quick `go build` in the `src/` directory and you'll get a compiled binary that isn't optimised. If you want an optimised release build, execute the following:
+If you're still here, great! Let's figure out how to get up and running by first building the source. Appetit is just a regular Go application so simply do a quick `go build` in the `src/` directory and you'll get a compiled binary that isn't optimised. If you want an optimised release build with a better name that "main," execute the following:
 
     go build -ldflags="-s -w -X 'main.BuildDate=$(date)'" -o dist/appetit
 
-#### Makefiles
-There is a conventional Makefile for non-Windows systems and a `Make.ps1` which is a Makefile of sorts for Windows.
+This command is effectively what is used to generate release builds.
 
-If you want this to work across platforms, you can run `make` in the `src/` directory and you will get x86_64 and ARM64 builds for macOS, Linux, Windows, NetBSD, FreeBSD, and OpenBSD. You can also just run `make [insert os]` to make builds for one of the supported operating systems.
 
-The `Make.ps1` file is really just to build Windows builds for now through PowerShell. In short, it's an effort to replace the `Makefile` with something more Windows friendly.
+### Makefiles
+There is a conventional Makefile for non-Windows systems and a `Make.ps1` PowerShell script that can be used on Windows to replace `make` (I'm aware here that the odds that you have `make` installed on a Windows machine are much lower than if you are using a non-Windows platform). There is one key difference to keep in mind: the `Makefile` will build binaries for all supported platforms whereas the `Make.ps1` file will only build Windows binaries.
 
-#### Installers
+The `Makefile` can do a few things:
+
+| Target | Comment |
+|----|----|
+| [no parameter] | Run the freebsd, linux, macos, netbsd, openbsd, and windows |
+| clean | Clean up any old builds by removing the `dist/` directory |
+| freebsd | Make builds for FreeBSD (x86_64, armv6, arm64) |
+| linux | Make builds for Linux (x86_64, armv6, arm64) |
+| macos | Make builds for macOS (x86_64, arm64) |
+| netbsd | Make builds for NetBSD (x86_64, armv6, arm64) |
+| openbsd | Make builds for OpenBSD (x86_64, armv6, arm64) |
+| windows | Make builds for Windows (x86_64, arm64) |
+| me | Make a build for your current platform and architecture |
+| install | Run `me` and copy the resulting binary in `/usr/local/bin` |
+| release | Build releas binaries and archives for all platforms including a source archive |
+| source | Make a source archive |
+| test | Run any tests |
+
+If you don't know which one you want, you probably want to just run `make install` with elevated privileges on non-Windows systems.
+
+
+### Installers
+**Right now, there are no officially supported installers but that's not to say that you can't. Note though that these are not supported and very little is done to ensure that this works.**
+
 With [fpm](https://fpm.readthedocs.io/en) installed, you can build installers like so from the src directory after `make me` has been run:
 
 **macOS**
@@ -62,28 +82,13 @@ With [fpm](https://fpm.readthedocs.io/en) installed, you can build installers li
 
     fpm -t rpm --rpm-os linux -p appetit.rpm [for x86_64 builds]
 
-This is not well tested so you shouldn't depend on this as a reliable way of making an installer.
-
-### Testing
-Tests are rather haphazardly written so far but there are an increasing number coming. To run what's available, run `go test ./...` in the root of the `src/` directory.
-
-You can also run `make test`.
-
-#### Testing Machines
-The language is tested on the following platforms.
-- macOS 26 [this is the primary development platform]
-- Fedora 42
-- FreeBSD 14.3
-- Windows 11
-
-The version of Go used is whatever is available via Homebrew on macOS. See [here](https://formulae.brew.sh/formula/go#default) for more info.
-
 
 ### Visual Studio Code Extension
-The extension is available in the extension repo [here](https://github.com/appetitlang/vscode_extension). It used to be in this repo but not anymore.
+There is a simple Visual Studio Code extension available for the language. It's hosted in a seperate repository [here](https://github.com/appetitlang/vscode_extension). Instructions and details are available in that repo.
+
 
 ### Appetit Scheduler (aptsched)
-A connected project -- Appetit Scheduler (also called aptsched) -- is available [here](https://github.com/appetitlang/aptsched) that allows you to schedule the execution of scripts in the same vein as something like cron, systemd timers, and launchd. Like the Appetit project more generally, this tool is purposefull simple on purpose at the cost of functionality.
+A connected project---Appetit Scheduler (also called aptsched)---is available [here](https://github.com/appetitlang/aptsched) that allows you to schedule the execution of scripts in the same vein as something like cron, systemd timers, and launchd. Like the extension, more details can be found in the project's linked repo.
 
 
 ## Using
@@ -91,13 +96,23 @@ Using the app is as simple as invoking it with the name of the script:
 
     appetit [script name.apt]
 
-There are a handful of flags that are documented via the `-help` flag.
+There are a handful of flags that are documented via the `-help` flag. More details are below:
+
+| Flag | Description |
+|----|----|
+| -allowexec | Allow execution of system commands. This defaults to disabled but is needed if you use the `execute` statement. |
+| -create | Pass a file name to create a template script. Eg: `-create=~/Desktop/test.apt` |
+| -dev | Prints out information relevant for development of the interpreter itself. |
+| -docs | Serves up a local copy of some lightweight documentation. |
+| -timer | Time the execution of the script. |
+| -verbose | Output details about steps when certain actions are performed but don't normally have output. Defaults to disabled. |
+| -version | Outputs the version number of the interpreter. |
 
 
 ## Language Syntax and Functionality
 The documentation is available in one of two places:
 1. [The project's homepage](https://bryanabsmith.com).
-2. Running the interpreter with the `-docs` flag. This will deploy a local web server that will host the documentation on port 8000.
+2. Running the interpreter with the `-docs` flag (see above). This will deploy a local web server that will host the documentation on port 8000.
 
 
 ## Licences

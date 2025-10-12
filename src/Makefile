@@ -80,9 +80,7 @@ me: clean
 	@go build -ldflags="$(LD_FLAGS)" -o dist/appetit
 
 # Install the application
-install: clean
-	@echo "\033[37m:: Building release binary...\033[0m"
-	@go build -ldflags="$(LD_FLAGS)" -o dist/appetit
+install: me clean
 	@echo "\033[37m:: Installing binary to /usr/local/bin/...\033[0m"
 	@sudo mv dist/appetit /usr/local/bin/
 	@echo "\033[31mRemoving dist/ directory...\033[0m"
@@ -91,7 +89,7 @@ install: clean
 # This is for releases as it builds all the binaries, creates release archives, and a source archive
 release: all
 	@echo "\n\033[31m[Release: FreeBSD] Making release archive\033[0m"
-	@tar -cJf dist/appetit-freebsd-v$(version).tar.xz dist/appetit-freebsd-amd64-$(version) dist/appetit-freebsd-arm64-$(version) dist/appetit-freebsd-arm-$(version) LICENCE
+	@tar -cJf dist/appetit-freebsd-v$(version).tar.xz bin/appetit-freebsd-amd64-$(version) dist/appetit-freebsd-arm64-$(version) dist/appetit-freebsd-arm-$(version) LICENCE
 	@rm -rf dist/appetit-freebsd-amd64-$(version) dist/appetit-freebsd-arm64-$(version) dist/appetit-freebsd-arm-$(version)
 
 	@echo "\033[33m[Release: Linux] Making release archive\033[0m"
