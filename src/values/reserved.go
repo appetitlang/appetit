@@ -132,11 +132,15 @@ func BuildReservedVariables() {
 	conn, conn_error := net.Dial("udp", "8.8.8.8:80")
 	if conn_error != nil {
 		VARIABLES[RESERVED_VARIABLE_PREFIX + "ipv4"] = "n/a"
+	} else {
+		// Defer the closure of the connection
+		defer conn.Close()
+		// Get the local IP Address
+		localIPAddr := conn.LocalAddr().(*net.UDPAddr)
+		// Set the reserved variable
+		VARIABLES[RESERVED_VARIABLE_PREFIX + "ipv4"] = localIPAddr.IP.String()
 	}
-	defer conn.Close()
-
-	localIPAddr := conn.LocalAddr().(*net.UDPAddr)
-	VARIABLES[RESERVED_VARIABLE_PREFIX + "ipv4"] = localIPAddr.IP.String()
+	
 
 }
 

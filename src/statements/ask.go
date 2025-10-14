@@ -151,8 +151,6 @@ func Ask(tokens []values.Token) string {
 	// Set the variable
 	values.VARIABLES[variable_name] = final_variable_value
 
-	fmt.Printf("\nThe length of the final value is %d\n\n", len(final_variable_value))
-
 	// Return the final value of the variable
 	return final_variable_value
 }
