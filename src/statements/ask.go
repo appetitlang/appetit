@@ -120,12 +120,13 @@ func Ask(tokens []values.Token) string {
 		)
 	}
 
-	input_reader := bufio.NewReader(os.Stdin)
+	input_reader := bufio.NewReaderSize(os.Stdin, 65536)
 	// Prompt as per the prompt provided by the script
 	fmt.Print(prompt)
 	/* Read in the line while looking for the new line character as the
 		delimiter
 	*/
+	//user_input, user_input_error := input_reader.ReadString('\n')
 	user_input, user_input_error := input_reader.ReadString('\n')
 	user_input = strings.TrimSuffix(user_input, "\n")
 
@@ -145,11 +146,13 @@ func Ask(tokens []values.Token) string {
 	/* Get the final variable value here by checking to see if the value is
 		a math expression
 	*/
-	final_variable_value := CalculateValue(loc, user_input)
-	fmt.Print(tools.ColouriseBlue(final_variable_value))
+	final_variable_value := CalculateValue(loc, string(user_input))
 
 	// Set the variable
 	values.VARIABLES[variable_name] = final_variable_value
+
+	fmt.Printf("\nThe length of the final value is %d\n\n", len(final_variable_value))
+
 	// Return the final value of the variable
 	return final_variable_value
 }
