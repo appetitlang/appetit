@@ -33,8 +33,8 @@ func CalculateValue(loc string, value string) string {
 	if err != nil {
 		return value
 	}
-	// Return the calculated value as a string
-	return tv.Value.String()
+	// Return the calculated value as a string. This has 
+	return tv.Value.ExactString()
 }
 
 /*

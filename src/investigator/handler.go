@@ -33,19 +33,31 @@ func Report(
 	*/
 	position += len(loc_title) - 1
 	// Set up the error arrow
-	error_arrow := tools.ColouriseRed("⇈")
+	error_arrow := tools.ColouriseRed("^") // ⇈
 
-	fmt.Println(tools.ColouriseRed("\n[Error]"))
+	fmt.Println(tools.ColouriseRed("\n[ERROR]\n\n[Location]"))
+	fmt.Println(tools.ColouriseMagenta(" Line Number: ") + line_number)
+	fmt.Println(tools.ColouriseMagenta("    Position: ") + token_pos)
 	fmt.Println(tools.ColouriseMagenta(loc_title) + full_loc)
 	fmt.Printf("%s%s\n",
 		strings.Repeat(" ", position),
 		error_arrow,
 	)
-	fmt.Println(tools.ColouriseMagenta("Line Number:  ") + line_number)
-	fmt.Println(tools.ColouriseMagenta("Position:     ") + token_pos)
 	fmt.Println(tools.ColouriseRed("\n[Message]"))
 	fmt.Print(error_message)
 	// Abandon ship
+	os.Exit(0)
+}
+
+/*
+	Report an error. Parameters include error_message, the error message
+	itself. Unlike Report(), this is designed for errors that aren't line or
+	syntax specific. This includes something like
+	parser.CheckValidMinverLocationCount() as an example. Returns nothing.
+*/
+func ReportSimple(error_message string) {
+	fmt.Println(tools.ColouriseRed("\n[Error]"))
+	fmt.Println(error_message + "\n")
 	os.Exit(0)
 }
 
@@ -86,17 +98,13 @@ func ReportTokeniserErrors(message string, loc int) {
 	switch message {
 	// Catch an unterminated literal
 	case "literal not terminated":
-		Report(
-			"Your line of code has an incomplete string. Did you forget " +
-			"an opening or closing quotation mark?\n\nSomething like " +
-			"the following line of code will trigger this error:\n" +
+		ReportSimple(
+			"Line " + strconv.Itoa(loc) + " has an incomplete string. Did " +
+			"you forget an opening or closing quotation mark? Something " +
+			"like the following line of code will trigger this error:\n\n\t" +
 			tools.ColouriseCyan("writeln ") +
 			tools.ColouriseGreen("\"Hello world") +
-			tools.ColouriseRed("_") + " <- (notice the lack of a " +
-			"closing quotation mark here).",
-			strconv.Itoa(loc),
-			"n/a",
-			"n/a",
+			tools.ColouriseRed("_"),
 		)
 	// Catch an invalid char literal
 	case "invalid char literal":

@@ -123,13 +123,18 @@ func Ask(tokens []values.Token) string {
 	input_reader := bufio.NewReader(os.Stdin)
 	// Prompt as per the prompt provided by the script
 	fmt.Print(prompt)
+	/* Read in the line while looking for the new line character as the
+		delimiter
+	*/
 	user_input, user_input_error := input_reader.ReadString('\n')
 	user_input = strings.TrimSuffix(user_input, "\n")
 
 	if user_input_error != nil {
 		investigator.Report(
-			"There was an error getting the user input. " +
-			user_input_error.Error(),
+			"There was an error getting the user input. Please report the " +
+			"following error in yellow to the project's GitHub repository " +
+			"and a copy of the script: " +
+			tools.ColouriseYellow(user_input_error.Error()),
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,
@@ -141,6 +146,7 @@ func Ask(tokens []values.Token) string {
 		a math expression
 	*/
 	final_variable_value := CalculateValue(loc, user_input)
+	fmt.Print(tools.ColouriseBlue(final_variable_value))
 
 	// Set the variable
 	values.VARIABLES[variable_name] = final_variable_value

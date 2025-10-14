@@ -341,7 +341,7 @@ func main() {
 	valid_minver, message := parser.CheckValidMinverLocationCount(contents)
 	// If it's not appropriately located in the script, error out
 	if !valid_minver {
-		investigator.Report(message, "n/a", "n/a", "n/a")
+		investigator.ReportSimple(message)
 	}
 
 	/* If the dev flag is set, run the script and report back developer

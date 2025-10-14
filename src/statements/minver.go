@@ -24,51 +24,31 @@ func MinVer(tokens []values.Token) int {
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 2)
-	// If not a valid number of tokens, report an error
-	if err != nil {
-		investigator.Report(
-			"The " + tools.ColouriseCyan("minver") + " statement needs to " +
-			"follow the form:\n\n\t" + tools.ColouriseCyan("minver") + " " +
-			tools.ColouriseYellow("[version number]") + "\n\nA common " +
-			"issue here is excluding a version number or passing one as a " +
-			"string (eg. " + tools.ColouriseGreen("\"3\"") + ").\n\nAn " +
-			"example of a working version check might be:\n\n\t" +
-			tools.ColouriseCyan("minver") + tools.ColouriseYellow(" 3") +
-			"\n\nNotice that there is an integer that is not in quotation " +
-			"marks.",
-			loc,
-			"n/a",
-			full_loc,
-		)
-	}
-
+	_, token_number_err := investigator.ValidNumberOfTokens(tokens, 2)
 	/* Get the minimum version as a string. As we check whether this is an
 		integer above, we should be good to go here.
 	*/
 	min_ver_string := tokens[2].TokenValue
 	// Get the minver set by the user as an integer for comparison
-	min_ver, err := strconv.Atoi(min_ver_string)
+	min_ver, int_conversion_err := strconv.Atoi(min_ver_string)
 	/* If there is an error trying to do the conversion or if the min_ver is
-		less than zero, report an error.
+		less than zero, report an error. This also captures negative integers
+		in particular as the negative sign and the integer are tokenised as
+		seperate tokens.
 	*/
-	if err != nil || min_ver <= 0 {
+	if int_conversion_err != nil || min_ver <= 0 || token_number_err != nil {
 		investigator.Report(
-			"The version number " + tools.ColouriseYellow(min_ver_string) +
-			" is not a valid version. You need to use a positive non-zero " +
-			"integer. For instance, the following line is valid:\n\n\t" +
-			tools.ColouriseCyan("minver ") +
-			tools.ColouriseYellow(strconv.Itoa(values.LANG_VERSION)) +
-			"\n\nThe following lines would be invalid:\n\n" +
-			tools.ColouriseCyan("\tminver ") + tools.ColouriseYellow("0\n") +
-			tools.ColouriseCyan("\tminver ") + tools.ColouriseYellow("1.0\n") +
-			tools.ColouriseCyan("\tminver ") + tools.ColouriseYellow("-2") +
-			"\n\nThe first invalid line sets the minimum version to zero " +
-			"which does not exist. The second line sets the version using " +
-			"a non-integer; the language is versioned using only integers. " +
-			"Finally, the last example is invalid because it uses a " +
-			"negative version number which, like zero, is an invalid " +
-			"version number.\n",
+			"The " + tools.ColouriseCyan("minver") + " statement needs to " +
+			"include a valid non-zero positive integer. A valid " +
+			tools.ColouriseCyan("minver") + " statement needs to follow the " +
+			"form:\n\t" + tools.ColouriseCyan("minver") +
+			tools.ColouriseYellow(" [version number]") + "\nAn example of a " +
+			"working version check might be:\n\t" +
+			tools.ColouriseCyan("minver") + tools.ColouriseYellow(" 3") +
+			"\nMake sure that you have none of the following for the " +
+			tools.ColouriseCyan("minver") + " statement value:\n\t" +
+			"- Negative number\n\t- Float (ie. decimal number)\n\t" +
+			"- String\n\t- No value\n",
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,
@@ -85,17 +65,17 @@ func MinVer(tokens []values.Token) int {
 			tools.ColouriseYellow(strconv.Itoa(values.LANG_VERSION)) + 
 			" but the script requires at least version " +
 			tools.ColouriseYellow(min_ver_string) + ". Check to see if " +
-			"a newer version is available. " +
-			"\n\nLine of Code: " + tools.ColouriseMagenta(full_loc),
-			"n/a",
-			"n/a",
+			"a newer version is available. ",
+			loc,
+			tokens[2].TokenPosition,
 			full_loc,
 		)
 	}
 
 	if values.MODE_VERBOSE {
 		fmt.Printf(
-			":: Setting the %s required to run this script to %s\n",
+			":: Setting the minimum version of Appetit (%s) required to " +
+			"run this script to %s\n",
 			tools.ColouriseBlue("minver"),
 			tools.ColouriseGreen(strconv.Itoa(min_ver)),
 		)
