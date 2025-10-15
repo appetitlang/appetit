@@ -146,7 +146,9 @@ func Ask(tokens []values.Token) string {
 	/* Get the final variable value here by checking to see if the value is
 		a math expression
 	*/
-	final_variable_value := CalculateValue(loc, string(user_input))
+	final_variable_value := CalculateValue(loc, user_input)
+
+	fmt.Printf("The length of user_input is %d\n", len(user_input))
 
 	// Set the variable
 	values.VARIABLES[variable_name] = final_variable_value

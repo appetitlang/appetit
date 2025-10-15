@@ -9,7 +9,7 @@
 
 ### Code
 #### Formatting
-* Lines of code are 80 characters wide
+* Lines of code are 80 characters wide. This is to help support use on widescreen monitors to provide space for running builds alongside the source.
 
 #### Path Organisation
 * investigator - this deals with checks and errors throughout the code
@@ -20,7 +20,7 @@
 
 #### Errors
 * Errors should include the full line of code where the error is triggered by a malformed line of code, not just that the execution failed. For instance, `writeln "Hello` should trigger an error with a line of code given the missing quotation marks.
-* Errors also need to be user friendly. It should be pointed as clear about what the problem is or might be. A cryptic message like `buffer overflow` or `permissions on dir are 0655, not 0755` are not helpful for those who don't know what a buffer is or what Unix style permissions are. Remember that the user is a human first, not a programmer first. If you have something that might cause an error, write any messages accordingly including, where possible, a potential explanation. Always include the full line of code.
+* Errors also need to be user friendly. It should be pointed and clear about what the problem is or might be. A cryptic message like `buffer overflow` or `permissions on dir are 0655, not 0755` are not helpful for those who don't know what a buffer is or what Unix style permissions are. Remember that the user is a human first, not a programmer first. If you have something that might cause an error, write any messages accordingly including, where possible, a potential explanation. Always include the full line of code and, where relevant, an example of a properly formed piece of code.
 
 #### Naming
 * We don't follow Go's preference for exceptionally short variable names. Variables have descriptive names.
@@ -34,4 +34,4 @@
     * All strings in sample code should be ColouriseGreen
     * All values in errors should be ColouriseYellow
     * All else including full lines of code should be ColouriseMagenta
-This is a work in progress so please do feel free to suggest errors where appropriate.
+**This is a work in progress so please do feel free to suggest errors where appropriate. I don't think this is consistent so far and is an ongoing area of improvement.**
