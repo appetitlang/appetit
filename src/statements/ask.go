@@ -120,6 +120,13 @@ func Ask(tokens []values.Token) string {
 		)
 	}
 
+	/* Create a reader to get the input from user. Create a buffer size of
+		65,536 bytes which doesn't seem to be acknowledged by any operating
+		system. See issue #1 on GitHub for more. Leave this as-is though as
+		it does allow for some extra space for input on platforms such as
+		Windows. This is also potentially an issue with stdin limitations on
+		any one given platform.
+	*/
 	input_reader := bufio.NewReaderSize(os.Stdin, 65536)
 	// Prompt as per the prompt provided by the script
 	fmt.Print(prompt)
@@ -128,13 +135,14 @@ func Ask(tokens []values.Token) string {
 	*/
 	//user_input, user_input_error := input_reader.ReadString('\n')
 	user_input, user_input_error := input_reader.ReadString('\n')
+	// Convert the user_input_bytes to a string
 	user_input = strings.TrimSuffix(user_input, "\n")
 
 	if user_input_error != nil {
 		investigator.Report(
 			"There was an error getting the user input. Please report the " +
 			"following error in yellow to the project's GitHub repository " +
-			"and a copy of the script: " +
+			"and a copy of the script:\n\n" +
 			tools.ColouriseYellow(user_input_error.Error()),
 			loc,
 			tokens[2].TokenPosition,
@@ -142,13 +150,10 @@ func Ask(tokens []values.Token) string {
 		)
 	}
 
-
 	/* Get the final variable value here by checking to see if the value is
 		a math expression
 	*/
 	final_variable_value := CalculateValue(loc, user_input)
-
-	fmt.Printf("The length of user_input is %d\n", len(user_input))
 
 	// Set the variable
 	values.VARIABLES[variable_name] = final_variable_value
