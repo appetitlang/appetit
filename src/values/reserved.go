@@ -125,23 +125,28 @@ func BuildReservedVariables() {
 		VARIABLES[RESERVED_VARIABLE_PREFIX + "wd"] = wd
 	}
 
-	/* House the ip address. Thanks to https://gosamples.dev/local-ip-address/
-		for this one. I don't particularly like that this uses a public facing
-		address here.
+	/* House the ip address. This now improves on the old format which depended
+		both on an external network connection and the stability of Google's
+		public DNS service which is not something I want to depend on.
 	*/
-	conn, conn_error := net.Dial("udp", "8.8.8.8:80")
-	if conn_error != nil {
+	// Get the interfaces
+	ipaddrs, ipaddrs_err := net.InterfaceAddrs()
+	// If we can't, abandon ship and save n/a to the ipv4 reserved variable
+	if ipaddrs_err != nil {
 		VARIABLES[RESERVED_VARIABLE_PREFIX + "ipv4"] = "n/a"
-	} else {
-		// Defer the closure of the connection
-		defer conn.Close()
-		// Get the local IP Address
-		localIPAddr := conn.LocalAddr().(*net.UDPAddr)
-		// Set the reserved variable
-		VARIABLES[RESERVED_VARIABLE_PREFIX + "ipv4"] = localIPAddr.IP.String()
 	}
-	
 
+	// Iterate over the addresses
+	for _, ipv4_addresses := range ipaddrs {
+		// If the address is an ip address and is not a loopback address...
+		if ip, ip_ok := ipv4_addresses.(*net.IPNet); ip_ok && !ip.IP.IsLoopback() {
+			// If converting it to an IPv4 address doesn't yield an error...
+			if ip.IP.To4() != nil {
+				// Set the IPv4 address reserved variable
+				VARIABLES[RESERVED_VARIABLE_PREFIX + "ipv4"] = ip.IP.String()
+			}
+		}
+	}
 }
 
 /*
