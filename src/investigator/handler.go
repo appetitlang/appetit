@@ -43,7 +43,7 @@ func Report(
 		strings.Repeat(" ", position),
 		error_arrow,
 	)
-	fmt.Println(tools.ColouriseRed("\n[Message]"))
+	fmt.Println(tools.ColouriseRed("\n[Description]"))
 	fmt.Print(error_message)
 	// Abandon ship
 	os.Exit(0)

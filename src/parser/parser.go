@@ -164,6 +164,7 @@ func Call(tokens []values.Token) {
 			"deletefile": func() { statements.DeleteFile(tokens) },
 			"download": func() { statements.Download(tokens) },
 			"execute": func() { statements.ExecuteCommand(tokens) },
+			"exit": func() { statements.Exit(tokens) },
 			"makedirectory": func() { statements.CreatePath(tokens) },
 			"makefile": func() { statements.MakeFile(tokens) },
 			"minver": func() { statements.MinVer(tokens) },

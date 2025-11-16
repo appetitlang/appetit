@@ -22,7 +22,7 @@ func CheckAction(loc string, action_value string) error {
 	if action_value != values.SYMBOL_ACTION {
 		return fmt.Errorf(
 			"an action was made using an invalid action statement (%s), " +
-			"please ensure that you use %s",
+			"please ensure that you use %s\n",
 			tools.ColouriseMagenta(action_value),
 			tools.ColouriseMagenta(values.SYMBOL_ACTION),
 		)
