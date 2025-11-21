@@ -2,6 +2,7 @@ package investigator
 
 import (
 	"appetit/values"
+	"runtime"
 	"testing"
 )
 
@@ -82,4 +83,59 @@ func TestCheckValidAssignment(t *testing.T) {
 			"operator passed",
 		)
 	}	
+}
+
+func TestCheckValidNumberOfTokens(t *testing.T) {
+	sample_simple_tokens := []values.Token{
+		{
+				FullLineOfCode: "writeln \"Hello World!\"",
+				LineNumber: 1,
+				TokenPosition: "0",
+				TokenValue: "",
+				TokenType: "string",
+				NonCommentLineNumber: 1,
+		},
+		{
+				FullLineOfCode: "writeln \"Hello World!\"",
+				LineNumber: 1,
+				TokenPosition: "1",
+				TokenValue: "writeln",
+				TokenType: "string",
+				NonCommentLineNumber: 1,
+		},
+		{
+				FullLineOfCode: "writeln \"Hello World!\"",
+				LineNumber: 1,
+				TokenPosition: "9",
+				TokenValue: "\"Hello World!\"",
+				TokenType: "string",
+				NonCommentLineNumber: 1,
+		},
+	}
+	valid_num, _ := ValidNumberOfTokens(sample_simple_tokens, 2)
+
+	if valid_num != true {
+		t.Errorf(
+			"CheckValidNumberOfTokens did not return true, invalid number " +
+			"of tokens",
+		)
+	}
+}
+
+func TestCheckFileExists(t *testing.T) {
+	file_not_exists := FileExists("fake_file.fake")
+	_, current_file, _, _ := runtime.Caller(0)
+	file_exists := FileExists(current_file)
+
+	if file_not_exists != false {
+		t.Errorf(
+			"CheckFileExists did not return false on an invalid file name",
+		)
+	}
+
+	if file_exists != true {
+		t.Errorf(
+			"CheckFileExists did not return true on an valid file name",
+		)
+	}
 }

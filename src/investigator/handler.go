@@ -33,7 +33,7 @@ func Report(
 	*/
 	position += len(loc_title) - 1
 	// Set up the error arrow
-	error_arrow := tools.ColouriseRed("^") // ⇈
+	error_pos_symbol := tools.ColouriseRed("^") // ⇈
 
 	fmt.Println(tools.ColouriseRed("\n[ERROR]\n\n[Location]"))
 	fmt.Println(tools.ColouriseMagenta(" Line Number: ") + line_number)
@@ -41,10 +41,10 @@ func Report(
 	fmt.Println(tools.ColouriseMagenta(loc_title) + full_loc)
 	fmt.Printf("%s%s\n",
 		strings.Repeat(" ", position),
-		error_arrow,
+		error_pos_symbol,
 	)
 	fmt.Println(tools.ColouriseRed("\n[Description]"))
-	fmt.Print(error_message)
+	fmt.Printf("%s\n\n", error_message)
 	// Abandon ship
 	os.Exit(0)
 }

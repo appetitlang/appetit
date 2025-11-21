@@ -30,6 +30,8 @@ func CopyPathWalker(token_info map[string]string) filepath.WalkFunc {
 	dest := token_info["destination"]
 	loc := token_info["loc"]
 	full_loc := token_info["full_loc"]
+	source_position := token_info["source_position"]
+	dest_position := token_info["dest_position"]
 
 	// Get the list of directories that make up the source path
 	list_of_src_dirs := strings.Split(source, string(os.PathSeparator))
@@ -73,7 +75,7 @@ func CopyPathWalker(token_info map[string]string) filepath.WalkFunc {
 					". Perhaps you don't have read permissions? " +
 					source_err.Error(),
 					loc,
-					"n/a",
+					source_position,
 					full_loc,
 				)
 			}
@@ -86,11 +88,12 @@ func CopyPathWalker(token_info map[string]string) filepath.WalkFunc {
 				investigator.Report(
 					"Couldn't create the file in " +
 					tools.ColouriseYellow(create_path) + ". Check that " +
-					"you have write permissions and/or that there is " +
+					"you have write permissions to write to " +
+					tools.ColouriseYellow(dest) + " and/or that there is " +
 					"enough space available for you to copy the file(s) " +
-					"over. " + create_err.Error(),
+					"over.",
 					loc,
-					"n/a",
+					dest_position,
 					full_loc,
 				)
 			}
@@ -198,7 +201,9 @@ func CopyPath(tokens []values.Token) {
 	walker_values["source"] = source_path
 	walker_values["destination"] = dest_path
 	walker_values["loc"] = loc
-	walker_values["full_loc"] = loc
+	walker_values["full_loc"] = full_loc
+	walker_values["source_position"] = tokens[2].TokenPosition
+	walker_values["dest_position"] = tokens[4].TokenPosition
 
 	// Walk the files are start copying
 	filepath.Walk(source_path, CopyPathWalker(walker_values))
