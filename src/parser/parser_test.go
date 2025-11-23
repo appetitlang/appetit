@@ -6,46 +6,6 @@ import (
 	"testing"
 )
 
-// Test the Tokenise() function.
-func TestTokenise(t *testing.T) {
-	sample_simple_tokens := []values.Token{
-			{
-					FullLineOfCode: "writeln \"Hello World!\"",
-					LineNumber: 1,
-					TokenPosition: "0",
-					TokenValue: "",
-					TokenType: "string",
-					NonCommentLineNumber: 1,
-			},
-			{
-					FullLineOfCode: "writeln \"Hello World!\"",
-					LineNumber: 1,
-					TokenPosition: "1",
-					TokenValue: "writeln",
-					TokenType: "string",
-					NonCommentLineNumber: 1,
-			},
-			{
-					FullLineOfCode: "writeln \"Hello World!\"",
-					LineNumber: 1,
-					TokenPosition: "9",
-					TokenValue: "\"Hello World!\"",
-					TokenType: "string",
-					NonCommentLineNumber: 1,
-			},
-	}
-
-	results := Tokenise("writeln \"Hello World!\"", 1, 1)
-	tokenisation_equal := reflect.DeepEqual(results, sample_simple_tokens)
-	if !tokenisation_equal {
-			t.Errorf(
-					"Tokenisation failed, got %v, expected %v",
-					results[0],
-					sample_simple_tokens,
-			)
-	}
-}
-
 func TestValidMinverCalls(t *testing.T) {
 	simple_line_sets := []string{
 			"minver 1",
@@ -98,5 +58,70 @@ func TestValidMinverCalls(t *testing.T) {
 					"MinverCheck failed (not first line), got false, " + 
 					"expected true",
 			)
+	}
+}
+
+func TestValidWriteCall(t *testing.T) {
+	results := Tokenise("write \"Hello World!\"", 1, 1)
+	tokenisation_equal := reflect.DeepEqual(results, values.TEST_WRITE)
+
+	if !tokenisation_equal {
+		t.Errorf(
+				"[write stmt] Tokenisation failed, got %v, expected %v",
+				results,
+				values.TEST_WRITE,
+		)
+	}
+}
+
+func TestValidWriteLnCall(t *testing.T) {
+	results := Tokenise("writeln \"Hello World!\"", 1, 1)
+	tokenisation_equal := reflect.DeepEqual(results, values.TEST_WRITELN)
+
+	if !tokenisation_equal {
+		t.Errorf(
+				"[writeln stmt] Tokenisation failed, got %v, expected %v",
+				results,
+				values.TEST_WRITELN,
+		)
+	}
+}
+
+func TestValidAskCall(t *testing.T) {
+	results := Tokenise("ask \"Greeting: \" to greeting", 1, 1)
+	tokenisation_equal := reflect.DeepEqual(results, values.TEST_ASK)
+
+	if !tokenisation_equal {
+		t.Errorf(
+				"[ask stmt] Tokenisation failed, got %v, expected %v",
+				results,
+				values.TEST_ASK,
+		)
+	}
+}
+
+func TestValidSetCall(t *testing.T) {
+	results := Tokenise("set name = \"Hello World!\"", 1, 1)
+	tokenisation_equal := reflect.DeepEqual(results, values.TEST_SET)
+
+	if !tokenisation_equal {
+		t.Errorf(
+			"[set stmt] Tokenisation failed, got %v, expected %v",
+			results,
+			values.TEST_SET,
+		)
+	}
+}
+
+func TestValidMinVerCall(t *testing.T) {
+	results := Tokenise("minver 1", 1, 1)
+	tokenisation_equal := reflect.DeepEqual(results, values.TEST_MINVER)
+
+	if !tokenisation_equal {
+		t.Errorf(
+			"[minver stmt] Tokenisation failed, got %v, expected %v",
+			results,
+			values.TEST_SET,
+		)
 	}
 }
