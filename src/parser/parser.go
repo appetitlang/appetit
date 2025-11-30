@@ -83,7 +83,7 @@ func Start(lines []string, dev_mode bool) {
 		- element 1 is the counter used to track non-comment lines of code,
 			those lines of code that are deemed significant (ie. those where
 			the line has a statement call).
-	Returns a slice of strings that represents a tokenised line where the first
+	Returns a slice of Tokens that represents a tokenised line where the first
 	element is the line number and each subsequent element is a token in the
 	line.
 */

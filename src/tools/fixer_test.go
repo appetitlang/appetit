@@ -35,3 +35,5 @@ func TestFixStringQuotationsComplex(t *testing.T) {
 		)
 	}
 }
+
+// TODO: add tests for other functions in fixer
