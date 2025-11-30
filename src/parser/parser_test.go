@@ -60,19 +60,23 @@ func TestValidDeleteDirCall(t *testing.T) {
 
 func TestValidDeleteFileCall(t *testing.T) {
 	results := Tokenise("deletefile \"/home/user/test.txt\"", 1, 1)
-	tokenisation_equal := reflect.DeepEqual(results, values.TEST_DELETEDIR)
+	tokenisation_equal := reflect.DeepEqual(results, values.TEST_DELETEFILE)
 
 	if !tokenisation_equal {
 		t.Errorf(
 			"[deletefile stmt] Tokenisation failed, got %v, expected %v",
 			results,
-			values.TEST_DELETEDIR,
+			values.TEST_DELETEFILE,
 		)
 	}
 }
 
 func TestValidDownloadCall(t *testing.T) {
-	results := Tokenise("download \"http://upload.wikimedia.org/wikipedia/commons/0/02/La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg\" to \"#b_home/Desktop/del.jpg\"", 1, 1)
+	results := Tokenise(
+		"download \"http://upload.wikimedia.org/wikipedia/commons/0/02/" +
+		"La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3" +
+		"%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024." +
+		"jpg\" to \"#b_home/Desktop/del.jpg\"", 1, 1)
 	tokenisation_equal := reflect.DeepEqual(results, values.TEST_DOWNLOADFILE)
 
 	if !tokenisation_equal {

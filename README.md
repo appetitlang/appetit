@@ -23,6 +23,7 @@ Appetit is a solution to an already solved problem: scripting simple actions on 
 **Project**
 - This project is designed as a way for me to learn about Go and some connected non-Go specific ideas (eg. parsing and tokenising text). As a non-professional programmer, this is first and foremost a hobby project so having fun is the most important thing.
 - As an educator professionally, I offer up this project as a basis for others to learn. This includes critiques and I am very happy for this project to serve as the basis for people to learn what to do and what not to do.
+- Finally, I wanted something that would provide me with something that would work across machines without any concern about the underlying OS. I wanted to run some simple sysadmin scripts across the devices I use that abstracted away some of the platform specific syntax so that I could run something on my Mac and Raspberry Pi running Linux, for instance, knowing that the script would run just as well on both.
 
 More information about the language can be found at the project's homepage [here](https://bryanabsmith.com/). 
 
