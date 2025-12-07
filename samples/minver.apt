@@ -1,0 +1,4 @@
+#!/usr/bin/appetit
+- Set the minimum version to version 1
+- This is not required but can help to ensure that your script requires a specific version under the hood.
+minver 1

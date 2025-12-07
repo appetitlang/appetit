@@ -10,6 +10,7 @@ import (
 	"appetit/tools"
 	"appetit/values"
 	"embed"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
@@ -275,6 +276,12 @@ func main() {
 
 	// If the version flag is true, print version info
 	if *version_flag {
+		type RemoteDetails struct {
+			Version	int	`json:"version"`
+			Date	string	`json:"date"`
+			Description	string	`json:"description"`
+		}
+
 		// Get build info
 		build_info, _ := debug.ReadBuildInfo()
 		// Get the go information absent the first to characters which is go
@@ -303,6 +310,36 @@ func main() {
 			tools.ColouriseGreen("Build Date: "),
 			BuildDate,
 		)
+
+		remote_response, remote_error := http.Get(
+			"https://bryanabsmith.com/appetit/version_info.json",
+		)
+
+		if remote_error != nil {
+			os.Exit(0)
+		} else {
+			var remote_data RemoteDetails
+			decode_error := json.NewDecoder(remote_response.Body).Decode(
+				&remote_data,
+			)
+			if decode_error != nil {
+				os.Exit(0)
+			} else {
+				if remote_data.Version > values.LANG_VERSION {
+					fmt.Printf(
+						"\n%s\nThere's a new version of Appetit " +
+						"available! Version %s is available, released %s. " +
+						"%s\n",
+						tools.ColouriseYellow("[Update]"),
+						strconv.Itoa(remote_data.Version),
+						remote_data.Date,
+						remote_data.Description,
+					)
+				}
+			}
+		}
+		defer remote_response.Body.Close()
+
 		// Exit the app
 		os.Exit(0)
 	}
