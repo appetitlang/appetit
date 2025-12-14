@@ -87,24 +87,16 @@ func PrintDevInfo() {
 		len(values.TOKEN_TREE),
 	)
 
+	// Get the size of a single token
 	token_memory_size := unsafe.Sizeof(values.TOKEN_TREE[0])
+	// Calculate the size of the token tree as a whole
 	memory_token_tree := uintptr(cap(values.TOKEN_TREE)) * token_memory_size
 	fmt.Printf(
 		tools.ColouriseCyan("\n:: Total Memory Usage of TOKEN_TREE:") +
-		" %d bytes",
+		" %d bytes (single token: %d bytes)",
 		memory_token_tree,
+		token_memory_size,
 	)
-	/*pretty_output, pretty_output_error := json.MarshalIndent(
-		values.TOKEN_TREE,
-		"",
-		"\t",
-	)
-	if pretty_output_error != nil {
-		fmt.Println(
-			tools.ColouriseRed("!! Error getting tokens for printing"),
-		)
-	}
-	fmt.Print(string(pretty_output))*/
 	
 	// Print out memory info
 	fmt.Println(tools.ColouriseYellow("\n\nMemory Information"))
@@ -276,12 +268,6 @@ func main() {
 
 	// If the version flag is true, print version info
 	if *version_flag {
-		type RemoteDetails struct {
-			Version	int	`json:"version"`
-			Date	string	`json:"date"`
-			Description	string	`json:"description"`
-		}
-
 		// Get build info
 		build_info, _ := debug.ReadBuildInfo()
 		// Get the go information absent the first to characters which is go
@@ -310,36 +296,56 @@ func main() {
 			tools.ColouriseGreen("Build Date: "),
 			BuildDate,
 		)
-
+		/* Set up the struct that will hold the JSON data for remotely checking
+			the current version.
+		*/
+		type RemoteDetails struct {
+			Version	int	`json:"version"`
+			Date	string	`json:"date"`
+			Description	string	`json:"description"`
+		}
+		// Fetch the info about the current release
 		remote_response, remote_error := http.Get(
 			"https://bryanabsmith.com/appetit/version_info.json",
 		)
-
+		// If there's an error getting the current version info, abandon ship
 		if remote_error != nil {
+			// Exit the app
 			os.Exit(0)
-		} else {
-			var remote_data RemoteDetails
-			decode_error := json.NewDecoder(remote_response.Body).Decode(
-				&remote_data,
-			)
-			if decode_error != nil {
-				os.Exit(0)
-			} else {
-				if remote_data.Version > values.LANG_VERSION {
-					fmt.Printf(
-						"\n%s\nThere's a new version of Appetit " +
-						"available! Version %s is available, released %s. " +
-						"%s\n",
-						tools.ColouriseYellow("[Update]"),
-						strconv.Itoa(remote_data.Version),
-						remote_data.Date,
-						remote_data.Description,
-					)
-				}
-			}
 		}
+		// Defer the remote handler close
 		defer remote_response.Body.Close()
 
+		// Set up a home for the remotely pulled information.
+		var remote_data RemoteDetails
+		// Decode the data and place it in the remote_data RemoteDetails
+		decode_error := json.NewDecoder(remote_response.Body).Decode(
+			&remote_data,
+		)
+		// If there was an error decoding the data, abandon ship
+		if decode_error != nil {
+			// Exit the app
+			os.Exit(0)
+		}
+		/* If the remote file has a version number greater than the current
+			version, inform the user and give them some details.
+		*/
+		if remote_data.Version > values.LANG_VERSION {
+			fmt.Printf(
+				"\n%s\nThere's a new version of Appetit " +
+				"available! Version %s is available, released %s. " +
+				"%s\n",
+				tools.ColouriseYellow("[New Version]"),
+				strconv.Itoa(remote_data.Version),
+				remote_data.Date,
+				remote_data.Description,
+			)
+		/* If the version information is the same, let them know that they are
+			running the most current version.
+		*/
+		} else if remote_data.Version == values.LANG_VERSION {
+			fmt.Println("\nYou're up to date!")
+		}
 		// Exit the app
 		os.Exit(0)
 	}

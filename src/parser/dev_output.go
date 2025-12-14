@@ -9,7 +9,6 @@ import (
 	"appetit/tools"
 	"appetit/values"
 	"fmt"
-	"strconv"
 )
 
 /*
@@ -28,6 +27,9 @@ func PrintTokenInfo(tokens []values.Token) {
 	// Token counter
 	token_count := 0
 
+	// Counter for the token on the current line
+	cur_line_token_number := 1
+
 	// Loop over the tokens
 	for token := range tokens {
 		// If the token value isn't nothing (ie. it's something meaningful)
@@ -38,12 +40,14 @@ func PrintTokenInfo(tokens []values.Token) {
 				encountered a new line of tokens)
 			*/
 			if tokens[token].LineNumber != cur_line {
+				// Reset the current line token counter
+				cur_line_token_number = 1
 				// Print the token line number header
-				fmt.Println(
-					tools.ColouriseGreen(
-						"\n\nLine " + strconv.Itoa(tokens[token].LineNumber),
-					),
+				fmt.Printf(
+					tools.ColouriseGreen("\n\nLINE %d\n"),
+					tokens[token].LineNumber,
 				)
+				fmt.Println(tokens[token].FullLineOfCode + "\n")
 				// Update the cur_line
 				cur_line = tokens[token].LineNumber
 			// Otherwise
@@ -51,6 +55,11 @@ func PrintTokenInfo(tokens []values.Token) {
 				// Print a new blank line
 				fmt.Println()
 			}
+			// Print out the current line token counter
+			fmt.Printf(
+				tools.ColouriseRed("  [Token %d]\n"),
+				cur_line_token_number,
+			)
 			// Print out the full line of code
 			fmt.Printf(
 				"%s Full Line of Code: %s\n",
@@ -92,6 +101,9 @@ func PrintTokenInfo(tokens []values.Token) {
 				dot_point,
 				tokens[token].NonCommentLineNumber,
 			)
+
+			// Increment the current line token counter
+			cur_line_token_number += 1
 		}
 	}
 }

@@ -1,4 +1,4 @@
 minver 1
 
-- This is currently "broken" in that the file is nested so, here, 
+- Archive a directory
 zipdirectory "#b_home/Downloads/" to "#b_home/Desktop/test.zip"
