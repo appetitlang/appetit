@@ -11,4 +11,4 @@ write "Hello World"
 - To see that it worked, let's write out something else. You'll notice that
 - this follows on quite neatly from the last Hello World. This also showcases
 - the d/m/y format and variable substitutions more broadly.
-write ". \nI see that you're quite spherical today (#b_date_dmy) there World."
+write ". \nI see that you're quite spherical today (#b_date_dmy) there World.\n"

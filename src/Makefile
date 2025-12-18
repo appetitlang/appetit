@@ -10,6 +10,8 @@ else
 	MAKEFLAGS := --jobs=$(shell nproc)
 endif
 
+DPKG_ARCH = $(shell dpkg --print-architecture)
+
 # Thanks to https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications
 LD_FLAGS=-s -w -X 'main.BuildDate=$(shell date)'
 
@@ -79,8 +81,18 @@ me: clean
 	@echo ":: Building binary for your platform"
 	@go build -ldflags="$(LD_FLAGS)" -o dist/appetit
 
+# dpkg build for Debian based systems
+dpkg: me
+	@echo "\033[37m:: Making dpkg for Debian based systems...\033[0m"
+	@mkdir -p dist/appetit_$(version)/DEBIAN
+	@mkdir -p dist/appetit_$(version)/usr/local/bin
+	@cp dist/appetit dist/appetit_$(version)/usr/local/bin
+	@echo "Package: appetit\nVersion: $(version)\nMaintainer: Bryan Smith\nArchitecture: $(DPKG_ARCH)\nDescription: A simple sys admin scripting language" > dist/appetit_$(version)/DEBIAN/control
+	@dpkg-deb --root-owner-group --build dist/appetit_$(version) > /dev/null 2>&1
+	@rm -rf dist/appetit_$(version)
+
 # Install the application
-install: me clean
+install: me
 	@echo "\033[37m:: Installing binary to /usr/local/bin/...\033[0m"
 	@sudo mv dist/appetit /usr/local/bin/
 	@echo "\033[31mRemoving dist/ directory...\033[0m"
