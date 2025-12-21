@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>Appetit</title>
+    <pkg-ref id="com.appetitlang.appetit"/>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.appetitlang.appetit"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="com.appetitlang.appetit" visible="false">
+        <pkg-ref id="com.appetitlang.appetit"/>
+    </choice>
+    <pkg-ref id="com.appetitlang.appetit" version="1" onConclusion="none">appetit.pkg</pkg-ref>
+    <license file="LICENCE" />
+</installer-gui-script>

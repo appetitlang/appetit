@@ -16,7 +16,7 @@ DPKG_ARCH = $(shell dpkg --print-architecture)
 LD_FLAGS=-s -w -X 'main.BuildDate=$(shell date)'
 
 # Build all binaries
-all: freebsd linux macos netbsd openbsd windows
+all: clean freebsd linux macos netbsd openbsd windows
 
 # Clean up old builds/packaging and the Go cache
 clean:
@@ -82,14 +82,24 @@ me: clean
 	@go build -ldflags="$(LD_FLAGS)" -o dist/appetit
 
 # dpkg build for Debian based systems
-dpkg: me
-	@echo "\033[37m:: Making dpkg for Debian based systems...\033[0m"
+pkg_deb: me
+	@echo "\033[37m:: Making dist/appetit_$(version).deb for Debian $(DPKG_ARCH)...\033[0m"
 	@mkdir -p dist/appetit_$(version)/DEBIAN
 	@mkdir -p dist/appetit_$(version)/usr/local/bin
 	@cp dist/appetit dist/appetit_$(version)/usr/local/bin
 	@echo "Package: appetit\nVersion: $(version)\nMaintainer: Bryan Smith\nArchitecture: $(DPKG_ARCH)\nDescription: A simple sys admin scripting language" > dist/appetit_$(version)/DEBIAN/control
 	@dpkg-deb --root-owner-group --build dist/appetit_$(version) > /dev/null 2>&1
 	@rm -rf dist/appetit_$(version)
+
+# pkg build for macOS
+pkg_macos: me
+	@echo "\033[37m:: Making dist/appetit_$(version).pkg for macOS...\033[0m"
+	@mkdir -p dist/appetit_$(version)/usr/local/bin
+	@mv dist/appetit dist/appetit_$(version)/usr/local/bin
+	@pkgbuild --root dist/appetit_$(version)/usr/local/bin --install-location /usr/local/bin --identifier com.appetitlang.appetit --version $(version) dist/appetit.pkg  > /dev/null 2>&1
+	@cp ../LICENCE dist/; cp distribution.xml dist/
+	@cd dist/; productbuild --quiet --distribution distribution.xml --resources . --package-path appetit.pkg appetit_$(version).pkg
+	@rm -rf dist/appetit_$(version)/; rm -rf dist/appetit.pkg; rm -rf dist/distribution.xml; rm -rf dist/LICENCE
 
 # Install the application
 install: me

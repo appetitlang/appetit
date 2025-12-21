@@ -53,10 +53,11 @@ func Report(
 	Report an error. Parameters include error_message, the error message
 	itself. Unlike Report(), this is designed for errors that aren't line or
 	syntax specific. This includes something like
-	parser.CheckValidMinverLocationCount() as an example. Returns nothing.
+	parser.CheckValidMinverLocationCount() as an example or passing the
+	interpreter no script. Returns nothing.
 */
 func ReportSimple(error_message string) {
-	fmt.Println(tools.ColouriseRed("\n[Error]"))
+	fmt.Println(tools.ColouriseRed("\n[ERROR]"))
 	fmt.Println(error_message + "\n")
 	os.Exit(0)
 }

@@ -10,6 +10,7 @@ A simple "Hello World" with some variable substitution present.
     - [Appetit Scheduler (aptsched)](#appetit-scheduler-aptsched)
 - [Using](#using)
 - [Language Syntax and Functionality](#language-syntax-and-functionality)
+- [Getting Involved](#getting-involved)
 - [Licences](#licences)
 
 ## Principles and About
@@ -50,38 +51,29 @@ The `Makefile` can do a few things:
 | [no parameter] | Run the freebsd, linux, macos, netbsd, openbsd, and windows |
 | clean | Clean up any old builds by removing the `dist/` directory |
 | freebsd | Make builds for FreeBSD (x86_64, armv6, arm64) |
+| install | Run `me` and copy the resulting binary in `/usr/local/bin` |
 | linux | Make builds for Linux (x86_64, armv6, arm64) |
 | macos | Make builds for macOS (x86_64, arm64) |
+| me | Make a build for your current platform and architecture |
 | netbsd | Make builds for NetBSD (x86_64, armv6, arm64) |
 | openbsd | Make builds for OpenBSD (x86_64, armv6, arm64) |
-| windows | Make builds for Windows (x86_64, arm64) |
-| me | Make a build for your current platform and architecture |
-| install | Run `me` and copy the resulting binary in `/usr/local/bin` |
-| release | Build releas binaries and archives for all platforms including a source archive |
+| pkg_deb | Build a Debian package for your current system |
+| pkg_macos | Build a macOS installer package for your current system |
+| release | Build release binaries and archives for all platforms including a source archive |
 | source | Make a source archive |
 | test | Run any tests |
+| windows | Make builds for Windows (x86_64, arm64) |
 
 If you don't know which one you want, you probably want to just run `make install` with elevated privileges on non-Windows systems.
 
 
 ### Installers
-**Right now, there are no officially supported installers but that's not to say that you can't. Note though that these are not supported and very little is done to ensure that this works.**
+There are no official installers available. There are a few `make` options though that should do the job:
+* You can install it via `sudo make install` on non-Windows systems to place the interpreter in /usr/local/bin/.
+* On Debian based systems, you can run `make pkg_deb` to get a .deb file for your platform.
+* On macOS systems, you can run `make pkg_macos` to generate a .pkg installer.
 
-With [fpm](https://fpm.readthedocs.io/en) installed, you can build installers like so from the src directory after `make me` has been run:
-
-**macOS**
-
-    fpm -t osxpkg -p appetit.pkg
-
-**Linux (deb)**
-
-    fpm -t deb -p appetit.deb
-
-**Linux (rpm)**
-
-    fpm -t rpm --rpm-os linux -a arm64 -p appetit.rpm [for ARM64 builds]
-
-    fpm -t rpm --rpm-os linux -p appetit.rpm [for x86_64 builds]
+The Debian and macOS installers are the only ones supported now because (a) they're the only platforms I use and; (b) they are easy to generate.
 
 
 ### Visual Studio Code Extension
@@ -114,6 +106,10 @@ There are a handful of flags that are documented via the `-help` flag. More deta
 The documentation is available in one of two places:
 1. [The project's homepage](https://bryanabsmith.com).
 2. Running the interpreter with the `-docs` flag (see above). This will deploy a local web server that will host the documentation on port 8000.
+
+
+## Getting Involved
+The project is very much my own right now as a learning experience and as something that I'm designing for myself. I'm happy to accept any feedback but note that I may very well not adopt it. In addition to this project being a learning experience, I always want it to be fun so any suggestions for improvements or fixes will be done when I am happy to do so. Please don't take this as a resistance to ideas as I'm happy to take them on board. Rather, consider this a caution that if the suggestion detracts from the learning, fun, or personal value, I'm unlikely to take it on board.
 
 
 ## Licences

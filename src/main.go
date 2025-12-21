@@ -277,12 +277,16 @@ func main() {
 			BuildDate variable will be "testing" and this is replaced with the
 			actual build date when the Makefile is run.
 		*/
+
+		bin_dir, _ := os.Executable()
+
 		fmt.Printf(
-			"%s\n\n%s\n\t%s%s\n\t%s%s\n\t%s%d\n\n%s\n\t%s%s\n\t%s%s\n",
+			"%s\nInstalled to %s\n\n%s\n\t%s%s\n\t%s%s\n\t%s%d\n\n%s\n\t%s%s\n\t%s%s\n",
 			tools.ColouriseMagenta(
 				values.LANG_NAME + " " +
 				strconv.Itoa(int(values.LANG_VERSION)),
 			),
+			tools.ColouriseBlue(bin_dir),
 			tools.ColouriseYellow("[Platform]"),
 			tools.ColouriseCyan("Operating System: "),
 			runtime.GOOS,
@@ -361,11 +365,8 @@ func main() {
 	// If there are no tailing arguments (ie. the file name)
 	if len(file_name) == 0 {
 		// Error out
-		investigator.Report(
+		investigator.ReportSimple(
 			"You need to pass a script name to the interpreter.",
-			"n/a",
-			"n/a",
-			"n/a",
 		)
 	}
 

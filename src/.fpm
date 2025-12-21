@@ -1,8 +1,0 @@
--s dir
---name appetit
---license MIT
---version 1.0.0
---description "Simple systems admin scripting language"
---url "https://bryanabsmith.com"
---maintainer "Bryan Smith <bryan@bryanabsmith.com>"
-dist/appetit=/usr/local/bin/appetit
