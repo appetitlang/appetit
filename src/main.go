@@ -9,7 +9,7 @@ import (
 	"appetit/parser"
 	"appetit/tools"
 	"appetit/values"
-	"embed"
+	_ "embed"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -19,7 +19,6 @@ import (
 	"runtime/debug"
 	"strconv"
 	"strings"
-	"text/template"
 	"time"
 	"unsafe"
 )
@@ -30,16 +29,22 @@ var BuildDate string = "-development"
 /* Thanks to https://mblessed.hashnode.dev/go-embed-embed-your-html-frontend-
 	in-golang for the embed info.
 */
-//go:embed docs
-var template_path embed.FS
+
+//go:embed docs/book.pdf
+var book []byte
+
 
 /*
-	Handle serving the documentation. The parameters are the conventional
-	response writer and the request. No returns.
+	Handle serving the documentation with appropriate headers. The parameters
+	are the conventional response writer and the request. No returns.
 */
 func DocsHandler(writer http.ResponseWriter, request *http.Request) {
-	template, _ := template.ParseFS(template_path, "docs/index.html")
-	template.Execute(writer, nil)
+	// Set the content type
+	writer.Header().Set("Content-Type", "application/pdf")
+	// Set the content disposition to make the PDF appear inline.
+	writer.Header().Set("Content-Disposition", "inline; filename=\"book.pdf\"")
+	// Write the book as the content
+	writer.Write(book)
 }
 
 
