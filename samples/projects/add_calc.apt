@@ -1,9 +1,0 @@
-minver 1
-- Get our first number
-ask "First Number: " to first_num
-- Get our second number
-ask "Second Number: " to second_num
-- Set a variable to hold the sum by asking Appetit to do some arithmetic
-set sum = "#first_num+#second_num"
-- Write out the answer
-writeln "The answer is #sum!"

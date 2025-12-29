@@ -18,3 +18,10 @@ Write-Output ":: Building Windows x86_64 binary..."
 $Env:GOOS="windows"; $Env:GOARCH="amd64"; go build -ldflags="-s -w -X 'main.BuildDate=$date'" -o dist/appetit-windows-amd64-$version.exe
 Write-Output ":: Building Windows arm64 binary..."
 $Env:GOOS="windows"; $Env:GOARCH="arm64"; go build -ldflags="-s -w -X 'main.BuildDate=$date'" -o dist/appetit-windows-arm64-$version.exe
+
+Write-Output ":: Adding binaries to C:\appetit and adding C:\appetit to PATH (user)"
+[void]New-Item -Path "C:\appetit" -ItemType Directory
+[void]Move-Item -Path "dist/appetit-windows-amd64-$version.exe" -Destination "C:\appetit"
+[void]Move-Item -Path "dist/appetit-windows-arm64-$version.exe" -Destination "C:\appetit"
+[void]Remove-Item -Path "dist/"
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\appetit", [System.EnvironmentVariableTarget]::User)

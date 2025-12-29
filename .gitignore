@@ -1,5 +1,5 @@
 # Exclude any dist folders that may be lingering
-src/dist/
+dist/
 vscode/dist/
 
 # Sample scripts from the samples folder that shouldn't be available for public consumption
