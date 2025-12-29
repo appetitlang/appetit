@@ -3,7 +3,7 @@ $date = Get-Date -Format "dd/MM/yyyy HH:mm:ss"
 $platform = $args[0]
 
 Write-Output ":: Cleaning up caches and dist/ directories"
-[void](Remove-Item -Path "dist" -Recurse -Force)
+[void](Remove-Item -Path "dist" -Recurse -Force -ErrorAction SilentlyContinue)
 
 # https://lazyadmin.nl/powershell/create-folder/#powershell-create-folder 
 # and https://collectingwisdom.com/powershell-new-item-silent/
@@ -20,8 +20,8 @@ Write-Output ":: Building Windows arm64 binary..."
 $Env:GOOS="windows"; $Env:GOARCH="arm64"; go build -ldflags="-s -w -X 'main.BuildDate=$date'" -o dist/appetit-windows-arm64-$version.exe
 
 Write-Output ":: Adding binaries to C:\appetit and adding C:\appetit to PATH (user)"
-[void]New-Item -Path "C:\appetit" -ItemType Directory
-[void]Move-Item -Path "dist/appetit-windows-amd64-$version.exe" -Destination "C:\appetit"
-[void]Move-Item -Path "dist/appetit-windows-arm64-$version.exe" -Destination "C:\appetit"
-[void]Remove-Item -Path "dist/"
+[void](New-Item -Path "C:\appetit" -ItemType Directory -Force)
+[void](Move-Item -Path "dist/appetit-windows-amd64-$version.exe" -Destination "C:\appetit" -Force)
+[void](Move-Item -Path "dist/appetit-windows-arm64-$version.exe" -Destination "C:\appetit" -Force)
+[void](Remove-Item -Path "dist" -Recurse -Force -ErrorAction SilentlyContinue)
 [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\appetit", [System.EnvironmentVariableTarget]::User)
