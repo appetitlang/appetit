@@ -1,0 +1,8 @@
+minver 1
+- This script shows how to get user input. Here, we learn to use the ask
+- statement. We'll start by asking the use for their name and then write out
+- a greeting.
+- Ask the user for some input
+ask "What is your name? " to "name"
+- Report back the name of the user
+writeln "Hello #name"
