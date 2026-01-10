@@ -27,16 +27,15 @@ import (
 var BuildDate string = "-development"
 
 /* Thanks to https://mblessed.hashnode.dev/go-embed-embed-your-html-frontend-
-	in-golang for the embed info.
+in-golang for the embed info.
 */
 
 //go:embed docs/book.pdf
 var book []byte
 
-
 /*
-	Handle serving the documentation with appropriate headers. The parameters
-	are the conventional response writer and the request. No returns.
+Handle serving the documentation with appropriate headers. The parameters
+are the conventional response writer and the request. No returns.
 */
 func DocsHandler(writer http.ResponseWriter, request *http.Request) {
 	// Set the content type
@@ -47,11 +46,9 @@ func DocsHandler(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(book)
 }
 
-
-
 /*
-	Open up a script and produce a list of lines. The only parameter is the
-	filename. This returns a slice of the lines.
+Open up a script and produce a list of lines. The only parameter is the
+filename. This returns a slice of the lines.
 */
 func OpenScript(filename string) []string {
 
@@ -61,7 +58,7 @@ func OpenScript(filename string) []string {
 	if err != nil {
 		// Report the error
 		investigator.Report(
-			"Unknown file: " + tools.ColouriseMagenta(filename) + ".",
+			"Unknown file: "+tools.ColouriseMagenta(filename)+".",
 			"n/a",
 			"n/a",
 			"n/a",
@@ -76,9 +73,9 @@ func OpenScript(filename string) []string {
 }
 
 /*
-	Get memory stats. This takes no parameters and returns nothing. Thanks to
-	https://reintech.io/blog/introduction-to-gos-runtime-package-memory-
-	management-performance
+Get memory stats. This takes no parameters and returns nothing. Thanks to
+https://reintech.io/blog/introduction-to-gos-runtime-package-memory-
+management-performance
 */
 func PrintDevInfo() {
 	var mem_stats runtime.MemStats
@@ -87,8 +84,8 @@ func PrintDevInfo() {
 	// Print out memory info
 	fmt.Println(tools.ColouriseYellow("\n\nToken Summary"))
 	fmt.Printf(
-		tools.ColouriseCyan(":: Total Tokens (incl. line number tokens):") +
-		" %d",
+		tools.ColouriseCyan(":: Total Tokens (incl. line number tokens):")+
+			" %d",
 		len(values.TOKEN_TREE),
 	)
 
@@ -97,44 +94,44 @@ func PrintDevInfo() {
 	// Calculate the size of the token tree as a whole
 	memory_token_tree := uintptr(cap(values.TOKEN_TREE)) * token_memory_size
 	fmt.Printf(
-		tools.ColouriseCyan("\n:: Total Memory Usage of TOKEN_TREE:") +
-		" %d bytes (single token: %d bytes)",
+		tools.ColouriseCyan("\n:: Total Memory Usage of TOKEN_TREE:")+
+			" %d bytes (single token: %d bytes)",
 		memory_token_tree,
 		token_memory_size,
 	)
-	
+
 	// Print out memory info
 	fmt.Println(tools.ColouriseYellow("\n\nMemory Information"))
 	// Print out the allocated memory
 	fmt.Printf(
-		tools.ColouriseCyan(":: Allocated Memory: ") +
-		"%d bytes, %d kilobytes\n",
+		tools.ColouriseCyan(":: Allocated Memory: ")+
+			"%d bytes, %d kilobytes\n",
 		mem_stats.Alloc,
-		(mem_stats.Alloc/1024),
+		(mem_stats.Alloc / 1024),
 	)
 	// Print out the total allocated memory
 	fmt.Printf(
-		tools.ColouriseCyan(":: Total Allocated Memory: ") +
-		"%d bytes, %d kilobytes\n",
+		tools.ColouriseCyan(":: Total Allocated Memory: ")+
+			"%d bytes, %d kilobytes\n",
 		mem_stats.TotalAlloc,
-		(mem_stats.TotalAlloc/1024),
+		(mem_stats.TotalAlloc / 1024),
 	)
 	// Print out the memory requested from the OS
 	fmt.Printf(
-		tools.ColouriseCyan(":: Memory Requested: ") +
-		"%d bytes, %d kilobytes\n",
+		tools.ColouriseCyan(":: Memory Requested: ")+
+			"%d bytes, %d kilobytes\n",
 		mem_stats.Sys,
-		(mem_stats.Sys/1024),
+		(mem_stats.Sys / 1024),
 	)
 	// Print out the garbage collections
 	fmt.Printf(
-		tools.ColouriseCyan(":: Garbage Collections: ") + "%d\n",
+		tools.ColouriseCyan(":: Garbage Collections: ")+"%d\n",
 		mem_stats.NumGC,
 	)
 }
 
 /*
-	The main function. No parameters and no returns.
+The main function. No parameters and no returns.
 */
 func main() {
 
@@ -151,19 +148,19 @@ func main() {
 		"",
 		"Create a script at the path specified.",
 	)
-	
+
 	// Print out developer relevant information
 	dev_flag := flag.Bool(
 		"dev",
 		false,
-		"[Dev] See information relevant for developing the interpreter. If " +
-		"you are an enduser, this information will not be helpful.",
+		"[Dev] See information relevant for developing the interpreter. If "+
+			"you are an enduser, this information will not be helpful.",
 	)
 
 	// Serve up the documentation
-	docs_flag := flag.Bool(
+	docs_flag := flag.String(
 		"docs",
-		false,
+		"",
 		"Serve up documentation for the language on port 8000.",
 	)
 
@@ -180,10 +177,10 @@ func main() {
 		"Verbose mode",
 	)
 	// Get the version of the app
-	version_flag := flag.Bool(
-		"version",
+	about_flag := flag.Bool(
+		"about",
 		false,
-		"The version of the interpreter/language.",
+		"Information about the interpreter.",
 	)
 
 	// Parse the flags
@@ -204,13 +201,13 @@ func main() {
 			strconv.Itoa(values.LANG_VERSION) + "\n\n- Say hello to the " +
 			"world\nwriteln \"Hello World!\"\n",
 		)
-		
+
 		// Dereference the *create_template_flag
 		file_name := *create_template_flag
 		// Get the user's home directory in case they pass a tilde
 		user_home, _ := os.UserHomeDir()
 		/* If they provide a tilde, convert the tilde to the user home
-			directory
+		directory
 		*/
 		if strings.HasPrefix(file_name, "~") {
 			// Hold the corrected file name
@@ -223,8 +220,8 @@ func main() {
 			// Respond with an error
 			fmt.Println(
 				"There was an error creating the script at " +
-				*create_template_flag + ". Make sure that you can save a " +
-				"file in that location.",
+					*create_template_flag + ". Make sure that you can save a " +
+					"file in that location.",
 			)
 		}
 		// Defer the file closing
@@ -238,80 +235,48 @@ func main() {
 			// Respond with an error
 			fmt.Println(
 				"There was an error creating the script at " +
-				*create_template_flag + ". Make sure that you can save a " +
-				"file in that location.",
+					*create_template_flag + ". Make sure that you can save a " +
+					"file in that location.",
 			)
 		}
 
 		// Report back that we're done
 		fmt.Println(
 			":: Created a script at " +
-			tools.ColouriseCyan(*create_template_flag),
+				tools.ColouriseCyan(*create_template_flag),
 		)
 		// Abandon ship
 		os.Exit(0)
 	}
 
 	// If the docs flag is passed, serve up the docs
-	if *docs_flag {
+	if *docs_flag != "" {
 		// Set the port
-		port := "8000"
+		port := *docs_flag
 		// Print the port that the documentation is being served on
 		fmt.Println(
-			"Open up " + tools.ColouriseCyan("http://localhost:" + port) +
-			" in your browser.",
+			"Open up " + tools.ColouriseCyan("http://localhost:"+port) +
+				" in your browser.",
 		)
 		fmt.Println(
 			"Press " + tools.ColouriseMagenta("Ctrl-C") + " to quit the " +
-			"server.",
+				"server.",
 		)
 		// Set up a handler
 		http.HandleFunc("/", DocsHandler)
 		// Serve the documentation
-		http.ListenAndServe(":" + port, nil)
+		http.ListenAndServe(":"+port, nil)
 	}
 
 	// If the version flag is true, print version info
-	if *version_flag {
-		// Get build info
-		build_info, _ := debug.ReadBuildInfo()
-		// Get the go information absent the first to characters which is go
-		go_version := build_info.GoVersion[2:]
-
-		/* Print out a pretty version of the version info. During testing, the
-			BuildDate variable will be "testing" and this is replaced with the
-			actual build date when the Makefile is run.
-		*/
-
-		bin_dir, _ := os.Executable()
-
-		fmt.Printf(
-			"%s\nInstalled to %s\n\n%s\n\t%s%s\n\t%s%s\n\t%s%d\n\n%s\n\t%s%s\n\t%s%s\n",
-			tools.ColouriseMagenta(
-				values.LANG_NAME + " " +
-				strconv.Itoa(int(values.LANG_VERSION)),
-			),
-			tools.ColouriseBlue(bin_dir),
-			tools.ColouriseYellow("[Platform]"),
-			tools.ColouriseCyan("Operating System: "),
-			runtime.GOOS,
-			tools.ColouriseCyan("Architecture: "),
-			runtime.GOARCH,
-			tools.ColouriseCyan("CPUs: "),
-			runtime.NumCPU(),
-			tools.ColouriseYellow("[Build]"),
-			tools.ColouriseGreen("Go Version: "),
-			go_version,
-			tools.ColouriseGreen("Build Date: "),
-			BuildDate,
-		)
+	if *about_flag {
 		/* Set up the struct that will hold the JSON data for remotely checking
-			the current version.
+		the current version.
 		*/
 		type RemoteDetails struct {
-			Version	int	`json:"version"`
-			Date	string	`json:"date"`
-			Description	string	`json:"description"`
+			Version     int    `json:"version"`
+			Date        string `json:"date"`
+			Description string `json:"description"`
 		}
 		// Fetch the info about the current release
 		remote_response, remote_error := http.Get(
@@ -336,25 +301,65 @@ func main() {
 			// Exit the app
 			os.Exit(0)
 		}
+
+		new_or_current_version := ""
 		/* If the remote file has a version number greater than the current
-			version, inform the user and give them some details.
+		version, inform the user and give them some details.
 		*/
 		if remote_data.Version > values.LANG_VERSION {
-			fmt.Printf(
-				"\n%s\nThere's a new version of Appetit " +
-				"available! Version %s is available, released %s. " +
-				"%s\n",
-				tools.ColouriseYellow("[New Version]"),
-				strconv.Itoa(remote_data.Version),
-				remote_data.Date,
-				remote_data.Description,
+			new_or_current_version = tools.ColouriseRed(
+				fmt.Sprintf(
+					"\n%s\nThere's a new version of Appetit "+
+						"available! Version %s is available, released %s. "+
+						"%s\n",
+					tools.ColouriseYellow("[New Version]"),
+					strconv.Itoa(remote_data.Version),
+					remote_data.Date,
+					remote_data.Description,
+				),
 			)
-		/* If the version information is the same, let them know that they are
+			/* If the version information is the same, let them know that they are
 			running the most current version.
-		*/
+			*/
 		} else if remote_data.Version == values.LANG_VERSION {
-			fmt.Println("\nYou're up to date!")
+			new_or_current_version = tools.ColouriseGreen("You're up to date!")
 		}
+
+		// Get build info
+		build_info, _ := debug.ReadBuildInfo()
+		// Get the go information absent the first to characters which is go
+		go_version := build_info.GoVersion[2:]
+
+		/* Print out a pretty version of the version info. During testing, the
+		BuildDate variable will be "testing" and this is replaced with the
+		actual build date when the Makefile is run.
+		*/
+
+		bin_dir, _ := os.Executable()
+
+		fmt.Printf(
+			"%s\n%s\n\n%s\n%s%s\n\n%s\n%s%s\n%s%s\n%s%d\n\n%s\n%s%s\n%s%s\n",
+			tools.ColouriseMagenta(
+				values.LANG_NAME+" "+
+					strconv.Itoa(int(values.LANG_VERSION)),
+			),
+			new_or_current_version,
+			tools.ColouriseYellow("[Files]"),
+			tools.ColouriseCyan("Interpreter Path: "),
+			tools.ColouriseBlue(bin_dir),
+			tools.ColouriseYellow("[Platform]"),
+			tools.ColouriseCyan("Operating System: "),
+			runtime.GOOS,
+			tools.ColouriseCyan("Architecture: "),
+			runtime.GOARCH,
+			tools.ColouriseCyan("CPUs: "),
+			runtime.NumCPU(),
+			tools.ColouriseYellow("[Build]"),
+			tools.ColouriseCyan("Go Version: "),
+			go_version,
+			tools.ColouriseCyan("Build Date: "),
+			BuildDate,
+		)
 		// Exit the app
 		os.Exit(0)
 	}
@@ -376,7 +381,7 @@ func main() {
 	}
 
 	/* Before we start parsing, set any reserved variables that require
-		"computation".
+	"computation".
 	*/
 	values.BuildReservedVariables()
 
@@ -385,7 +390,7 @@ func main() {
 	// Remove the comments from the script
 	contents = parser.RemoveComments(contents)
 	/* Do a quick check to make sure that the minver statement call, if
-		present, is the first language specific call.
+	present, is the first language specific call.
 	*/
 	valid_minver, message := parser.CheckValidMinverLocationCount(contents)
 	// If it's not appropriately located in the script, error out
@@ -394,7 +399,7 @@ func main() {
 	}
 
 	/* If the dev flag is set, run the script and report back developer
-		information.
+	information.
 	*/
 	if *dev_flag {
 		// Start printing out the tokens
@@ -415,11 +420,11 @@ func main() {
 		fmt.Println("\tReported value: " + total_running_time.String())
 		fmt.Println(
 			"\tRounded (millisecond): " +
-			time.Since(start).Round(time.Millisecond).String(),
+				time.Since(start).Round(time.Millisecond).String(),
 		)
 		fmt.Println(
 			"\tRounded (nanosecond): " +
-			time.Since(start).Round(time.Nanosecond).String(),
+				time.Since(start).Round(time.Nanosecond).String(),
 		)
 	}
 
@@ -427,5 +432,5 @@ func main() {
 	if *dev_flag {
 		PrintDevInfo()
 	}
-		
+
 }
