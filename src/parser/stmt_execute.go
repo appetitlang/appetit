@@ -1,9 +1,7 @@
 /*
-The statements package controls the execution of actual statements.
-
 This module deals with the execute statement.
 */
-package statements
+package parser
 
 import (
 	"appetit/investigator"
@@ -16,7 +14,7 @@ import (
 )
 
 /*
-	Execute a system command. Parameters include the tokens. Returns nothing.
+Execute a system command. Parameters include the tokens. Returns nothing.
 */
 func ExecuteCommand(tokens []values.Token) {
 	// Get the full line of code
@@ -28,13 +26,13 @@ func ExecuteCommand(tokens []values.Token) {
 	// If not a valid number of tokens, report an error
 	if err != nil {
 		investigator.Report(
-			"The " + tools.ColouriseCyan("execute") + " statement needs " +
-			"to follow the form " + tools.ColouriseCyan("execute") + " " +
-			tools.ColouriseGreen("\"[command]\"") + ". A common " +
-			"issue here is excluding a command. An example of a working " +
-			"statement might be " + tools.ColouriseCyan("execute") +
-			tools.ColouriseGreen(" \"ls\"") + "." + "\n\nLine of Code: " +
-			tools.ColouriseMagenta(full_loc),
+			"The "+tools.ColouriseCyan("execute")+" statement needs "+
+				"to follow the form "+tools.ColouriseCyan("execute")+" "+
+				tools.ColouriseGreen("\"[command]\"")+". A common "+
+				"issue here is excluding a command. An example of a working "+
+				"statement might be "+tools.ColouriseCyan("execute")+
+				tools.ColouriseGreen(" \"ls\"")+"."+"\n\nLine of Code: "+
+				tools.ColouriseMagenta(full_loc),
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,
@@ -45,13 +43,13 @@ func ExecuteCommand(tokens []values.Token) {
 	command := tools.FixStringCombined(tokens[2].TokenValue)
 
 	/* Check if the -allowexec flag was passed to the app and if not, throw
-		an error
+	an error
 	*/
 	if !values.ALLOW_EXEC {
 		investigator.Report(
-			"You are unable to execute system commands. If you would like " +
-			"to do so, you need to run with the " +
-			tools.ColouriseYellow("-allowexec") + " flag.",
+			"You are unable to execute system commands. If you would like "+
+				"to do so, you need to run with the "+
+				tools.ColouriseYellow("-allowexec")+" flag.",
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,
@@ -71,15 +69,15 @@ func ExecuteCommand(tokens []values.Token) {
 	cmd_split := strings.Split(command, " ")
 
 	/* Get the output and an error from executing the command and capturing
-		the output. Thanks to https://stackoverflow.com/a/23724092 for the
-		argument passing here.
+	the output. Thanks to https://stackoverflow.com/a/23724092 for the
+	argument passing here.
 	*/
 	output, err := exec.Command(cmd_split[0], cmd_split[1:]...).Output()
 	// If the error isn't nil, throw an err
 	if err != nil {
 		investigator.Report(
-			"The application " + tools.ColouriseYellow(command) + 
-			" was not found. Perhaps it was a typo?",
+			"The application "+tools.ColouriseYellow(command)+
+				" was not found. Perhaps it was a typo?",
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,

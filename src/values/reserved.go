@@ -26,8 +26,8 @@ const LANG_DEV bool = true
 const LANG_NAME string = "Appetit"
 
 /*
-	Version. The versioning system here is a simple integer based system where
-	each version increment represents a new version. No semver here.
+Version. The versioning system here is a simple integer based system where
+each version increment represents a new version. No semver here.
 */
 const LANG_VERSION int = 1
 
@@ -36,6 +36,9 @@ var ALLOW_EXEC bool = false
 
 // Whether we are verbose with our output
 var MODE_VERBOSE bool = false
+
+// Whether we are in developer mode
+var MODE_DEV bool = false
 
 // The valid assignment operator
 var OPERATOR_ASSIGNMENT string = "="
@@ -64,11 +67,12 @@ var RESERVED_VARIABLE_PREFIX = "b_"
 	"zipdirectory",
 	"zipfile",
 }*/
-var STATEMENT_NAMES []string;
+var STATEMENT_NAMES []string
 
-/* The action symbol. This is used in placements where we don't need an
-	assignment operator but need something to split something where something
-	is happening to something.
+/*
+	 The action symbol. This is used in placements where we don't need an
+		assignment operator but need something to split something where something
+		is happening to something.
 */
 var SYMBOL_ACTION string = "to"
 
@@ -79,29 +83,29 @@ var SYMBOL_COMMENT string = "-"
 var SYMBOL_VARIABLE_SUBSTITUTION = "#"
 
 /*
-	Create any values for built in reserved variables that require building.
-	This addresses the empty ones in the VARIABLES map. No parameters and no
-	returns.
+Create any values for built in reserved variables that require building.
+This addresses the empty ones in the VARIABLES map. No parameters and no
+returns.
 */
 func BuildReservedVariables() {
 
 	cur_user, cur_user_error := user.Current()
 	if cur_user_error != nil {
-		VARIABLES[RESERVED_VARIABLE_PREFIX + "user"] = ""	
+		VARIABLES[RESERVED_VARIABLE_PREFIX+"user"] = ""
 	} else {
-		VARIABLES[RESERVED_VARIABLE_PREFIX + "user"] = cur_user.Username
+		VARIABLES[RESERVED_VARIABLE_PREFIX+"user"] = cur_user.Username
 	}
 
 	// Create a date
 	date := time.Now()
 
 	// Get the date in dd-mm-yyyy format
-	VARIABLES[RESERVED_VARIABLE_PREFIX + "date_dmy"] = fmt.Sprintf(
+	VARIABLES[RESERVED_VARIABLE_PREFIX+"date_dmy"] = fmt.Sprintf(
 		"%d-%d-%d", date.Day(), date.Month(), date.Year(),
 	)
 
 	// Get the date in yyyy-mm-dd format
-	VARIABLES[RESERVED_VARIABLE_PREFIX + "date_ymd"] = fmt.Sprintf(
+	VARIABLES[RESERVED_VARIABLE_PREFIX+"date_ymd"] = fmt.Sprintf(
 		"%d-%d-%d", date.Year(), date.Month(), date.Day(),
 	)
 
@@ -109,31 +113,31 @@ func BuildReservedVariables() {
 	host, err := os.Hostname()
 	// If there's no error, set the b_host to the hostname.
 	if err == nil {
-		VARIABLES[RESERVED_VARIABLE_PREFIX + "hostname"] = host
+		VARIABLES[RESERVED_VARIABLE_PREFIX+"hostname"] = host
 	}
 	// Get the user home directory
 	home, err := os.UserHomeDir()
 	// If there's no error, set the b_home to the home directory.
 	if err == nil {
-		VARIABLES[RESERVED_VARIABLE_PREFIX + "home"] = home
+		VARIABLES[RESERVED_VARIABLE_PREFIX+"home"] = home
 	}
 
 	// Get the working directory
 	wd, err := syscall.Getwd()
 	// If there's no error, set the b_wd to the working directory.
 	if err == nil {
-		VARIABLES[RESERVED_VARIABLE_PREFIX + "wd"] = wd
+		VARIABLES[RESERVED_VARIABLE_PREFIX+"wd"] = wd
 	}
 
 	/* House the ip address. This now improves on the old format which depended
-		both on an external network connection and the stability of Google's
-		public DNS service which is not something I want to depend on.
+	both on an external network connection and the stability of Google's
+	public DNS service which is not something I want to depend on.
 	*/
 	// Get the interfaces
 	ipaddrs, ipaddrs_err := net.InterfaceAddrs()
 	// If we can't, abandon ship and save n/a to the ipv4 reserved variable
 	if ipaddrs_err != nil {
-		VARIABLES[RESERVED_VARIABLE_PREFIX + "ipv4"] = "n/a"
+		VARIABLES[RESERVED_VARIABLE_PREFIX+"ipv4"] = "n/a"
 	}
 
 	// Iterate over the addresses
@@ -143,28 +147,28 @@ func BuildReservedVariables() {
 			// If converting it to an IPv4 address doesn't yield an error...
 			if ip.IP.To4() != nil {
 				// Set the IPv4 address reserved variable
-				VARIABLES[RESERVED_VARIABLE_PREFIX + "ipv4"] = ip.IP.String()
+				VARIABLES[RESERVED_VARIABLE_PREFIX+"ipv4"] = ip.IP.String()
 			}
 		}
 	}
 }
 
 /*
-	Create a string list of the reserved variables that can be easily printed
-	if need be. No parameters. Returns a string representation of the list of
-	reserved variables.
+Create a string list of the reserved variables that can be easily printed
+if need be. No parameters. Returns a string representation of the list of
+reserved variables.
 */
 func ListReservedVariables() string {
 	// Hold the list of reserved variables
 	var reserved_var []string
 	// For each variable in the VARIABLES map
 	for vars := range VARIABLES {
-		/* If the prefix -- signified by the string from 0 to the length of 
-			the RESERVED_VARIABLE_PREFIX -- is the RESERVED_VARIABLE_PREFIX
+		/* If the prefix -- signified by the string from 0 to the length of
+		the RESERVED_VARIABLE_PREFIX -- is the RESERVED_VARIABLE_PREFIX
 		*/
 		if vars[0:len(RESERVED_VARIABLE_PREFIX)] == RESERVED_VARIABLE_PREFIX {
 			/* Append the reserved variable to the list of them with a
-				colourised version
+			colourised version
 			*/
 			reserved_var = append(reserved_var, tools.ColouriseMagenta(vars))
 		}
@@ -182,9 +186,9 @@ func ListReservedVariables() string {
 }
 
 /*
-	Create a string list of the statement names that can be easily printed if
-	need be. No parameters. Returns a string representation of the list of
-	statements.
+Create a string list of the statement names that can be easily printed if
+need be. No parameters. Returns a string representation of the list of
+statements.
 */
 func ListStatements() string {
 	// Hold the list of statements

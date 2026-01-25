@@ -1,4 +1,4 @@
-package statements
+package parser
 
 import (
 	"appetit/investigator"
@@ -10,8 +10,8 @@ import (
 )
 
 /*
-	Handle an exit statement call. This one is very basic and doesn't require
-	much of the end user other than the statement call itself.
+Handle an exit statement call. This one is very basic and doesn't require
+much of the end user other than the statement call itself.
 */
 func Exit(tokens []values.Token) {
 	// Get the full line of code
@@ -23,12 +23,12 @@ func Exit(tokens []values.Token) {
 	// If not a valid number of tokens, report an error
 	if err != nil {
 		investigator.Report(
-			"The " + tools.ColouriseCyan("exit") + " statement needs " +
-			"to follow the form:\n\n\t" + tools.ColouriseCyan("exit") +
-			"\n\nThere are no values that you can or need to pass which is " +
-			"most likely the cause here.\n\n" +
-			"Your line of code looks like the following:\n\n\t" +
-			tools.ColouriseRed(full_loc) + "\n\n",
+			"The "+tools.ColouriseCyan("exit")+" statement needs "+
+				"to follow the form:\n\n\t"+tools.ColouriseCyan("exit")+
+				"\n\nThere are no values that you can or need to pass which is "+
+				"most likely the cause here.\n\n"+
+				"Your line of code looks like the following:\n\n\t"+
+				tools.ColouriseRed(full_loc)+"\n\n",
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,

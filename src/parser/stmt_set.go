@@ -1,11 +1,9 @@
 /*
-The statements package controls the execution of actual statements.
-
 This module deals with the set statement and any variable related
 functionality. In this way, it does more heavy lifting relative to other
 statement modules which often just have single functions in them.
 */
-package statements
+package parser
 
 import (
 	"appetit/investigator"
@@ -19,9 +17,9 @@ import (
 )
 
 /*
-	Calculate the value variable to see if it's a math expression. Parameters
-	include loc, the line of the script (if an error needs to be reported and
-	the value to calculate. Returns the value of the calculated string.
+Calculate the value variable to see if it's a math expression. Parameters
+include loc, the line of the script (if an error needs to be reported and
+the value to calculate. Returns the value of the calculated string.
 */
 func CalculateValue(loc string, value string) string {
 	// Thanks to https://stackoverflow.com/a/65484336 for the below
@@ -33,13 +31,13 @@ func CalculateValue(loc string, value string) string {
 	if err != nil {
 		return value
 	}
-	// Return the calculated value as a string. This has 
+	// Return the calculated value as a string. This has
 	return tv.Value.ExactString()
 }
 
 /*
-	Replace variables inside of a string. Parameters include the input line of
-	code to fix. Returns a templated string where variables have been fixed.
+Replace variables inside of a string. Parameters include the input line of
+code to fix. Returns a templated string where variables have been fixed.
 */
 func VariableTemplater(input string) string {
 	// For each key-value pair in the map of variables
@@ -47,11 +45,11 @@ func VariableTemplater(input string) string {
 		// Get the string value of the variable
 		value = string(value)
 		/* Replace the value in the string if the value is found in the
-			string prepended by the variable replacement symbol
+		string prepended by the variable replacement symbol
 		*/
 		input = strings.ReplaceAll(
 			input,
-			values.SYMBOL_VARIABLE_SUBSTITUTION + key,
+			values.SYMBOL_VARIABLE_SUBSTITUTION+key,
 			value,
 		)
 	}
@@ -60,7 +58,7 @@ func VariableTemplater(input string) string {
 }
 
 /*
-	Set a variable. Parameters include the tokens. Returns nothing.
+Set a variable. Parameters include the tokens. Returns the variable value.
 */
 func Set(tokens []values.Token) string {
 	// Get the full line of code
@@ -72,14 +70,14 @@ func Set(tokens []values.Token) string {
 	// If not a valid number of tokens, report an error
 	if err != nil {
 		investigator.Report(
-			"The " + tools.ColouriseCyan("set") + " statement needs " +
-			"to follow the form " + tools.ColouriseCyan("set") + " " +
-			tools.ColouriseYellow("[variable name]") + " = " +
-			tools.ColouriseGreen("\"[value]\"") + ". An example of a " +
-			"working version check might be " + tools.ColouriseCyan("set") +
-			" name = " +
-			tools.ColouriseGreen("\"" + values.LANG_NAME + "\"") + "\n\n" +
-			"Line of Code: " + tools.ColouriseMagenta(full_loc),
+			"The "+tools.ColouriseCyan("set")+" statement needs "+
+				"to follow the form "+tools.ColouriseCyan("set")+" "+
+				tools.ColouriseYellow("[variable name]")+" = "+
+				tools.ColouriseGreen("\"[value]\"")+". An example of a "+
+				"working version check might be "+tools.ColouriseCyan("set")+
+				" name = "+
+				tools.ColouriseGreen("\""+values.LANG_NAME+"\"")+"\n\n"+
+				"Line of Code: "+tools.ColouriseMagenta(full_loc),
 			loc,
 			"n/a",
 			full_loc,
@@ -92,9 +90,9 @@ func Set(tokens []values.Token) string {
 	assignment_operator := tokens[3].TokenValue
 	// The variable value with fixes that need to be made
 	variable_value := tools.FixStringCombined(tokens[4].TokenValue)
-	
+
 	/* Get the prefix of the variable so that we can check that it isn't
-		reserved
+	reserved
 	*/
 	// Hold the (possible) prefix for checking
 	var variable_prefix string
@@ -124,9 +122,9 @@ func Set(tokens []values.Token) string {
 	// If it is a statement
 	if statement {
 		investigator.ReportWithFixes(
-			"The variable - " + tools.ColouriseYellow(variable_name) + " - " +
-			"is not a valid variable name as it conflicts with a statement " +
-			"name.",
+			"The variable - "+tools.ColouriseYellow(variable_name)+" - "+
+				"is not a valid variable name as it conflicts with a statement "+
+				"name.",
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,
@@ -145,12 +143,12 @@ func Set(tokens []values.Token) string {
 	}
 
 	/* Get a templated value, that is, a variable where values have been
-		substituted
+	substituted
 	*/
 	templated_variable := VariableTemplater(variable_value)
 
 	/* Get the final variable value here by checking to see if the value is
-		a math expression
+	a math expression
 	*/
 	final_variable_value := CalculateValue(loc, templated_variable)
 

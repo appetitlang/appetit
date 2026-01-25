@@ -385,23 +385,20 @@ func main() {
 	*/
 	values.BuildReservedVariables()
 
-	// Open up the script
-	contents := OpenScript(file_name[0])
-	// Remove the comments from the script
-	contents = parser.RemoveComments(contents)
-	/* Do a quick check to make sure that the minver statement call, if
-	present, is the first language specific call.
+	/* TODO: move some of this to parser delegation code to a new function
+	so that a future 'run' statement can be implemented
 	*/
-	valid_minver, message := parser.CheckValidMinverLocationCount(contents)
-	// If it's not appropriately located in the script, error out
-	if !valid_minver {
-		investigator.ReportSimple(message)
-	}
+	// Open up the script
+	//contents := OpenScript(file_name[0])
+	// Remove the comments from the script
+	//contents = parser.RemoveComments(contents)
+	contents := parser.OpenAndSanitiseScript(file_name[0])
 
 	/* If the dev flag is set, run the script and report back developer
 	information.
 	*/
 	if *dev_flag {
+		values.MODE_DEV = true
 		// Start printing out the tokens
 		fmt.Println(tools.ColouriseYellow("\nTokens"))
 		parser.Start(contents, true)

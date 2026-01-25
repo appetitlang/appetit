@@ -34,7 +34,7 @@ func TestFixStringQuotations(t *testing.T) {
 	}
 }
 
-func TestFixStringEscapes(t *testing.T){
+func TestFixStringEscapes(t *testing.T) {
 	results := FixStringEscapes("\"Hello World\"")
 	pass := "\"Hello World\""
 	if results != pass {
@@ -78,5 +78,3 @@ func TestFixPathSeperators(t *testing.T) {
 		)
 	}
 }
-
-// TODO: add tests for other functions in fixer

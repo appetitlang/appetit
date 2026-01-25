@@ -1,0 +1,7 @@
+minver 1
+
+writeln "Running write.apt script"
+
+run "../samples/write.apt"
+
+writeln "And now back to run.apt!"

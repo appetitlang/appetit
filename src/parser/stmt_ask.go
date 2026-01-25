@@ -1,4 +1,4 @@
-package statements
+package parser
 
 import (
 	"appetit/investigator"
@@ -12,8 +12,8 @@ import (
 )
 
 /*
-	Set a variable. Parameters include the tokens. Returns the final value of
-	the variable.
+Set a variable. Parameters include the tokens. Returns the final value of
+the variable.
 */
 func Ask(tokens []values.Token) string {
 	// Get the full line of code
@@ -25,18 +25,18 @@ func Ask(tokens []values.Token) string {
 	// If not a valid number of tokens, report an error
 	if err != nil {
 		investigator.Report(
-			"The " + tools.ColouriseCyan("ask") + " statement needs " +
-			"to follow the form:\n\n\t" + tools.ColouriseCyan("ask") + " " +
-			tools.ColouriseGreen("\"[question/prompt]\"") +
-			tools.ColouriseMagenta(" to ") +
-			tools.ColouriseYellow("\"[variable name]\"") + "\n\nAn example " +
-			"of a working version check might be:\n\n\t" +
-			tools.ColouriseCyan("ask") + " " +
-			tools.ColouriseGreen("\"What is your name?\"") +
-			tools.ColouriseMagenta(" to ") +
-			tools.ColouriseGreen("\"name\"") + "\n\n" +
-			"Your line of code looks like the following:\n\n\t" +
-			tools.ColouriseRed(full_loc),
+			"The "+tools.ColouriseCyan("ask")+" statement needs "+
+				"to follow the form:\n\n\t"+tools.ColouriseCyan("ask")+" "+
+				tools.ColouriseGreen("\"[question/prompt]\"")+
+				tools.ColouriseMagenta(" to ")+
+				tools.ColouriseYellow("\"[variable name]\"")+"\n\nAn example "+
+				"of a working version check might be:\n\n\t"+
+				tools.ColouriseCyan("ask")+" "+
+				tools.ColouriseGreen("\"What is your name?\"")+
+				tools.ColouriseMagenta(" to ")+
+				tools.ColouriseGreen("\"name\"")+"\n\n"+
+				"Your line of code looks like the following:\n\n\t"+
+				tools.ColouriseRed(full_loc),
 			loc,
 			"n/a",
 			full_loc,
@@ -44,7 +44,7 @@ func Ask(tokens []values.Token) string {
 	}
 
 	/* Fix the prompt to ensure that quotation marks and escapes are handled
-		properly.
+	properly.
 	*/
 	prompt := tools.FixStringCombined(tokens[2].TokenValue)
 	// Get a templated value for the prompt
@@ -62,14 +62,14 @@ func Ask(tokens []values.Token) string {
 			full_loc,
 		)
 	}
-	
+
 	/* Fix the variable name to ensure that quotation marks and escapes are
-		handled properly.
+	handled properly.
 	*/
 	variable_name := tools.FixStringCombined(tokens[4].TokenValue)
-	
+
 	/* Get the prefix of the variable so that we can check that it isn't
-		reserved
+	reserved
 	*/
 	// Hold the (possible) prefix for checking
 	var variable_prefix string
@@ -101,9 +101,9 @@ func Ask(tokens []values.Token) string {
 	// If it is a statement
 	if statement {
 		investigator.ReportWithFixes(
-			"The variable - " + tools.ColouriseYellow(variable_name) + " - " +
-			"is not a valid variable name as it conflicts with a statement " +
-			"name.",
+			"The variable - "+tools.ColouriseYellow(variable_name)+" - "+
+				"is not a valid variable name as it conflicts with a statement "+
+				"name.",
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,
@@ -121,17 +121,17 @@ func Ask(tokens []values.Token) string {
 	}
 
 	/* Create a reader to get the input from user. Create a buffer size of
-		65,536 bytes which doesn't seem to be acknowledged by any operating
-		system. See issue #1 on GitHub for more. Leave this as-is though as
-		it does allow for some extra space for input on platforms such as
-		Windows. This is also potentially an issue with stdin limitations on
-		any one given platform.
+	65,536 bytes which doesn't seem to be acknowledged by any operating
+	system. See issue #1 on GitHub for more. Leave this as-is though as
+	it does allow for some extra space for input on platforms such as
+	Windows. This is also potentially an issue with stdin limitations on
+	any one given platform.
 	*/
 	input_reader := bufio.NewReaderSize(os.Stdin, 65536)
 	// Prompt as per the prompt provided by the script
 	fmt.Print(prompt)
 	/* Read in the line while looking for the new line character as the
-		delimiter
+	delimiter
 	*/
 	//user_input, user_input_error := input_reader.ReadString('\n')
 	user_input, user_input_error := input_reader.ReadString('\n')
@@ -140,10 +140,10 @@ func Ask(tokens []values.Token) string {
 
 	if user_input_error != nil {
 		investigator.Report(
-			"There was an error getting the user input. Please report the " +
-			"following error in yellow to the project's GitHub repository " +
-			"and a copy of the script:\n\n" +
-			tools.ColouriseYellow(user_input_error.Error()),
+			"There was an error getting the user input. Please report the "+
+				"following error in yellow to the project's GitHub repository "+
+				"and a copy of the script:\n\n"+
+				tools.ColouriseYellow(user_input_error.Error()),
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,
@@ -151,7 +151,7 @@ func Ask(tokens []values.Token) string {
 	}
 
 	/* Get the final variable value here by checking to see if the value is
-		a math expression
+	a math expression
 	*/
 	final_variable_value := CalculateValue(loc, user_input)
 

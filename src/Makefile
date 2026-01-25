@@ -147,4 +147,5 @@ source:
 
 # Run the Go unit tests
 test:
+	@go clean -testcache
 	@go test ./...
