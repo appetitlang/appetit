@@ -380,11 +380,6 @@ func main() {
 		)
 	}
 
-	/* Before we start parsing, set any reserved variables that require
-	"computation".
-	*/
-	values.BuildReservedVariables()
-
 	/* TODO: move some of this to parser delegation code to a new function
 	so that a future 'run' statement can be implemented
 	*/
@@ -392,7 +387,7 @@ func main() {
 	//contents := OpenScript(file_name[0])
 	// Remove the comments from the script
 	//contents = parser.RemoveComments(contents)
-	contents := parser.OpenAndSanitiseScript(file_name[0])
+	contents := parser.PrepScript(file_name[0])
 
 	/* If the dev flag is set, run the script and report back developer
 	information.

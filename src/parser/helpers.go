@@ -1,8 +1,7 @@
 /*
 The helpers module provides functions that help to clean up and check the lines
-
-	of the script before the three main parsing functions -- Start(),
-	Tokenise(), and Call() -- are run.
+of the script before the three main parsing functions -- Start(), Tokenise(),
+and Call() -- are run.
 */
 package parser
 
@@ -17,40 +16,11 @@ import (
 )
 
 /*
-This functions opens a script, cleans it up by removing comments and returns
-a ready to parse set of script lines. This is fundamentally just a function
-that calls other functions and consolidates efforts to make a slice that is
-ready for parsing. Returns a slice of strings that contain lines ready to be
-passed to the parser.
+Prepare a script for execution. Here, open it up and strip the comments. This
+returns a slice of the lines of the script with comments replaced with just
+the comment symbol.
 */
-
-/*
-Open up a script and produce a list of lines. The only parameter is the
-filename. This returns a slice of the lines.
-*/
-func OpenScript(filename string) []string {
-
-	// Read the file
-	script, err := os.ReadFile(filename)
-	// If the file couldn't be opened
-	if err != nil {
-		// Report the error
-		investigator.Report(
-			"Unknown file: "+tools.ColouriseMagenta(filename)+".",
-			"n/a",
-			"n/a",
-			"n/a",
-		)
-		// Exit the script
-		os.Exit(0)
-	}
-	//fmt.Print(string(script))
-	//os.Exit(0)
-	// Return the lines of the script
-	return strings.Split(string(script), "\n")
-}
-
-func OpenAndSanitiseScript(file_name string) []string {
+func PrepScript(file_name string) []string {
 	var lines []string
 
 	// Read the file

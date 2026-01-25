@@ -1,5 +1,6 @@
 /*
-This module deals with file related statements.
+This module deals with file related statements: copyfile, deletefile, makefile,
+and movefile.
 */
 package parser
 

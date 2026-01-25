@@ -16,6 +16,8 @@ writeln "Your IP address is #b_ipv4."
 
 writeln "Your operating system is #b_os."
 
+writeln "The time is #b_time in timezone #b_zone."
+
 writeln "Your temporary directory is #b_tempdir."
 
 writeln "The user is #b_user."

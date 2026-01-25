@@ -109,6 +109,20 @@ func BuildReservedVariables() {
 		"%d-%d-%d", date.Year(), date.Month(), date.Day(),
 	)
 
+	// Get the current time
+	time_now := time.Now()
+
+	// Get the time in hh-mm-ss in 24 hour format
+	VARIABLES[RESERVED_VARIABLE_PREFIX+"time"] = fmt.Sprintf(
+		"%d-%d-%d", time_now.Hour(), time_now.Minute(), time_now.Second(),
+	)
+
+	// Get the time zone, ignoring the offset as this isn't needed
+	time_zone, _ := time_now.Zone()
+
+	// Get the timezone
+	VARIABLES[RESERVED_VARIABLE_PREFIX+"zone"] = time_zone
+
 	// Get the hostname
 	host, err := os.Hostname()
 	// If there's no error, set the b_host to the hostname.

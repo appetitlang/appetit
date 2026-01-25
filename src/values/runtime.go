@@ -16,37 +16,37 @@ import (
 )
 
 /*
-	The Token type houses information about a particular token and serves as an
-	object that houses the relevant information. The structure of the token is
-	as follows:
+The Token type houses information about a particular token and serves as an
+object that houses the relevant information. The structure of the token is
+as follows:
 
-	FullLineOfCode [string]: the full line of code that the token is embedded
-	in which is helpful for error reporting
+FullLineOfCode [string]: the full line of code that the token is embedded
+in which is helpful for error reporting
 
-	LineNumber [int]: the line number
+LineNumber [int]: the line number
 
-	TokenPosition [string]: the starting position (column) of the token in
-	question which is helpful for error reporting
+TokenPosition [string]: the starting position (column) of the token in
+question which is helpful for error reporting
 
-	TokenValue [string]: the actual string value of the token
+TokenValue [string]: the actual string value of the token
 
-	TokenType [string]: the type of the token as a string
+TokenType [string]: the type of the token as a string
 
-	NonCommentLineNumber [int]: the line counter for lines that aren't
-	comments, that is, lines with statement calls
+NonCommentLineNumber [int]: the line counter for lines that aren't
+comments, that is, lines with statement calls
 */
 type Token struct {
-	FullLineOfCode string
-	LineNumber int
-	TokenPosition string
-	TokenValue string
-	TokenType string
+	FullLineOfCode       string
+	LineNumber           int
+	TokenPosition        string
+	TokenValue           string
+	TokenType            string
 	NonCommentLineNumber int
 }
 
 /*
-	A helper function to make Token printing easier. It takes no parameters nor
-	does it return anything.
+A helper function to make Token printing easier. It takes no parameters nor
+does it return anything.
 */
 func (token *Token) PrintToken() {
 	// Marshal the toke into JSON and indent it with a tab
@@ -59,15 +59,15 @@ func (token *Token) PrintToken() {
 	fmt.Printf("Token: %s", string(indented_json))
 }
 
-/* 
-	Do we have a shebang line? If so, set this to true. This is necessary for
-	the minver statement 
+/*
+Do we have a shebang line? If so, set this to true. This is necessary for
+the minver statement
 */
 var SHEBANG_PRESENT bool = false
 
 /*
-	The TOKEN_TREE holds the tokens in a "tree" which is a glorified list of
-	tokens.
+The TOKEN_TREE holds the tokens in a "tree" which is a glorified list of
+tokens.
 */
 var TOKEN_TREE []Token
 
@@ -80,15 +80,17 @@ var TOKEN_TREE []Token
 */
 
 var VARIABLES = map[string]string{
-	fmt.Sprintf("%sarch", RESERVED_VARIABLE_PREFIX): runtime.GOARCH,
-	fmt.Sprintf("%scpu", RESERVED_VARIABLE_PREFIX): strconv.Itoa(runtime.NumCPU()),
+	fmt.Sprintf("%sarch", RESERVED_VARIABLE_PREFIX):     runtime.GOARCH,
+	fmt.Sprintf("%scpu", RESERVED_VARIABLE_PREFIX):      strconv.Itoa(runtime.NumCPU()),
 	fmt.Sprintf("%sdate_dmy", RESERVED_VARIABLE_PREFIX): "",
 	fmt.Sprintf("%sdate_ymd", RESERVED_VARIABLE_PREFIX): "",
-	fmt.Sprintf("%shome", RESERVED_VARIABLE_PREFIX): "",
+	fmt.Sprintf("%shome", RESERVED_VARIABLE_PREFIX):     "",
 	fmt.Sprintf("%shostname", RESERVED_VARIABLE_PREFIX): "",
-	fmt.Sprintf("%sipv4", RESERVED_VARIABLE_PREFIX): "",
-	fmt.Sprintf("%sos", RESERVED_VARIABLE_PREFIX): runtime.GOOS,
-	fmt.Sprintf("%stempdir", RESERVED_VARIABLE_PREFIX): os.TempDir(),
-	fmt.Sprintf("%suser", RESERVED_VARIABLE_PREFIX): "",
-	fmt.Sprintf("%swd", RESERVED_VARIABLE_PREFIX): "",
+	fmt.Sprintf("%sipv4", RESERVED_VARIABLE_PREFIX):     "",
+	fmt.Sprintf("%sos", RESERVED_VARIABLE_PREFIX):       runtime.GOOS,
+	fmt.Sprintf("%stempdir", RESERVED_VARIABLE_PREFIX):  os.TempDir(),
+	fmt.Sprintf("%stime", RESERVED_VARIABLE_PREFIX):     "",
+	fmt.Sprintf("%szone", RESERVED_VARIABLE_PREFIX):     "",
+	fmt.Sprintf("%suser", RESERVED_VARIABLE_PREFIX):     "",
+	fmt.Sprintf("%swd", RESERVED_VARIABLE_PREFIX):       "",
 }

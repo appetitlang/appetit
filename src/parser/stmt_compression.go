@@ -1,3 +1,6 @@
+/*
+This module deals with the zipdirectory and zipfile statements.
+*/
 package parser
 
 import (

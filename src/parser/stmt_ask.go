@@ -1,3 +1,6 @@
+/*
+This module deals with the ask statement.
+*/
 package parser
 
 import (

@@ -1,5 +1,6 @@
 /*
-This module deals with path related statements.
+This module deals with path related statements: copydirectory, deletedirectory,
+makedirectory, and movedirectory.
 */
 package parser
 

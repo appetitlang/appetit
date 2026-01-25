@@ -1,3 +1,6 @@
+/*
+This deals with the exit statement.
+*/
 package parser
 
 import (

@@ -22,6 +22,10 @@ and the delegator. The only parameter is the lines of the script. No
 returns.
 */
 func Start(lines []string, dev_mode bool) {
+	/* Before we start parsing, set any reserved variables that require
+	"computation".
+	*/
+	values.BuildReservedVariables()
 	/* Do a quick check to make sure that the minver statement call, if
 	present, is the first language specific call.
 	*/

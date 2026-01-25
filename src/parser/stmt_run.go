@@ -54,7 +54,7 @@ func Run(tokens []values.Token) {
 		)
 	}
 
-	contents := OpenAndSanitiseScript(script_name)
+	contents := PrepScript(script_name)
 
 	if values.MODE_DEV {
 		// Start printing out the tokens

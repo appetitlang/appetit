@@ -1,7 +1,10 @@
 minver 1
 
+- Start us off
 writeln "Running write.apt script"
 
+- Run an external script
 run "../samples/write.apt"
 
+- And then back to this one
 writeln "And now back to run.apt!"
