@@ -7,9 +7,7 @@ import (
 	"appetit/investigator"
 	"appetit/tools"
 	"appetit/values"
-	"errors"
 	"fmt"
-	"os"
 	"strconv"
 )
 
@@ -42,8 +40,9 @@ func Run(tokens []values.Token) {
 	// Replace any variables in the output string
 	script_name = VariableTemplater(script_name)
 
-	_, exist_error := os.Stat(script_name)
-	if errors.Is(exist_error, os.ErrNotExist) {
+	file_exists := investigator.FileExists(script_name)
+
+	if !file_exists {
 		investigator.Report(
 			"The script - "+tools.ColouriseYellow(script_name)+" - does "+
 				"not exist and/or can't be accessed. Double check to verify "+
