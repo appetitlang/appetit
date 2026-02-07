@@ -5,58 +5,54 @@ import (
 	"testing"
 )
 
-func TestCheckValidMinverLocationCount(t *testing.T) {
-	valid_sample := []string{
-		"minver 1",
-		"writeln \"Hello world!\"",
-		"ask \"Name: \" to name",
-		"writeln \"Hello #name!\"",
-	}
+/*
+This is a simple test to ensure that the CommaSeperator() function is working.
+*/
+func TestCommaSeperator(t *testing.T) {
+	num_one := 1234567890
+	num_one_seperated := "1,234,567,890"
 
-	// minver not on the first line
-	invalid_sample_one := []string{
-		"writeln \"Hello world!\"",
-		"minver 1",
-		"ask \"Name: \" to name",
-		"writeln \"Hello #name!\"",
-	}
+	num_two := 12345
+	num_two_seperated := "12,345"
 
-	// minver provided twice
-	invalid_sample_two := []string{
-		"minver 1",
-		"minver 1",
-		"writeln \"Hello world!\"",
-		"ask \"Name: \" to name",
-		"writeln \"Hello #name!\"",
-	}
+	num_three := 123
+	num_three_seperated := "123"
 
-	valid, _ := CheckValidMinverLocationCount(valid_sample)
-	invalid_one, _ := CheckValidMinverLocationCount(invalid_sample_one)
-	invalid_two, _ := CheckValidMinverLocationCount(invalid_sample_two)
+	result_one := CommaSeperator(float64(num_one))
+	result_two := CommaSeperator(float64(num_two))
+	result_three := CommaSeperator(float64(num_three))
 
-	if !valid {
+	if result_one != num_one_seperated {
 		t.Errorf(
-			"[CheckValidMinverLocationCount] Valid sample returned false, " +
-				"expected true",
+			"[CommaSeperator] Expected %s, got %s ",
+			num_one_seperated,
+			result_one,
 		)
 	}
 
-	if invalid_one {
+	if result_two != num_two_seperated {
 		t.Errorf(
-			"[CheckValidMinverLocationCount] Invalid location returned " +
-				"true, expected false",
+			"[CommaSeperator] Expected %s, got %s ",
+			num_two_seperated,
+			result_two,
 		)
 	}
 
-	if invalid_two {
+	if result_three != num_three_seperated {
 		t.Errorf(
-			"[CheckValidMinverLocationCount] Invalid count returned " +
-				"true, expected false",
+			"[CommaSeperator] Expected %s, got %s ",
+			num_three_seperated,
+			result_three,
 		)
 	}
 }
 
+/*
+Check to make sure that the removal of comments does what it should - replace
+the comments with empty comment strings.
+*/
 func TestRemoveComments(t *testing.T) {
+	// This is a commented script
 	commented_script := []string{
 		"- This is a comment",
 		"minver 1",
@@ -68,7 +64,8 @@ func TestRemoveComments(t *testing.T) {
 	}
 
 	/* The "stripped" version of a script actually just removes everything
-	after a comment.
+	after a comment. This is what the internal representation of the lines
+	should look like after.
 	*/
 	comments_stripped := []string{
 		"-",
@@ -80,9 +77,12 @@ func TestRemoveComments(t *testing.T) {
 		"writeln \"Hello #name!\"",
 	}
 
+	// Remove the comments
 	comments_removed := RemoveComments(commented_script)
 
+	// Check to see if the slices are equivalent and if not...
 	if !slices.Equal(comments_removed, comments_stripped) {
+		// Report an error
 		t.Errorf(
 			"[RemoveComments] Expected %s, got %s",
 			comments_stripped,

@@ -4,9 +4,7 @@ This module deals with the zipdirectory and zipfile statements.
 package parser
 
 import (
-	"appetit/investigator"
-	"appetit/tools"
-	"appetit/values"
+	"appetit/utils"
 	"archive/zip"
 	"fmt"
 	"io"
@@ -21,34 +19,34 @@ Make a zip archive of a file. The tokens are passed to get
 the origin, destination, and to ensure that the 'action' is appropriate.
 Returns nothing. Thanks to https://earthly.dev/blog/golang-zip-files/
 */
-func ZipFromFile(tokens []values.Token) {
+func ZipFromFile(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 4)
+	_, err := CheckValidNumberOfTokens(tokens, 4)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("zipfile")+" statement needs "+
-				"to follow the form "+tools.ColouriseCyan("zipfile")+" "+
-				tools.ColouriseGreen("\"[path]\"")+" to "+
-				tools.ColouriseGreen("\"[path]\"")+". A common issue is the "+
+		Report(
+			"The "+utils.ColouriseCyan("zipfile")+" statement needs "+
+				"to follow the form "+utils.ColouriseCyan("zipfile")+" "+
+				utils.ColouriseGreen("\"[path]\"")+" to "+
+				utils.ColouriseGreen("\"[path]\"")+". A common issue is the "+
 				"use of an inappropriate action symbol ("+
-				tools.ColouriseMagenta(values.SYMBOL_ACTION)+"). An "+
+				utils.ColouriseMagenta(SYMBOL_ACTION)+"). An "+
 				"example of a working version might be "+
-				tools.ColouriseCyan("zipfile")+
-				tools.ColouriseGreen(" \"/Users/user/test_dir.txt\"")+" to "+
-				tools.ColouriseGreen(" \"test_dir.zip\"")+"\n\nLine of "+
-				"Code: "+tools.ColouriseMagenta(full_loc),
+				utils.ColouriseCyan("zipfile")+
+				utils.ColouriseGreen(" \"/Users/user/test_dir.txt\"")+" to "+
+				utils.ColouriseGreen(" \"test_dir.zip\"")+"\n\nLine of "+
+				"Code: "+utils.ColouriseMagenta(full_loc),
 			loc,
 			"n/a",
 			full_loc,
 		)
 	}
 	// Fix up the source string
-	source := tools.FixStringCombined(tokens[2].TokenValue)
+	source := FixStringCombined(tokens[2].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
@@ -57,10 +55,10 @@ func ZipFromFile(tokens []values.Token) {
 	// Get the action to ensure that it can be checked
 	action := tokens[3].TokenValue
 	// Check the action keyword to ensure that it's valid
-	action_error := investigator.CheckAction(loc, action)
+	action_error := CheckAction(loc, action)
 	// If there's an error in the action keyword, report it
 	if action_error != nil {
-		investigator.Report(
+		Report(
 			action_error.Error(),
 			loc,
 			tokens[3].TokenPosition,
@@ -69,19 +67,19 @@ func ZipFromFile(tokens []values.Token) {
 	}
 
 	// Fix up the destination string
-	destination := tools.FixStringCombined(tokens[4].TokenValue)
+	destination := FixStringCombined(tokens[4].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
 	destination = VariableTemplater(destination)
 
 	// If verbose mode is set, note that we're zipping a file
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(
 			":: %s %s to %s...",
-			tools.ColouriseBlue("Zipping"),
-			tools.ColouriseGreen(source),
-			tools.ColouriseGreen(destination),
+			utils.ColouriseBlue("Zipping"),
+			utils.ColouriseGreen(source),
+			utils.ColouriseGreen(destination),
 		)
 	}
 
@@ -89,9 +87,9 @@ func ZipFromFile(tokens []values.Token) {
 	archive_name, archive_name_error := os.Create(destination)
 	// If there's an error with creating the archive, report it
 	if archive_name_error != nil {
-		investigator.Report(
+		Report(
 			"The archive name you provided - "+
-				tools.ColouriseYellow(destination)+" - could "+
+				utils.ColouriseYellow(destination)+" - could "+
 				" not be created. Is it possible that you can't write to that "+
 				"path?",
 			loc,
@@ -109,8 +107,8 @@ func ZipFromFile(tokens []values.Token) {
 	file_to_zip, file_to_zip_error := os.Open(source)
 	// If there's an error opening up the file that will be zipped, report it
 	if file_to_zip_error != nil {
-		investigator.Report(
-			"Couldn't open "+tools.ColouriseYellow(source)+"! Is it "+
+		Report(
+			"Couldn't open "+utils.ColouriseYellow(source)+"! Is it "+
 				"possible that this file doesn't exist?",
 			loc,
 			tokens[2].TokenPosition,
@@ -131,9 +129,9 @@ func ZipFromFile(tokens []values.Token) {
 	add_file, add_file_error := zip_writer.Create(filename)
 	// If there was an error creating the file in the zip archive, report it
 	if add_file_error != nil {
-		investigator.Report(
-			"Couldn't add "+tools.ColouriseYellow(source)+" to "+
-				tools.ColouriseYellow(destination)+". Something went wrong "+
+		Report(
+			"Couldn't add "+utils.ColouriseYellow(source)+" to "+
+				utils.ColouriseYellow(destination)+". Something went wrong "+
 				"with adding the file to the archive.",
 			loc,
 			tokens[4].TokenPosition,
@@ -149,7 +147,7 @@ func ZipFromFile(tokens []values.Token) {
 	archive, report it
 	*/
 	if copy_file_err != nil {
-		investigator.Report(
+		Report(
 			"Couldn't copy data from "+source+" to "+destination+
 				"Check to make sure that the original file can be read.",
 			loc,
@@ -161,10 +159,10 @@ func ZipFromFile(tokens []values.Token) {
 	/* If verbose mode is set, report back that we're done along with how many
 	bytes were written
 	*/
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(
 			"done! "+
-				tools.ColouriseMagenta(
+				utils.ColouriseMagenta(
 					"[%s bytes written]\n",
 				),
 			strconv.FormatInt(copy_file_size, 10),
@@ -180,35 +178,35 @@ Make a zip archive of a folder. The tokens are passed to get
 the origin, destination, and to ensure that the 'action' is appropriate.
 Returns nothing. Thanks to https://stackoverflow.com/a/63233911
 */
-func ZipFromPath(tokens []values.Token) {
+func ZipFromPath(tokens []Token) {
 
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 4)
+	_, err := CheckValidNumberOfTokens(tokens, 4)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("zipdirectory")+" statement needs "+
-				"to follow the form "+tools.ColouriseCyan("zipdirectory")+" "+
-				tools.ColouriseGreen("\"[path]\"")+" to "+
-				tools.ColouriseGreen("\"[path]\"")+". A common issue is the "+
+		Report(
+			"The "+utils.ColouriseCyan("zipdirectory")+" statement needs "+
+				"to follow the form "+utils.ColouriseCyan("zipdirectory")+" "+
+				utils.ColouriseGreen("\"[path]\"")+" to "+
+				utils.ColouriseGreen("\"[path]\"")+". A common issue is the "+
 				"use of an inappropriate action symbol ("+
-				tools.ColouriseMagenta(values.SYMBOL_ACTION)+"). An "+
+				utils.ColouriseMagenta(SYMBOL_ACTION)+"). An "+
 				"example of a working version might be "+
-				tools.ColouriseCyan("zipdirectory")+
-				tools.ColouriseGreen(" \"/Users/user/test_dir/\"")+" to "+
-				tools.ColouriseGreen(" \"test_dir.zip\"")+"\n\nLine of "+
-				"Code: "+tools.ColouriseMagenta(full_loc),
+				utils.ColouriseCyan("zipdirectory")+
+				utils.ColouriseGreen(" \"/Users/user/test_dir/\"")+" to "+
+				utils.ColouriseGreen(" \"test_dir.zip\"")+"\n\nLine of "+
+				"Code: "+utils.ColouriseMagenta(full_loc),
 			loc,
 			"n/a",
 			full_loc,
 		)
 	}
 	// Fix up the source string
-	source := tools.FixStringCombined(tokens[2].TokenValue)
+	source := FixStringCombined(tokens[2].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
@@ -217,10 +215,10 @@ func ZipFromPath(tokens []values.Token) {
 	// Get the action to ensure that it can be checked
 	action := tokens[3].TokenValue
 	// Check the action keyword to ensure that it's valid
-	action_error := investigator.CheckAction(loc, action)
+	action_error := CheckAction(loc, action)
 	// If there's an error in the action keyword, report it
 	if action_error != nil {
-		investigator.Report(
+		Report(
 			action_error.Error(),
 			loc,
 			tokens[3].TokenPosition,
@@ -229,19 +227,19 @@ func ZipFromPath(tokens []values.Token) {
 	}
 
 	// Fix up the destination string
-	destination := tools.FixStringCombined(tokens[4].TokenValue)
+	destination := FixStringCombined(tokens[4].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
 	destination = VariableTemplater(destination)
 
 	// If verbose mode is set, note that we're zipping a file
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(
 			":: %s %s to %s...\n",
-			tools.ColouriseBlue("Zipping"),
-			tools.ColouriseGreen(source),
-			tools.ColouriseGreen(destination),
+			utils.ColouriseBlue("Zipping"),
+			utils.ColouriseGreen(source),
+			utils.ColouriseGreen(destination),
 		)
 	}
 
@@ -249,9 +247,9 @@ func ZipFromPath(tokens []values.Token) {
 	archive_name, archive_name_error := os.Create(destination)
 	// If there's an error with creating the archive, report it
 	if archive_name_error != nil {
-		investigator.Report(
+		Report(
 			"The archive name you provided - "+
-				tools.ColouriseYellow(destination)+" - could "+
+				utils.ColouriseYellow(destination)+" - could "+
 				" not be created. Is it possible that you can't write to that "+
 				"path?",
 			loc,
@@ -269,19 +267,19 @@ func ZipFromPath(tokens []values.Token) {
 	path_walker := func(path string, info os.FileInfo, err error) error {
 
 		// If verbose mode is set, note that we're zipping a file
-		if values.MODE_VERBOSE {
+		if MODE_VERBOSE {
 			fmt.Printf(
 				":: %s %s...",
-				tools.ColouriseBlue("Adding"),
-				tools.ColouriseGreen(path),
+				utils.ColouriseBlue("Adding"),
+				utils.ColouriseGreen(path),
 			)
 		}
 
 		// If there's an error walking the path, report it
 		if err != nil {
-			investigator.Report(
+			Report(
 				"There was an error traversing the  "+
-					tools.ColouriseYellow(path)+". Is it possible that "+
+					utils.ColouriseYellow(path)+". Is it possible that "+
 					"you can't read from that path?",
 				loc,
 				tokens[2].TokenPosition,
@@ -300,8 +298,8 @@ func ZipFromPath(tokens []values.Token) {
 		file_path, file_path_error := os.Open(path)
 		// If there's an error opening our file, report it
 		if file_path_error != nil {
-			investigator.Report(
-				"There was an error opening  "+tools.ColouriseYellow(path)+
+			Report(
+				"There was an error opening  "+utils.ColouriseYellow(path)+
 					". Is it possible that you can't read from that path?",
 				loc,
 				tokens[2].TokenPosition,
@@ -316,7 +314,7 @@ func ZipFromPath(tokens []values.Token) {
 		nested folders. This trims off what is considered a reasonable
 		number of folders (ie. the user home directory).
 		*/
-		path = strings.TrimPrefix(path, values.VARIABLES["b_home"])
+		path = strings.TrimPrefix(path, VARIABLES["b_home"])
 
 		/* To give the unzipped folder some nice naming, we want to get the
 		name of the destination zip file. So, we're going to split the name
@@ -336,9 +334,9 @@ func ZipFromPath(tokens []values.Token) {
 		file, file_error := zip_writer.Create(zip_path)
 		// If there's an error doing this, report it
 		if file_error != nil {
-			investigator.Report(
+			Report(
 				"There was an error creating the file:  "+
-					tools.ColouriseYellow(path)+". Is it possible that you "+
+					utils.ColouriseYellow(path)+". Is it possible that you "+
 					"can't write to that path?",
 				loc,
 				tokens[4].TokenPosition,
@@ -354,9 +352,9 @@ func ZipFromPath(tokens []values.Token) {
 		bytes_written, bytes_error := io.Copy(file, file_path)
 		// If there was an error, report it
 		if bytes_error != nil {
-			investigator.Report(
+			Report(
 				"There was an error creating the file:  "+
-					tools.ColouriseYellow(path)+". Is it possible that you "+
+					utils.ColouriseYellow(path)+". Is it possible that you "+
 					"can't write to that path?",
 				loc,
 				tokens[4].TokenPosition,
@@ -365,10 +363,10 @@ func ZipFromPath(tokens []values.Token) {
 		}
 
 		// If verbose mode is set, note that we're zipping a file
-		if values.MODE_VERBOSE {
+		if MODE_VERBOSE {
 			fmt.Printf(
 				":: done [%s bytes written]\n",
-				tools.ColouriseMagenta(strconv.Itoa(int(bytes_written))),
+				utils.ColouriseMagenta(strconv.Itoa(int(bytes_written))),
 			)
 		}
 
@@ -384,9 +382,9 @@ func ZipFromPath(tokens []values.Token) {
 	reporting errors instead.
 	*/
 	if walker_error != nil {
-		investigator.Report(
+		Report(
 			"There was an error traversing the  "+
-				tools.ColouriseYellow(source)+". Is it possible that "+
+				utils.ColouriseYellow(source)+". Is it possible that "+
 				"you can't read from that path?",
 			loc,
 			tokens[2].TokenPosition,

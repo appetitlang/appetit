@@ -5,9 +5,7 @@ and movefile.
 package parser
 
 import (
-	"appetit/investigator"
-	"appetit/tools"
-	"appetit/values"
+	"appetit/utils"
 	"fmt"
 	"io"
 	"os"
@@ -21,27 +19,27 @@ the origin, destination, and to ensure that the 'action' is appropriate.
 Returns nothing. Thanks to https://www.kelche.co/blog/go/golang-file-
 handling/.
 */
-func CopyFile(tokens []values.Token) {
+func CopyFile(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 4)
+	_, err := CheckValidNumberOfTokens(tokens, 4)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("copyfile")+" statement needs "+
-				"to follow the form "+tools.ColouriseCyan("copyfile")+" "+
-				tools.ColouriseGreen("\"[path]\"")+" to "+
-				tools.ColouriseGreen("\"[path]\"")+". A common issue is the "+
+		Report(
+			"The "+utils.ColouriseCyan("copyfile")+" statement needs "+
+				"to follow the form "+utils.ColouriseCyan("copyfile")+" "+
+				utils.ColouriseGreen("\"[path]\"")+" to "+
+				utils.ColouriseGreen("\"[path]\"")+". A common issue is the "+
 				"use of an inappropriate action symbol ("+
-				tools.ColouriseMagenta(values.SYMBOL_ACTION)+"). An "+
+				utils.ColouriseMagenta(SYMBOL_ACTION)+"). An "+
 				"example of a working version might be "+
-				tools.ColouriseCyan("copyfile")+
-				tools.ColouriseGreen(" \"test.txt\"")+" to "+
-				tools.ColouriseGreen(" \"test_new.txt\"")+"\n\nLine of "+
-				"Code: "+tools.ColouriseMagenta(full_loc),
+				utils.ColouriseCyan("copyfile")+
+				utils.ColouriseGreen(" \"test.txt\"")+" to "+
+				utils.ColouriseGreen(" \"test_new.txt\"")+"\n\nLine of "+
+				"Code: "+utils.ColouriseMagenta(full_loc),
 			loc,
 			"n/a",
 			full_loc,
@@ -49,7 +47,7 @@ func CopyFile(tokens []values.Token) {
 	}
 
 	// Fix the source string
-	source := tools.FixStringCombined(tokens[2].TokenValue)
+	source := FixStringCombined(tokens[2].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
@@ -58,9 +56,9 @@ func CopyFile(tokens []values.Token) {
 	// Get the action to ensure that it can be checked
 	action := tokens[3].TokenValue
 	// Check the action keyword to ensure that it's valid
-	action_error := investigator.CheckAction(loc, action)
+	action_error := CheckAction(loc, action)
 	if action_error != nil {
-		investigator.Report(
+		Report(
 			action_error.Error(),
 			loc,
 			tokens[3].TokenPosition,
@@ -69,7 +67,7 @@ func CopyFile(tokens []values.Token) {
 	}
 
 	// Fix the destination string
-	destination := tools.FixStringCombined(tokens[4].TokenValue)
+	destination := FixStringCombined(tokens[4].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
@@ -89,19 +87,19 @@ func CopyFile(tokens []values.Token) {
 		destination = destination + filename
 	}
 
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(
 			":: %s %s to %s...",
-			tools.ColouriseBlue("Copying"),
-			tools.ColouriseGreen(source),
-			tools.ColouriseGreen(destination),
+			utils.ColouriseBlue("Copying"),
+			utils.ColouriseGreen(source),
+			utils.ColouriseGreen(destination),
 		)
 	}
 
 	source_file, err := os.Open(source)
 	if err != nil {
-		investigator.Report(
-			"Can't open "+tools.ColouriseYellow(source)+
+		Report(
+			"Can't open "+utils.ColouriseYellow(source)+
 				"! Are you sure that the file exists?",
 			loc,
 			tokens[2].TokenPosition,
@@ -111,11 +109,11 @@ func CopyFile(tokens []values.Token) {
 
 	destination_file, err := os.Create(destination)
 	if err != nil {
-		investigator.Report(
-			"The destination - "+tools.ColouriseYellow(destination)+
+		Report(
+			"The destination - "+utils.ColouriseYellow(destination)+
 				" - is invalid. Are you source that the destination exists? If "+
 				"you're trying to copy to a directory, make sure to put in a "+
-				"trailing "+tools.ColouriseYellow(string(os.PathSeparator)),
+				"trailing "+utils.ColouriseYellow(string(os.PathSeparator)),
 			loc,
 			tokens[4].TokenPosition,
 			full_loc,
@@ -123,7 +121,7 @@ func CopyFile(tokens []values.Token) {
 	}
 	bytes, err := io.Copy(destination_file, source_file)
 	if err != nil {
-		investigator.Report(
+		Report(
 			"There was an error doing the file copy/move. Check to ensure that "+
 				"source - "+source+" - and the destination - "+destination+
 				" - are valid.",
@@ -133,10 +131,10 @@ func CopyFile(tokens []values.Token) {
 		)
 	}
 
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(
 			"done! "+
-				tools.ColouriseMagenta(
+				utils.ColouriseMagenta(
 					"[%s bytes written]\n",
 				),
 			strconv.FormatInt(bytes, 10),
@@ -149,26 +147,26 @@ Move a file from an origin to a destination. The tokens are passed to get
 the origin, destination, and to ensure that the 'action' is appropriate.
 Returns nothing.
 */
-func MoveFile(tokens []values.Token) {
+func MoveFile(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 4)
+	_, err := CheckValidNumberOfTokens(tokens, 4)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("movefile")+" statement needs "+
-				"to follow the form "+tools.ColouriseCyan("movefile")+" "+
-				tools.ColouriseGreen("\"[path]\"")+" to "+
-				tools.ColouriseGreen("\"[path]\"")+". A common issue is the "+
+		Report(
+			"The "+utils.ColouriseCyan("movefile")+" statement needs "+
+				"to follow the form "+utils.ColouriseCyan("movefile")+" "+
+				utils.ColouriseGreen("\"[path]\"")+" to "+
+				utils.ColouriseGreen("\"[path]\"")+". A common issue is the "+
 				"use of an inappropriate action symbol ("+
-				tools.ColouriseMagenta(values.SYMBOL_ACTION)+"). An "+
+				utils.ColouriseMagenta(SYMBOL_ACTION)+"). An "+
 				"example of a working version might be "+
-				tools.ColouriseCyan("movefile")+
-				tools.ColouriseGreen(" \"test.txt\"")+" to "+
-				tools.ColouriseGreen(" \"test_new.txt\"")+".",
+				utils.ColouriseCyan("movefile")+
+				utils.ColouriseGreen(" \"test.txt\"")+" to "+
+				utils.ColouriseGreen(" \"test_new.txt\"")+".",
 			loc,
 			"n/a",
 			full_loc,
@@ -176,7 +174,7 @@ func MoveFile(tokens []values.Token) {
 	}
 
 	// Fix the source string
-	source := tools.FixStringCombined(tokens[2].TokenValue)
+	source := FixStringCombined(tokens[2].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
@@ -185,9 +183,9 @@ func MoveFile(tokens []values.Token) {
 	// Get the action to ensure that it can be checked
 	action := tokens[3].TokenValue
 	// Check the action keyword to ensure that it's valid
-	action_error := investigator.CheckAction(loc, action)
+	action_error := CheckAction(loc, action)
 	if action_error != nil {
-		investigator.Report(
+		Report(
 			action_error.Error(),
 			loc,
 			tokens[3].TokenPosition,
@@ -196,7 +194,7 @@ func MoveFile(tokens []values.Token) {
 	}
 
 	// Fix the destination string
-	destination := tools.FixStringCombined(tokens[4].TokenValue)
+	destination := FixStringCombined(tokens[4].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
@@ -216,12 +214,12 @@ func MoveFile(tokens []values.Token) {
 		destination = destination + filename
 	}
 
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(
 			":: %s %s to %s...",
-			tools.ColouriseBlue("Moving"),
-			tools.ColouriseGreen(source),
-			tools.ColouriseGreen(destination),
+			utils.ColouriseBlue("Moving"),
+			utils.ColouriseGreen(source),
+			utils.ColouriseGreen(destination),
 		)
 	}
 
@@ -236,9 +234,9 @@ func MoveFile(tokens []values.Token) {
 		CopyFile(tokens)
 		remove_err := os.Remove(source)
 		if remove_err != nil {
-			investigator.Report(
+			Report(
 				"There was an error removing the source file: "+
-					tools.ColouriseYellow(source)+". It will be worth "+
+					utils.ColouriseYellow(source)+". It will be worth "+
 					"trying to remove it manually.",
 				loc,
 				tokens[4].TokenPosition,
@@ -247,7 +245,7 @@ func MoveFile(tokens []values.Token) {
 		}
 	}
 
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Println("done!")
 	}
 }
@@ -256,21 +254,21 @@ func MoveFile(tokens []values.Token) {
 Delete a file. The tokens are passed to get the file that will be deleted
 and the full line of code is passed for error reporting. Returns nothing.
 */
-func DeleteFile(tokens []values.Token) {
+func DeleteFile(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 2)
+	_, err := CheckValidNumberOfTokens(tokens, 2)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("deletefile")+" statement needs "+
-				"to follow the form "+tools.ColouriseCyan("deletefile")+" "+
-				tools.ColouriseGreen("\"[path]\"")+". An example of a working "+
-				"version might be "+tools.ColouriseCyan("deletefile")+
-				tools.ColouriseGreen(" \"test.txt\"")+".",
+		Report(
+			"The "+utils.ColouriseCyan("deletefile")+" statement needs "+
+				"to follow the form "+utils.ColouriseCyan("deletefile")+" "+
+				utils.ColouriseGreen("\"[path]\"")+". An example of a working "+
+				"version might be "+utils.ColouriseCyan("deletefile")+
+				utils.ColouriseGreen(" \"test.txt\"")+".",
 			loc,
 			"n/a",
 			full_loc,
@@ -278,19 +276,19 @@ func DeleteFile(tokens []values.Token) {
 	}
 
 	// Fix the source string
-	source := tools.FixStringCombined(tokens[2].TokenValue)
+	source := FixStringCombined(tokens[2].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
 	source = VariableTemplater(source)
 	// Check to see if the file exists
-	file_exists := investigator.FileExists(source)
+	file_exists := CheckFileExists(source)
 
 	// If the file doesn't exist, error out
 	if !file_exists {
 		// Report the error
-		investigator.Report(
-			tools.ColouriseMagenta(source)+" does not exist.",
+		Report(
+			utils.ColouriseMagenta(source)+" does not exist.",
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,
@@ -298,8 +296,8 @@ func DeleteFile(tokens []values.Token) {
 		// If it does exist, remove it
 	} else {
 		// If we're in verbose mode, report back some more info
-		if values.MODE_VERBOSE {
-			fmt.Printf(":: Deleting %s...", tools.ColouriseMagenta(source))
+		if MODE_VERBOSE {
+			fmt.Printf(":: Deleting %s...", utils.ColouriseMagenta(source))
 		}
 		err := os.Remove(source)
 		if err != nil {
@@ -310,7 +308,7 @@ func DeleteFile(tokens []values.Token) {
 			that
 			*/
 			if info_err != nil {
-				investigator.Report(
+				Report(
 					"So, I'm having difficulties removing the file and even "+
 						"getting some information on the file to help you "+
 						"understand why.",
@@ -320,9 +318,9 @@ func DeleteFile(tokens []values.Token) {
 				)
 			}
 			// Report back some info about the permissions on the file
-			investigator.Report(
+			Report(
 				"There was an error deleting the file: "+
-					tools.ColouriseMagenta(source)+". It looks like the "+
+					utils.ColouriseMagenta(source)+". It looks like the "+
 					"permissions on the file are "+info.Mode().Perm().String()+
 					". Check to make sure that you have the right permissions "+
 					"to delete the file.",
@@ -332,7 +330,7 @@ func DeleteFile(tokens []values.Token) {
 			)
 		}
 		// If we're in verbose mode, report back some more info
-		if values.MODE_VERBOSE {
+		if MODE_VERBOSE {
 			fmt.Println("done!")
 		}
 
@@ -344,21 +342,21 @@ func DeleteFile(tokens []values.Token) {
 Create a file. The tokens are passed to get the file that will be deleted
 and the full line of code is passed for error reporting. Returns nothing.
 */
-func MakeFile(tokens []values.Token) {
+func MakeFile(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 2)
+	_, err := CheckValidNumberOfTokens(tokens, 2)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("makefile")+" statement needs "+
-				"to follow the form "+tools.ColouriseCyan("create")+" "+
-				tools.ColouriseGreen("\"[path]\"")+". An example of a working "+
-				"version might be "+tools.ColouriseCyan("makefile")+
-				tools.ColouriseGreen(" \"test.txt\"")+".",
+		Report(
+			"The "+utils.ColouriseCyan("makefile")+" statement needs "+
+				"to follow the form "+utils.ColouriseCyan("create")+" "+
+				utils.ColouriseGreen("\"[path]\"")+". An example of a working "+
+				"version might be "+utils.ColouriseCyan("makefile")+
+				utils.ColouriseGreen(" \"test.txt\"")+".",
 			loc,
 			"n/a",
 			full_loc,
@@ -366,35 +364,35 @@ func MakeFile(tokens []values.Token) {
 	}
 
 	// Fix the file name string
-	file_name := tools.FixStringCombined(tokens[2].TokenValue)
+	file_name := FixStringCombined(tokens[2].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
 	file_name = VariableTemplater(file_name)
 	// Check to see if the file exists
-	file_exists := investigator.FileExists(file_name)
+	file_exists := CheckFileExists(file_name)
 
 	// If the file exists already exist, error out
 	if file_exists {
 		// Report the error
-		investigator.Report(
-			tools.ColouriseMagenta(file_name)+" exists already.",
+		Report(
+			utils.ColouriseMagenta(file_name)+" exists already.",
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,
 		)
 	}
 	// If we're in verbose mode, report back some more info
-	if values.MODE_VERBOSE {
-		fmt.Printf(":: Making %s...", tools.ColouriseMagenta(file_name))
+	if MODE_VERBOSE {
+		fmt.Printf(":: Making %s...", utils.ColouriseMagenta(file_name))
 	}
 	// Create the file
 	_, create_err := os.Create(file_name)
 	// If there is an issue with creating the file...
 	if create_err != nil {
 		// Report the error
-		investigator.Report(
-			tools.ColouriseMagenta(file_name)+" could not be created: "+
+		Report(
+			utils.ColouriseMagenta(file_name)+" could not be created: "+
 				create_err.Error(),
 			loc,
 			tokens[2].TokenPosition,
@@ -402,7 +400,7 @@ func MakeFile(tokens []values.Token) {
 		)
 	}
 	// If we're in verbose mode, report back some more info
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Println("done!")
 	}
 }

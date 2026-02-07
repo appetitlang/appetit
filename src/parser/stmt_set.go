@@ -6,9 +6,7 @@ statement modules which often just have single functions in them.
 package parser
 
 import (
-	"appetit/investigator"
-	"appetit/tools"
-	"appetit/values"
+	"appetit/utils"
 	"fmt"
 	"go/token"
 	"go/types"
@@ -41,7 +39,7 @@ code to fix. Returns a templated string where variables have been fixed.
 */
 func VariableTemplater(input string) string {
 	// For each key-value pair in the map of variables
-	for key, value := range values.VARIABLES {
+	for key, value := range VARIABLES {
 		// Get the string value of the variable
 		value = string(value)
 		/* Replace the value in the string if the value is found in the
@@ -49,7 +47,7 @@ func VariableTemplater(input string) string {
 		*/
 		input = strings.ReplaceAll(
 			input,
-			values.SYMBOL_VARIABLE_SUBSTITUTION+key,
+			SYMBOL_VARIABLE_SUBSTITUTION+key,
 			value,
 		)
 	}
@@ -60,24 +58,24 @@ func VariableTemplater(input string) string {
 /*
 Set a variable. Parameters include the tokens. Returns the variable value.
 */
-func Set(tokens []values.Token) string {
+func Set(tokens []Token) string {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 4)
+	_, err := CheckValidNumberOfTokens(tokens, 4)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("set")+" statement needs "+
-				"to follow the form "+tools.ColouriseCyan("set")+" "+
-				tools.ColouriseYellow("[variable name]")+" = "+
-				tools.ColouriseGreen("\"[value]\"")+". An example of a "+
-				"working version check might be "+tools.ColouriseCyan("set")+
+		Report(
+			"The "+utils.ColouriseCyan("set")+" statement needs "+
+				"to follow the form "+utils.ColouriseCyan("set")+" "+
+				utils.ColouriseYellow("[variable name]")+" = "+
+				utils.ColouriseGreen("\"[value]\"")+". An example of a "+
+				"working version check might be "+utils.ColouriseCyan("set")+
 				" name = "+
-				tools.ColouriseGreen("\""+values.LANG_NAME+"\"")+"\n\n"+
-				"Line of Code: "+tools.ColouriseMagenta(full_loc),
+				utils.ColouriseGreen("\""+LANG_NAME+"\"")+"\n\n"+
+				"Line of Code: "+utils.ColouriseMagenta(full_loc),
 			loc,
 			"n/a",
 			full_loc,
@@ -89,7 +87,7 @@ func Set(tokens []values.Token) string {
 	// The assignment operator
 	assignment_operator := tokens[3].TokenValue
 	// The variable value with fixes that need to be made
-	variable_value := tools.FixStringCombined(tokens[4].TokenValue)
+	variable_value := FixStringCombined(tokens[4].TokenValue)
 
 	/* Get the prefix of the variable so that we can check that it isn't
 	reserved
@@ -97,7 +95,7 @@ func Set(tokens []values.Token) string {
 	// Hold the (possible) prefix for checking
 	var variable_prefix string
 	// If the length of the variable is less than the RESERVED_VARIABLE_PREFIX
-	if len(variable_name) < len(values.RESERVED_VARIABLE_PREFIX) {
+	if len(variable_name) < len(SYMBOL_RESERVED_VARIABLE_PREFIX) {
 		// Just set the prefix to the variable
 		variable_prefix = string(variable_name)
 	} else {
@@ -106,10 +104,10 @@ func Set(tokens []values.Token) string {
 	}
 
 	// Check the variable prefix
-	var_prefix_error := investigator.CheckVariablePrefix(
+	var_prefix_error := CheckVariablePrefix(
 		loc, variable_prefix, variable_name)
 	if var_prefix_error != nil {
-		investigator.ReportWithFixes(
+		ReportWithFixes(
 			var_prefix_error.Error(),
 			loc,
 			tokens[2].TokenPosition,
@@ -118,11 +116,11 @@ func Set(tokens []values.Token) string {
 	}
 
 	// Check that the variable name is not one of the statement names
-	statement := investigator.CheckIsStatement(loc, variable_name)
+	statement := CheckIsStatement(loc, variable_name)
 	// If it is a statement
 	if statement {
-		investigator.ReportWithFixes(
-			"The variable - "+tools.ColouriseYellow(variable_name)+" - "+
+		ReportWithFixes(
+			"The variable - "+utils.ColouriseYellow(variable_name)+" - "+
 				"is not a valid variable name as it conflicts with a statement "+
 				"name.",
 			loc,
@@ -132,9 +130,9 @@ func Set(tokens []values.Token) string {
 	}
 
 	// Check for a valid assignment operator
-	assignment_error := investigator.CheckValidAssignment(loc, assignment_operator)
+	assignment_error := CheckValidAssignment(loc, assignment_operator)
 	if assignment_error != nil {
-		investigator.ReportWithFixes(
+		ReportWithFixes(
 			assignment_error.Error(),
 			loc,
 			tokens[3].TokenPosition,
@@ -153,19 +151,19 @@ func Set(tokens []values.Token) string {
 	final_variable_value := CalculateValue(loc, templated_variable)
 
 	// If verbose mode is set...
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(
 			":: %s %s to %s...",
-			tools.ColouriseBlue("Setting"),
-			tools.ColouriseYellow(variable_name),
-			tools.ColouriseGreen(final_variable_value),
+			utils.ColouriseBlue("Setting"),
+			utils.ColouriseYellow(variable_name),
+			utils.ColouriseGreen(final_variable_value),
 		)
 	}
 	// Set the variable
-	values.VARIABLES[variable_name] = final_variable_value
+	VARIABLES[variable_name] = final_variable_value
 
 	// If verbose mode is set, report that things are done.
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Println("done!")
 	}
 

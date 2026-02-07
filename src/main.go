@@ -5,10 +5,8 @@ Nothing of note here needs to be mentioned that is unique to this package.
 package main
 
 import (
-	"appetit/investigator"
 	"appetit/parser"
-	"appetit/tools"
-	"appetit/values"
+	"appetit/utils"
 	_ "embed"
 	"encoding/json"
 	"flag"
@@ -17,6 +15,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
+	"runtime/trace"
 	"strconv"
 	"strings"
 	"time"
@@ -50,15 +49,15 @@ func DocsHandler(writer http.ResponseWriter, request *http.Request) {
 Open up a script and produce a list of lines. The only parameter is the
 filename. This returns a slice of the lines.
 */
-func OpenScript(filename string) []string {
+/*func OpenScript(filename string) []string {
 
 	// Read the file
 	script, err := os.ReadFile(filename)
 	// If the file couldn't be opened
 	if err != nil {
 		// Report the error
-		investigator.Report(
-			"Unknown file: "+tools.ColouriseMagenta(filename)+".",
+		utils.Report(
+			"Unknown file: "+utils.ColouriseMagenta(filename)+".",
 			"n/a",
 			"n/a",
 			"n/a",
@@ -70,7 +69,7 @@ func OpenScript(filename string) []string {
 	//os.Exit(0)
 	// Return the lines of the script
 	return strings.Split(string(script), "\n")
-}
+}*/
 
 /*
 Get memory stats. This takes no parameters and returns nothing. Thanks to
@@ -82,50 +81,50 @@ func PrintDevInfo() {
 	runtime.ReadMemStats(&mem_stats)
 
 	// Print out memory info
-	fmt.Println(tools.ColouriseYellow("\n\nToken Summary"))
+	fmt.Println(utils.ColouriseYellow("\n\nToken Summary"))
 	fmt.Printf(
-		tools.ColouriseCyan(":: Total Tokens (incl. line number tokens):")+
+		utils.ColouriseCyan(":: Total Tokens (incl. line number tokens):")+
 			" %d",
-		len(values.TOKEN_TREE),
+		len(parser.TOKEN_TREE),
 	)
 
 	// Get the size of a single token
-	token_memory_size := unsafe.Sizeof(values.TOKEN_TREE[0])
+	token_memory_size := unsafe.Sizeof(parser.TOKEN_TREE[0])
 	// Calculate the size of the token tree as a whole
-	memory_token_tree := uintptr(cap(values.TOKEN_TREE)) * token_memory_size
+	memory_token_tree := uintptr(cap(parser.TOKEN_TREE)) * token_memory_size
 	fmt.Printf(
-		tools.ColouriseCyan("\n:: Total Memory Usage of TOKEN_TREE:")+
+		utils.ColouriseCyan("\n:: Total Memory Usage of TOKEN_TREE:")+
 			" %d bytes (single token: %d bytes)",
 		memory_token_tree,
 		token_memory_size,
 	)
 
 	// Print out memory info
-	fmt.Println(tools.ColouriseYellow("\n\nMemory Information"))
+	fmt.Println(utils.ColouriseYellow("\n\nMemory Information"))
 	// Print out the allocated memory
 	fmt.Printf(
-		tools.ColouriseCyan(":: Allocated Memory: ")+
+		utils.ColouriseCyan(":: Allocated Memory: ")+
 			"%d bytes, %d kilobytes\n",
 		mem_stats.Alloc,
 		(mem_stats.Alloc / 1024),
 	)
 	// Print out the total allocated memory
 	fmt.Printf(
-		tools.ColouriseCyan(":: Total Allocated Memory: ")+
+		utils.ColouriseCyan(":: Total Allocated Memory: ")+
 			"%d bytes, %d kilobytes\n",
 		mem_stats.TotalAlloc,
 		(mem_stats.TotalAlloc / 1024),
 	)
 	// Print out the memory requested from the OS
 	fmt.Printf(
-		tools.ColouriseCyan(":: Memory Requested: ")+
+		utils.ColouriseCyan(":: Memory Requested: ")+
 			"%d bytes, %d kilobytes\n",
 		mem_stats.Sys,
 		(mem_stats.Sys / 1024),
 	)
 	// Print out the garbage collections
 	fmt.Printf(
-		tools.ColouriseCyan(":: Garbage Collections: ")+"%d\n",
+		utils.ColouriseCyan(":: Garbage Collections: ")+"%d\n",
 		mem_stats.NumGC,
 	)
 }
@@ -170,6 +169,14 @@ func main() {
 		false,
 		"[Dev] Time the execution of the script.",
 	)
+
+	// Run a trace
+	trace_flag := flag.Bool(
+		"trace",
+		false,
+		"[Dev] Execute a runtime trace on the interpreter.",
+	)
+
 	// Get whether we are being verbose with output or not, defaults to false
 	verbose_flag := flag.Bool(
 		"verbose",
@@ -186,6 +193,53 @@ func main() {
 	// Parse the flags
 	flag.Parse()
 
+	if *trace_flag {
+		// Get the date and time
+		date_now := time.Now()
+		// Format the date in YYYY-MM-DD format
+		date := fmt.Sprintf(
+			"%d-%d-%d-%d-%d-%d",
+			date_now.Year(),
+			date_now.Month(),
+			date_now.Day(),
+			date_now.Hour(),
+			date_now.Minute(),
+			date_now.Second(),
+		)
+		// Create the trace file name
+		trace_file_name := date + "-function_trace.out"
+		// Output information about the running of the trace
+		fmt.Println(
+			utils.ColouriseYellow(":: Saving trace to " + trace_file_name),
+		)
+		fmt.Print(
+			utils.ColouriseYellow(":: When the execution is done, run "),
+		)
+		fmt.Print(
+			utils.ColouriseCyan("go tool trace " + trace_file_name + "\n"),
+		)
+
+		// Function tracing here
+		trace_file, trace_error := os.Create(trace_file_name)
+		// If there is an error creating a trace, error out
+		if trace_error != nil {
+			fmt.Println("Error creating the trace file")
+		}
+		// Notify the user if the trace file can't be created
+		defer func() {
+			if trace_error := trace_file.Close(); trace_error != nil {
+				fmt.Println("Failed to close the trace file")
+			}
+		}()
+
+		// Notify the user if the trace can't be started
+		if trace_error := trace.Start(trace_file); trace_error != nil {
+			fmt.Println("Failed to start the trace")
+		}
+		// Defer the stop of the trace
+		defer trace.Stop()
+	}
+
 	// Set up a start timer
 	var start time.Time
 	// If the timer flag is true, start a timer
@@ -198,7 +252,7 @@ func main() {
 	if *create_template_flag != "" {
 		// Create the template with a minver and a shebang line
 		template_script := []byte("#!/usr/bin/appetit\nminver " +
-			strconv.Itoa(values.LANG_VERSION) + "\n\n- Say hello to the " +
+			strconv.Itoa(parser.LANG_VERSION) + "\n\n- Say hello to the " +
 			"world\nwriteln \"Hello World!\"\n",
 		)
 
@@ -243,7 +297,7 @@ func main() {
 		// Report back that we're done
 		fmt.Println(
 			":: Created a script at " +
-				tools.ColouriseCyan(*create_template_flag),
+				utils.ColouriseCyan(*create_template_flag),
 		)
 		// Abandon ship
 		os.Exit(0)
@@ -255,11 +309,11 @@ func main() {
 		port := *docs_flag
 		// Print the port that the documentation is being served on
 		fmt.Println(
-			"Open up " + tools.ColouriseCyan("http://localhost:"+port) +
+			"Open up " + utils.ColouriseCyan("http://localhost:"+port) +
 				" in your browser.",
 		)
 		fmt.Println(
-			"Press " + tools.ColouriseMagenta("Ctrl-C") + " to quit the " +
+			"Press " + utils.ColouriseMagenta("Ctrl-C") + " to quit the " +
 				"server.",
 		)
 		// Set up a handler
@@ -306,13 +360,13 @@ func main() {
 		/* If the remote file has a version number greater than the current
 		version, inform the user and give them some details.
 		*/
-		if remote_data.Version > values.LANG_VERSION {
-			new_or_current_version = tools.ColouriseRed(
+		if remote_data.Version > parser.LANG_VERSION {
+			new_or_current_version = utils.ColouriseRed(
 				fmt.Sprintf(
 					"\n%s\nThere's a new version of Appetit "+
 						"available! Version %s is available, released %s. "+
 						"%s\n",
-					tools.ColouriseYellow("[New Version]"),
+					utils.ColouriseYellow("[New Version]"),
 					strconv.Itoa(remote_data.Version),
 					remote_data.Date,
 					remote_data.Description,
@@ -321,8 +375,8 @@ func main() {
 			/* If the version information is the same, let them know that they are
 			running the most current version.
 			*/
-		} else if remote_data.Version == values.LANG_VERSION {
-			new_or_current_version = tools.ColouriseGreen("You're up to date!")
+		} else if remote_data.Version == parser.LANG_VERSION {
+			new_or_current_version = utils.ColouriseGreen("You're up to date!")
 		}
 
 		// Get build info
@@ -339,25 +393,25 @@ func main() {
 
 		fmt.Printf(
 			"%s\n%s\n\n%s\n%s%s\n\n%s\n%s%s\n%s%s\n%s%d\n\n%s\n%s%s\n%s%s\n",
-			tools.ColouriseMagenta(
-				values.LANG_NAME+" "+
-					strconv.Itoa(int(values.LANG_VERSION)),
+			utils.ColouriseMagenta(
+				parser.LANG_NAME+" "+
+					strconv.Itoa(int(parser.LANG_VERSION)),
 			),
 			new_or_current_version,
-			tools.ColouriseYellow("[Files]"),
-			tools.ColouriseCyan("Interpreter Path: "),
-			tools.ColouriseBlue(bin_dir),
-			tools.ColouriseYellow("[Platform]"),
-			tools.ColouriseCyan("Operating System: "),
+			utils.ColouriseYellow("[Files]"),
+			utils.ColouriseCyan("Interpreter Path: "),
+			utils.ColouriseBlue(bin_dir),
+			utils.ColouriseYellow("[Platform]"),
+			utils.ColouriseCyan("Operating System: "),
 			runtime.GOOS,
-			tools.ColouriseCyan("Architecture: "),
+			utils.ColouriseCyan("Architecture: "),
 			runtime.GOARCH,
-			tools.ColouriseCyan("CPUs: "),
+			utils.ColouriseCyan("CPUs: "),
 			runtime.NumCPU(),
-			tools.ColouriseYellow("[Build]"),
-			tools.ColouriseCyan("Go Version: "),
+			utils.ColouriseYellow("[Build]"),
+			utils.ColouriseCyan("Go Version: "),
 			go_version,
-			tools.ColouriseCyan("Build Date: "),
+			utils.ColouriseCyan("Build Date: "),
 			BuildDate,
 		)
 		// Exit the app
@@ -365,37 +419,31 @@ func main() {
 	}
 
 	// Set the output to verbose
-	values.MODE_VERBOSE = *verbose_flag
+	parser.MODE_VERBOSE = *verbose_flag
 
 	// Set the allow exec setting
-	values.ALLOW_EXEC = *allowexec_flag
+	parser.MODE_ALLOW_EXEC = *allowexec_flag
 
 	// Get the file name
 	file_name := flag.Args()
 	// If there are no tailing arguments (ie. the file name)
 	if len(file_name) == 0 {
 		// Error out
-		investigator.ReportSimple(
+		parser.ReportSimple(
 			"You need to pass a script name to the interpreter.",
 		)
 	}
 
-	/* TODO: move some of this to parser delegation code to a new function
-	so that a future 'run' statement can be implemented
-	*/
-	// Open up the script
-	//contents := OpenScript(file_name[0])
-	// Remove the comments from the script
-	//contents = parser.RemoveComments(contents)
+	// Prep the script by opening it and removing the comments
 	contents := parser.PrepScript(file_name[0])
 
 	/* If the dev flag is set, run the script and report back developer
 	information.
 	*/
 	if *dev_flag {
-		values.MODE_DEV = true
+		parser.MODE_DEV = true
 		// Start printing out the tokens
-		fmt.Println(tools.ColouriseYellow("\nTokens"))
+		fmt.Println(utils.ColouriseYellow("\nTokens"))
 		parser.Start(contents, true)
 	} else {
 		parser.Start(contents, false)
@@ -408,7 +456,7 @@ func main() {
 
 		// Get the time
 		total_running_time := end.Sub(start)
-		fmt.Println(tools.ColouriseCyan("\nTotal Running Times"))
+		fmt.Println(utils.ColouriseCyan("\nTotal Running Times"))
 		fmt.Println("\tReported value: " + total_running_time.String())
 		fmt.Println(
 			"\tRounded (millisecond): " +

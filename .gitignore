@@ -14,3 +14,6 @@ docs/videos
 
 # Apple Container for development script. This is for setting up a quick container to trial things on my development machine that ought not to be available for the public.
 container.sh
+
+# Any trace files made during testing
+*.out

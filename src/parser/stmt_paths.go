@@ -5,9 +5,7 @@ makedirectory, and movedirectory.
 package parser
 
 import (
-	"appetit/investigator"
-	"appetit/tools"
-	"appetit/values"
+	"appetit/utils"
 	"fmt"
 	"io"
 	"io/fs"
@@ -54,9 +52,9 @@ func CopyPathWalker(token_info map[string]string) filepath.WalkFunc {
 			/* If verbose mode is set, notify the user that we are making a
 			directory
 			*/
-			if values.MODE_VERBOSE {
+			if MODE_VERBOSE {
 				fmt.Println(
-					":: Making " + tools.ColouriseGreen(relative_path) +
+					":: Making " + utils.ColouriseGreen(relative_path) +
 						"...",
 				)
 			}
@@ -69,8 +67,8 @@ func CopyPathWalker(token_info map[string]string) filepath.WalkFunc {
 			source_file, source_err := os.Open(file_to_copy)
 			// If there is an error opening the source file, report that
 			if source_err != nil {
-				investigator.Report(
-					"Can't open "+tools.ColouriseYellow(file_to_copy)+
+				Report(
+					"Can't open "+utils.ColouriseYellow(file_to_copy)+
 						". Perhaps you don't have read permissions? "+
 						source_err.Error(),
 					loc,
@@ -84,11 +82,11 @@ func CopyPathWalker(token_info map[string]string) filepath.WalkFunc {
 			create, create_err := os.Create(create_path)
 			// If there was an error in creating the new file, report that
 			if create_err != nil {
-				investigator.Report(
+				Report(
 					"Couldn't create the file in "+
-						tools.ColouriseYellow(create_path)+". Check that "+
+						utils.ColouriseYellow(create_path)+". Check that "+
 						"you have write permissions to write to "+
-						tools.ColouriseYellow(dest)+" and/or that there is "+
+						utils.ColouriseYellow(dest)+" and/or that there is "+
 						"enough space available for you to copy the file(s) "+
 						"over.",
 					loc,
@@ -99,11 +97,11 @@ func CopyPathWalker(token_info map[string]string) filepath.WalkFunc {
 			/* If verbose mode is set, note that we are copying a file and
 			report back the file size
 			*/
-			if values.MODE_VERBOSE {
+			if MODE_VERBOSE {
 				fmt.Printf(
 					"    :: Copying %s %s...",
-					tools.ColouriseGreen(info.Name()),
-					tools.ColouriseMagenta(
+					utils.ColouriseGreen(info.Name()),
+					utils.ColouriseMagenta(
 						"["+strconv.FormatInt(info.Size(), 10)+
 							" bytes]",
 					),
@@ -114,7 +112,7 @@ func CopyPathWalker(token_info map[string]string) filepath.WalkFunc {
 			_, copy_err := io.Copy(create, source_file)
 			// If there's an error, report it
 			if copy_err != nil {
-				investigator.Report(
+				Report(
 					"There was an error doing the copy for "+
 						source_file.Name(),
 					loc,
@@ -123,7 +121,7 @@ func CopyPathWalker(token_info map[string]string) filepath.WalkFunc {
 				)
 			}
 			// If verbose mode is set, note that we are done copying the file
-			if values.MODE_VERBOSE {
+			if MODE_VERBOSE {
 				fmt.Println("done.")
 			}
 
@@ -139,36 +137,36 @@ func CopyPathWalker(token_info map[string]string) filepath.WalkFunc {
 Copy a directory from one place to another. The parameters are the
 conventional set of tokens. Returns nothing.
 */
-func CopyPath(tokens []values.Token) {
+func CopyPath(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, token_err := investigator.ValidNumberOfTokens(tokens, 4)
+	_, token_err := CheckValidNumberOfTokens(tokens, 4)
 	// If not a valid number of tokens, report an error
 	if token_err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("copydirectory")+
+		Report(
+			"The "+utils.ColouriseCyan("copydirectory")+
 				"statement needs to follow the form "+
-				tools.ColouriseCyan("copydirectory")+
-				tools.ColouriseGreen(" \"[path]\"")+" to "+
-				tools.ColouriseGreen("\"[path]\"")+". A common issue "+
+				utils.ColouriseCyan("copydirectory")+
+				utils.ColouriseGreen(" \"[path]\"")+" to "+
+				utils.ColouriseGreen("\"[path]\"")+". A common issue "+
 				"is the  use of an inappropriate action symbol ("+
-				tools.ColouriseMagenta(values.SYMBOL_ACTION)+"). An "+
+				utils.ColouriseMagenta(SYMBOL_ACTION)+"). An "+
 				"example of a working version might be "+
-				tools.ColouriseCyan("copyfcopydirectoryile")+
-				tools.ColouriseGreen(" \"test_dir\"")+" to "+
-				tools.ColouriseGreen(" \"new_dir\""),
+				utils.ColouriseCyan("copyfcopydirectoryile")+
+				utils.ColouriseGreen(" \"test_dir\"")+" to "+
+				utils.ColouriseGreen(" \"new_dir\""),
 			loc,
 			"n/a",
 			full_loc,
 		)
 	}
 	// Get the source folder to copy and fix the string where need be
-	source_path := tools.FixStringCombined(tokens[2].TokenValue)
+	source_path := FixStringCombined(tokens[2].TokenValue)
 	// Fix the path seperators to ensure that the last character is a seperator
-	source_path = tools.FixPathSeperators(source_path)
+	source_path = FixPathSeperators(source_path)
 	/* Get a templated value, that is, a variable where values have
 	been substituted.
 	*/
@@ -177,9 +175,9 @@ func CopyPath(tokens []values.Token) {
 	// Get the action to ensure that it can be checked
 	action := tokens[3].TokenValue
 	// Check the action keyword to ensure that it's valid
-	action_error := investigator.CheckAction(loc, action)
+	action_error := CheckAction(loc, action)
 	if action_error != nil {
-		investigator.Report(
+		Report(
 			action_error.Error(),
 			loc,
 			tokens[3].TokenPosition,
@@ -187,9 +185,9 @@ func CopyPath(tokens []values.Token) {
 		)
 	}
 	// Get the source folder to copy and fix the string where need be
-	dest_path := tools.FixStringCombined(tokens[4].TokenValue)
+	dest_path := FixStringCombined(tokens[4].TokenValue)
 	// Fix the path seperators to ensure that the last character is a seperator
-	dest_path = tools.FixPathSeperators(dest_path)
+	dest_path = FixPathSeperators(dest_path)
 	/* Get a templated value, that is, a variable where values have
 	been substituted.
 	*/
@@ -212,25 +210,25 @@ func CopyPath(tokens []values.Token) {
 Move a directory. The parameters are the conventional set of tokens.
 Returns nothing.
 */
-func MovePath(tokens []values.Token) {
+func MovePath(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 4)
+	_, err := CheckValidNumberOfTokens(tokens, 4)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("movedirectory")+" statement "+
+		Report(
+			"The "+utils.ColouriseCyan("movedirectory")+" statement "+
 				"needs to follow the form "+
-				tools.ColouriseCyan("movedirectory")+" "+
-				tools.ColouriseYellow("\"[path]\"")+". A common error here "+
+				utils.ColouriseCyan("movedirectory")+" "+
+				utils.ColouriseYellow("\"[path]\"")+". A common error here "+
 				"is trying to concatenate multiple values into one statement "+
 				"call here. An example of a working version might be "+
-				tools.ColouriseCyan("movedirectory ")+
-				tools.ColouriseGreen("\"test_dir\"")+" to "+
-				tools.ColouriseGreen("\"actual_dir\""),
+				utils.ColouriseCyan("movedirectory ")+
+				utils.ColouriseGreen("\"test_dir\"")+" to "+
+				utils.ColouriseGreen("\"actual_dir\""),
 			loc,
 			"n/a",
 			full_loc,
@@ -238,9 +236,9 @@ func MovePath(tokens []values.Token) {
 	}
 
 	// Get the source folder to copy and fix the strings
-	old_path := tools.FixStringCombined(tokens[2].TokenValue)
+	old_path := FixStringCombined(tokens[2].TokenValue)
 	// Fix the path seperators to ensure that the last character is a seperator
-	old_path = tools.FixPathSeperators(old_path)
+	old_path = FixPathSeperators(old_path)
 	/* Get a templated value, that is, a variable where values have
 	been substituted.
 	*/
@@ -249,9 +247,9 @@ func MovePath(tokens []values.Token) {
 	// Get the action to ensure that it can be checked
 	action := tokens[3].TokenValue
 	// Check the action keyword to ensure that it's valid
-	action_error := investigator.CheckAction(loc, action)
+	action_error := CheckAction(loc, action)
 	if action_error != nil {
-		investigator.Report(
+		Report(
 			action_error.Error(),
 			loc,
 			tokens[3].TokenPosition,
@@ -259,20 +257,20 @@ func MovePath(tokens []values.Token) {
 		)
 	}
 	// Get the destination folder to copy and fix the strings
-	new_path := tools.FixStringCombined(tokens[4].TokenValue)
+	new_path := FixStringCombined(tokens[4].TokenValue)
 	// Fix the path seperators to ensure that the last character is a seperator
-	new_path = tools.FixPathSeperators(new_path)
+	new_path = FixPathSeperators(new_path)
 	/* Get a templated value, that is, a variable where values have
 	been substituted.
 	*/
 	new_path = VariableTemplater(new_path)
 
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(
 			":: %s %s to %s...",
-			tools.ColouriseBlue("Moving"),
-			tools.ColouriseGreen(old_path),
-			tools.ColouriseGreen(new_path),
+			utils.ColouriseBlue("Moving"),
+			utils.ColouriseGreen(old_path),
+			utils.ColouriseGreen(new_path),
 		)
 	}
 
@@ -287,11 +285,11 @@ func MovePath(tokens []values.Token) {
 		*/
 		// Give copying a go here instead.
 		CopyPath(tokens)
-		/*investigator.Report(
+		/*Report(
 			"There was an error moving the directory. Check to ensure that " +
-			"the source - " + tools.ColouriseYellow(old_path) + " - and the " +
-			"destination - " + tools.ColouriseYellow(new_path) + " - " +
-			"are valid locations and that " + tools.ColouriseYellow(new_path) +
+			"the source - " + utils.ColouriseYellow(old_path) + " - and the " +
+			"destination - " + utils.ColouriseYellow(new_path) + " - " +
+			"are valid locations and that " + utils.ColouriseYellow(new_path) +
 			" doesn't already exist.",
 			loc,
 			"n/a",
@@ -299,7 +297,7 @@ func MovePath(tokens []values.Token) {
 		)*/
 	}
 
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Println("done!")
 	}
 }
@@ -308,57 +306,57 @@ func MovePath(tokens []values.Token) {
 Delete a directory. The parameters are the conventional set of tokens.
 Returns nothing.
 */
-func DeletePath(tokens []values.Token) {
+func DeletePath(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 2)
+	_, err := CheckValidNumberOfTokens(tokens, 2)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("deletedirectory")+" statement "+
+		Report(
+			"The "+utils.ColouriseCyan("deletedirectory")+" statement "+
 				"needs to follow the form "+
-				tools.ColouriseCyan("deletedirectory")+" "+
-				tools.ColouriseYellow("\"[path]\"")+". A common error here "+
+				utils.ColouriseCyan("deletedirectory")+" "+
+				utils.ColouriseYellow("\"[path]\"")+". A common error here "+
 				"is trying to concatenate multiple values into one statement "+
 				"call here. An example of a working version might be "+
-				tools.ColouriseCyan("deletedirectory ")+
-				tools.ColouriseGreen("\"test_dir\"")+".",
+				utils.ColouriseCyan("deletedirectory ")+
+				utils.ColouriseGreen("\"test_dir\"")+".",
 			loc,
 			"n/a",
 			full_loc,
 		)
 	}
 	// Fix up the path string
-	path := tools.FixStringCombined(tokens[2].TokenValue)
+	path := FixStringCombined(tokens[2].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
 	path = VariableTemplater(path)
 
 	// If verbose mode is set, print out what's happening
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(
 			":: %s %s...",
-			tools.ColouriseBlue("Deleting"),
-			tools.ColouriseGreen(path),
+			utils.ColouriseBlue("Deleting"),
+			utils.ColouriseGreen(path),
 		)
 	}
 
 	remove_err := os.RemoveAll(path)
 	if remove_err != nil {
-		investigator.Report(
+		Report(
 			"There was an error removing "+
-				tools.ColouriseMagenta(path)+". The path does not exist.",
+				utils.ColouriseMagenta(path)+". The path does not exist.",
 			loc,
 			"n/a",
 			full_loc,
 		)
 	}
 
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Println("done!")
 	}
 }
@@ -367,31 +365,31 @@ func DeletePath(tokens []values.Token) {
 Make a directory. The tokens are passed to get the file that will be moved.
 Returns nothing.
 */
-func CreatePath(tokens []values.Token) {
+func CreatePath(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 2)
+	_, err := CheckValidNumberOfTokens(tokens, 2)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("makedirectory")+" statement "+
+		Report(
+			"The "+utils.ColouriseCyan("makedirectory")+" statement "+
 				"needs to follow the form "+
-				tools.ColouriseCyan("makedirectory")+" "+
-				tools.ColouriseYellow("\"[path]\"")+". A common error here "+
+				utils.ColouriseCyan("makedirectory")+" "+
+				utils.ColouriseYellow("\"[path]\"")+". A common error here "+
 				"is trying to concatenate multiple values into one statement "+
 				"call here. An example of a working version might be "+
-				tools.ColouriseCyan("makedirectory ")+
-				tools.ColouriseGreen("\"test_dir\"")+".",
+				utils.ColouriseCyan("makedirectory ")+
+				utils.ColouriseGreen("\"test_dir\"")+".",
 			loc,
 			"n/a",
 			full_loc,
 		)
 	}
 	// Fix up the path string
-	path := tools.FixStringCombined(tokens[2].TokenValue)
+	path := FixStringCombined(tokens[2].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
@@ -405,18 +403,18 @@ func CreatePath(tokens []values.Token) {
 		path = path + string(os.PathSeparator)
 	}
 
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(
 			":: %s %s...",
-			tools.ColouriseBlue("Making"),
-			tools.ColouriseGreen(path),
+			utils.ColouriseBlue("Making"),
+			utils.ColouriseGreen(path),
 		)
 	}
 
 	mk_err := os.MkdirAll(path, 0750)
 	if mk_err != nil {
-		investigator.Report(
-			"Error creating the directory "+tools.ColouriseYellow(path)+
+		Report(
+			"Error creating the directory "+utils.ColouriseYellow(path)+
 				". Check to make sure that you have the right permissions to "+
 				"the parent directory.",
 			loc,
@@ -424,7 +422,7 @@ func CreatePath(tokens []values.Token) {
 			full_loc,
 		)
 	}
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Println("done!")
 	}
 }

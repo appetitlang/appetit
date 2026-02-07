@@ -2,10 +2,10 @@
 The handler module provides error handling and reporting for language specific
 issues.
 */
-package investigator
+package parser
 
 import (
-	"appetit/tools"
+	"appetit/utils"
 	"fmt"
 	"os"
 	"strconv"
@@ -24,26 +24,33 @@ func Report(
 
 	// Get the token position and convert it to an integer
 	position, _ := strconv.Atoi(token_pos)
-	/* Set the header for the line of code header so that we can also get its
-	length
+	/*
+		Set the header for the line of code header so that we can also get its
+		length
 	*/
 	loc_title := "Line of Code: "
-	/* Get the position but subtract one as we want to insert the error arrow
-	at the right place
+	/*
+		Get the position but subtract one as we want to insert the error arrow
+		at the right place
 	*/
 	position += len(loc_title) - 1
 	// Set up the error arrow
-	error_pos_symbol := tools.ColouriseRed("^") // ⇈
-
-	fmt.Println(tools.ColouriseRed("\n[ERROR]\n\n[Location]"))
-	fmt.Println(tools.ColouriseMagenta(" Line Number: ") + line_number)
-	fmt.Println(tools.ColouriseMagenta("    Position: ") + token_pos)
-	fmt.Println(tools.ColouriseMagenta(loc_title) + full_loc)
+	error_pos_symbol := utils.ColouriseRed("^") // ⇈
+	// Print the error information
+	fmt.Println(utils.ColouriseRed("\n[ERROR]\n\n[Location]"))
+	fmt.Println(utils.ColouriseMagenta(" Line Number: ") + line_number)
+	fmt.Println(utils.ColouriseMagenta("    Position: ") + token_pos)
+	fmt.Println(utils.ColouriseMagenta(loc_title) + full_loc)
+	/*
+		Print out the arrow to note where the error starts by repeating some
+		blank spaces at the beginning that is the length of the line of code
+		header.
+	*/
 	fmt.Printf("%s%s\n",
 		strings.Repeat(" ", position),
 		error_pos_symbol,
 	)
-	fmt.Println(tools.ColouriseRed("\n[Description]"))
+	fmt.Println(utils.ColouriseRed("\n[Description]"))
 	fmt.Printf("%s\n\n", error_message)
 	// Abandon ship
 	os.Exit(0)
@@ -57,7 +64,7 @@ parser.CheckValidMinverLocationCount() as an example or passing the
 interpreter no script. Returns nothing.
 */
 func ReportSimple(error_message string) {
-	fmt.Println(tools.ColouriseRed("\n[ERROR]"))
+	fmt.Println(utils.ColouriseRed("\n[ERROR]"))
 	fmt.Println(error_message + "\n")
 	os.Exit(0)
 }
@@ -70,11 +77,12 @@ trailing punctuation). Parameters include error_message, the error message
 itself and line_number, the line number that triggered the error. Returns
 nothing.
 */
-func ReportWithFixes(
-	error_message string, line_number string, token_pos string,
-	full_loc string) {
+func ReportWithFixes(error_message string, line_number string,
+	token_pos string, full_loc string) {
+	// Capitalise the error message
 	error_message = strings.ToTitle(string(error_message[0])) +
 		error_message[1:] + "."
+	// Report the error
 	Report(error_message, line_number, token_pos, full_loc)
 }
 
@@ -94,7 +102,8 @@ func ReportTokeniserErrors(message string, loc int) {
 		TODO: more carefully account for some of the errors reported back by
 		scanner.Init(). See here: https://cs.opensource.google/go/go/+/refs/
 		// tags/go1.25.1:src/text/scanner/scanner.go;l=181. Find all the
-		s.error() calls.
+		s.error() calls. This is an ongoing to-do that is likely only to be
+		resolved by way of more testing and usage.
 	*/
 	switch message {
 	// Catch an unterminated literal
@@ -102,18 +111,18 @@ func ReportTokeniserErrors(message string, loc int) {
 		ReportSimple(
 			"Line " + strconv.Itoa(loc) + " has an incomplete string. Did " +
 				"you forget an opening or closing quotation mark? Something " +
-				"like the following line of code will trigger this error:\n\n\t" +
-				tools.ColouriseCyan("writeln ") +
-				tools.ColouriseGreen("\"Hello world") +
-				tools.ColouriseRed("_"),
+				"like the following line of code will trigger this error:" +
+				"\n\n\t" + utils.ColouriseCyan("writeln ") +
+				utils.ColouriseGreen("\"Hello world") +
+				utils.ColouriseRed("_"),
 		)
 	// Catch an invalid char literal
 	case "invalid char literal":
 		Report(
 			"Your line of code use single quotation marks instead of "+
 				"the required double quotation marks. See the example:\n\n"+
-				tools.ColouriseCyan("writeln ")+
-				tools.ColouriseGreen("'Hello world'")+" <- (notice the"+
+				utils.ColouriseCyan("writeln ")+
+				utils.ColouriseGreen("'Hello world'")+" <- (notice the"+
 				" lack of double quotation marks here).",
 			strconv.Itoa(loc),
 			"n/a",
@@ -122,8 +131,8 @@ func ReportTokeniserErrors(message string, loc int) {
 	case "comment not terminated":
 		Report(
 			"You've included a Go style comment as a statement call which "+
-				"is not valid. Comments are single line and take the following "+
-				"form:\n\n"+tools.ColouriseGrey(
+				"is not valid. Comments are single line and take the "+
+				"following "+"form:\n\n"+utils.ColouriseGrey(
 				" - This is a comment."),
 			strconv.Itoa(loc),
 			"n/a",
@@ -132,8 +141,8 @@ func ReportTokeniserErrors(message string, loc int) {
 	case "invalid char escape":
 		Report(
 			"You've included an invalid character escape. You need to use "+
-				"one of the following: "+tools.ColouriseMagenta("\\n")+
-				" (for new line), "+tools.ColouriseMagenta("\\t")+" (for "+
+				"one of the following: "+utils.ColouriseMagenta("\\n")+
+				" (for new line), "+utils.ColouriseMagenta("\\t")+" (for "+
 				"tab indentation).",
 			strconv.Itoa(loc),
 			"n/a",

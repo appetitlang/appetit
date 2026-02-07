@@ -8,9 +8,7 @@ handling progress tracking and reporting back the progress.
 package parser
 
 import (
-	"appetit/investigator"
-	"appetit/tools"
-	"appetit/values"
+	"appetit/utils"
 	"bufio"
 	"fmt"
 	"io"
@@ -22,8 +20,7 @@ import (
 )
 
 /*
-	Hold values of the progress of the writing of downloaded data. This has two
-
+Hold values of the progress of the writing of downloaded data. This has two
 values: TotalBytes (which holds how many bytes have been downloaded) and
 FileSize (which holds the total number of bytes of the file being
 downloaded). Somewhere down the line, a 64-bit integer is returned as the
@@ -54,13 +51,14 @@ func (wp *WriteProgress) Write(progress []byte) (int, error) {
 	// Calculate the percentage
 	percentage := wp.TotalBytes / wp.FileSize
 	// Format the progress as a percentage for printing.
+	// TODO: Add comma seperators for download sizes
 	progress_output := fmt.Sprintf(
-		"\rDownloaded %s (%.0f KB of %.0f KB)",
-		tools.ColouriseMagenta(
+		"\rDownloaded %s (%s KB of %s KB)",
+		utils.ColouriseMagenta(
 			strconv.FormatFloat(percentage*100, 'f', 2, 32)+"%",
 		),
-		wp.TotalBytes/1024,
-		wp.FileSize/1024,
+		CommaSeperator(wp.TotalBytes/1024),
+		CommaSeperator(wp.FileSize/1024),
 	)
 	// Write out the progress
 	writer.WriteString(progress_output)
@@ -81,7 +79,7 @@ This function deals with the download itself. It takes in the conventional
 set of tokens as the parameter. There is no return here as there is little
 reason to have one.
 */
-func Download(tokens []values.Token) {
+func Download(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
@@ -92,10 +90,10 @@ func Download(tokens []values.Token) {
 	temp_loc := temp_file.Name()
 
 	if temp_file_err != nil {
-		investigator.Report(
+		Report(
 			"Issue with creating a temporary file to store the download. "+
 				"The temp file that I tried to make was "+temp_loc+
-				". Check to make sure that "+tools.ColouriseCyan(os.TempDir())+
+				". Check to make sure that "+utils.ColouriseCyan(os.TempDir())+
 				" is writeable.",
 			loc,
 			"n/a",
@@ -104,7 +102,7 @@ func Download(tokens []values.Token) {
 	}
 
 	// Fix the remote file name
-	file_to_get := tools.FixStringCombined(tokens[2].TokenValue)
+	file_to_get := FixStringCombined(tokens[2].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
@@ -113,12 +111,12 @@ func Download(tokens []values.Token) {
 	// Get the action to ensure that it can be checked
 	action := tokens[3].TokenValue
 	// Check the action keyword to ensure that it's valid
-	action_error := investigator.CheckAction(loc, action)
+	action_error := CheckAction(loc, action)
 	/* If the action is not a valid action keyword (ie. "to"), report back the
 	error
 	*/
 	if action_error != nil {
-		investigator.ReportWithFixes(
+		ReportWithFixes(
 			action_error.Error(),
 			loc,
 			tokens[3].TokenPosition,
@@ -126,24 +124,25 @@ func Download(tokens []values.Token) {
 		)
 	}
 	// Fix the local save file name
-	save_name := tools.FixStringCombined(tokens[4].TokenValue)
+	save_name := FixStringCombined(tokens[4].TokenValue)
 	/* Get a templated value, that is, a variable where values have been
 	substituted
 	*/
 	save_name = VariableTemplater(save_name)
 
 	// If verbose mode is set, notify the user of what is happening
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Println(
 			":: Creating a temp file - " + temp_loc + " - to store the " +
-				"download before it's moved to its final home: " + save_name + ".",
+				"download before it's moved to its final home: " + save_name +
+				".",
 		)
 	}
 
 	/* If the user is not using Windows, we can defer the file close. Below,
 	you'll see that we explicitly close the handler for Windows users.
 	*/
-	if values.VARIABLES["b_os"] != "windows" {
+	if VARIABLES["b_os"] != "windows" {
 		// Defer the file close.
 		defer temp_file.Close()
 	}
@@ -159,9 +158,9 @@ func Download(tokens []values.Token) {
 	// Set up the GET request
 	request, err := http.NewRequest("GET", file_to_get, nil)
 	if err != nil {
-		investigator.Report(
+		Report(
 			"There was an error initiating the request to "+
-				tools.ColouriseCyan(file_to_get)+". Make sure that the URL "+
+				utils.ColouriseCyan(file_to_get)+". Make sure that the URL "+
 				"is valid.",
 			loc,
 			tokens[2].TokenPosition,
@@ -183,9 +182,9 @@ func Download(tokens []values.Token) {
 	// Do the request itself
 	response, err := client.Do(request)
 	if err != nil {
-		investigator.Report(
+		Report(
 			"There was an error getting the file - "+
-				tools.ColouriseCyan(file_to_get)+". Make sure that the URL "+
+				utils.ColouriseCyan(file_to_get)+". Make sure that the URL "+
 				"is valid.",
 			loc,
 			tokens[2].TokenPosition,
@@ -199,7 +198,7 @@ func Download(tokens []values.Token) {
 	*/
 	remote_file_name := path.Base(response.Request.URL.Path)
 	// Note which file we are downloading
-	fmt.Printf("Downloading %s\n", tools.ColouriseGreen(remote_file_name))
+	fmt.Printf("Downloading %s\n", utils.ColouriseGreen(remote_file_name))
 	// Set the file size in the WriteProgress struct
 	size_counter := &WriteProgress{
 		FileSize: float64(response.ContentLength),
@@ -212,7 +211,7 @@ func Download(tokens []values.Token) {
 	_, io_err := io.Copy(temp_file, io.TeeReader(response.Body, size_counter))
 	// If there is an error in the saving of the chunk, report it
 	if io_err != nil {
-		investigator.Report(
+		Report(
 			"There is an error saving the downloaded chunk: "+io_err.Error(),
 			loc,
 			tokens[1].TokenPosition,
@@ -227,7 +226,7 @@ func Download(tokens []values.Token) {
 	code is not to have OS specific bits, sometimes "Windows gonna Windows"
 	and its idiosyncracies need to be accounted for.
 	*/
-	if values.VARIABLES["b_os"] == "windows" {
+	if VARIABLES["b_os"] == "windows" {
 		// Close the file handler.
 		temp_file.Close()
 	}
@@ -270,9 +269,9 @@ func Download(tokens []values.Token) {
 		// Remove the temp file
 		remove_err := os.Remove(temp_loc)
 		if remove_err != nil {
-			investigator.Report(
+			Report(
 				"There was an error removing the temp file: "+
-					tools.ColouriseYellow(save_name)+". It will be worth "+
+					utils.ColouriseYellow(save_name)+". It will be worth "+
 					"trying to remove it manually.",
 				loc,
 				tokens[4].TokenPosition,
@@ -282,7 +281,7 @@ func Download(tokens []values.Token) {
 	}
 
 	// Report that the file is downloaded
-	fmt.Printf("\nFile downloaded to %s\n", tools.ColouriseGreen(save_name))
+	fmt.Printf("\nFile downloaded to %s\n", utils.ColouriseGreen(save_name))
 
 	/* This is a macOS specific fix to accommodate the fact that macOS seems to
 	make the file hidden when the file is moved. Here, "macOS gonna macOS"
@@ -291,7 +290,7 @@ func Download(tokens []values.Token) {
 	useless for those preferring the graphical user interface for file
 	management.
 	*/
-	if values.VARIABLES["b_os"] == "darwin" {
+	if VARIABLES["b_os"] == "darwin" {
 		// Unhide the file
 		macos_unhide := exec.Command("chflags", "nohidden", save_name)
 		/* Capture the output and suppress it as there isn't any but we may
@@ -304,11 +303,11 @@ func Download(tokens []values.Token) {
 		if unhide_err != nil {
 			unhide_keycombo := fmt.Sprintf(
 				"%s-%s-%s",
-				tools.ColouriseGreen("Command"),
-				tools.ColouriseGreen("Shift"),
-				tools.ColouriseGreen("."),
+				utils.ColouriseGreen("Command"),
+				utils.ColouriseGreen("Shift"),
+				utils.ColouriseGreen("."),
 			)
-			investigator.Report(
+			Report(
 				"On macOS, the file is hidden by the operating system by "+
 					"default. There was an attempt to unhide it but it failed. "+
 					"You will want to enable the showing of hidden files in "+

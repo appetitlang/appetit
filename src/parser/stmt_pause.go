@@ -4,9 +4,7 @@ This module deals with the pause statement.
 package parser
 
 import (
-	"appetit/investigator"
-	"appetit/tools"
-	"appetit/values"
+	"appetit/utils"
 	"fmt"
 	"strconv"
 	"time"
@@ -16,23 +14,23 @@ import (
 Pause the execution of the script. Parameters include the tokens. Returns
 nothing.
 */
-func Pause(tokens []values.Token) {
+func Pause(tokens []Token) {
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
 	// Check the number of tokens and ensure that it's a proper amount
-	_, err := investigator.ValidNumberOfTokens(tokens, 2)
+	_, err := CheckValidNumberOfTokens(tokens, 2)
 	// If not a valid number of tokens, report an error
 	if err != nil {
-		investigator.Report(
-			"The "+tools.ColouriseCyan("pause")+" statement needs to "+
-				"follow the form "+tools.ColouriseCyan("pause")+" "+
-				tools.ColouriseYellow("[version number]")+". A common "+
+		Report(
+			"The "+utils.ColouriseCyan("pause")+" statement needs to "+
+				"follow the form "+utils.ColouriseCyan("pause")+" "+
+				utils.ColouriseYellow("[version number]")+". A common "+
 				"issue here is excluding a version number or passing one as a "+
-				"string (eg. "+tools.ColouriseGreen("\"3\"")+"). An "+
+				"string (eg. "+utils.ColouriseGreen("\"3\"")+"). An "+
 				"example of a working version check might be "+
-				tools.ColouriseCyan("pause")+tools.ColouriseYellow(" 3"),
+				utils.ColouriseCyan("pause")+utils.ColouriseYellow(" 3"),
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,
@@ -50,8 +48,8 @@ func Pause(tokens []values.Token) {
 	less than zero, report an error.
 	*/
 	if err != nil || pause_int < 0 {
-		investigator.Report(
-			"The version number "+tools.ColouriseYellow(pause_as_string)+
+		Report(
+			"The version number "+utils.ColouriseYellow(pause_as_string)+
 				" is not a valid version. You need to use a positive non-zero "+
 				"integer.",
 			loc,
@@ -61,7 +59,7 @@ func Pause(tokens []values.Token) {
 	}
 
 	// If verbose mode is set...
-	if values.MODE_VERBOSE {
+	if MODE_VERBOSE {
 		fmt.Printf(":: Pausing for %s seconds...", pause_as_string)
 	}
 	// Pause execution by sleeping for the required number of seconds
