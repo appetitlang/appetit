@@ -1,10 +1,11 @@
 /*
-The token module contains all token related code including the struct, struct
-methods for the token, token related functions, and test token slices.
+This file contains all token related code including the struct, struct methods
+for the token, token related functions, and test token slices.
 */
 package parser
 
 import (
+	"appetit/utils"
 	"encoding/json"
 	"fmt"
 )
@@ -13,33 +14,27 @@ import (
 The Token type houses information about a particular token and serves as an
 object that houses the relevant information. The structure of the token is
 as follows:
-
-FullLineOfCode [string]: the full line of code that the token is embedded
-in which is helpful for error reporting
-
-LineNumber [int]: the line number
-
-TokenPosition [string]: the starting position (column) of the token in
-question which is helpful for error reporting
-
-TokenValue [string]: the actual string value of the token
-
-TokenType [string]: the type of the token as a string
-
-NonCommentLineNumber [int]: the line counter for lines that aren't
-comments, that is, lines with statement calls
+  - FullLineOfCode [string]: the full line of code that the token is embedded
+    in which is helpful for error reporting
+  - LineNumber [int]: the line number
+  - TokenPosition [string]: the starting position (column) of the token in
+    question which is helpful for error reporting
+  - TokenValue [string]: the actual string value of the token
+  - TokenType [string]: the type of the token as a string
+  - NonCommentLineNumber [int]: the line counter for lines that aren't
+    comments, that is, lines with statement calls
 */
 type Token struct {
 	FullLineOfCode       string
 	LineNumber           int
+	NonCommentLineNumber int
 	TokenPosition        string
 	TokenValue           string
 	TokenType            string
-	NonCommentLineNumber int
 }
 
 /*
-A helper function to make Token printing easier. It takes no parameters nor
+A helper method to make Token printing easier. It takes no parameters nor
 does it return anything.
 */
 func (token *Token) PrintToken() {
@@ -54,11 +49,138 @@ func (token *Token) PrintToken() {
 }
 
 /*
-	The following Token slices are useful for testing purposes that model ideal
-	token arrangements for various statement calls.
+Similar to the above but focuses on printing out a token with some styling
+applied.
 */
+func (token *Token) PrintPrettyToken() {
 
-// TODO: verify that this list is complete
+	// Hold the "dot point" symbol from token properties
+	dot_point := utils.ColouriseMagenta("  ::")
+
+	// Print out the full line of code
+	fmt.Printf(
+		"%s Full Line of Code: %s\n",
+		dot_point,
+		token.FullLineOfCode,
+	)
+	/*
+		Print out the line number. While this may seem redundant, it's
+		helpful to know that the line number is being added to a token
+		properly.
+	*/
+	fmt.Printf(
+		"%s Line Number: %d\n",
+		dot_point,
+		token.LineNumber,
+	)
+	/*
+		Print out the non-comment line number, the line counter that
+		counts the non-comment related lines.
+	*/
+	fmt.Printf(
+		"%s Non Comment Line Number: %d\n",
+		dot_point,
+		token.NonCommentLineNumber,
+	)
+	// Print out the token column/position (ie. where the token starts)
+	fmt.Printf(
+		"%s Position: %s\n",
+		dot_point,
+		token.TokenPosition,
+	)
+	// Print out the token type
+	fmt.Printf(
+		"%s Type: %s\n",
+		dot_point,
+		token.TokenType,
+	)
+	// Print out the token value
+	fmt.Printf(
+		"%s Value: %s\n",
+		dot_point,
+		token.TokenValue,
+	)
+}
+
+/*
+Print out a token to the console, properly formatted, for viewing on the
+console. Takes one parameter: the tokens on a line to be printed. Note that
+this does not, for obvious reasons, print out a tokenised version of a blank
+line.
+*/
+func PrintTokenInfo(tokens []Token) {
+
+	/*
+		First up, we need to keep track of both what line we're on (cur_line)
+		and what token we're working with on that line (cur_token_number).
+	*/
+	// Hold the current line
+	cur_line := 0
+
+	// Counter for the token on the current line
+	cur_token_number := 1
+
+	// Loop over the tokens
+	for token := range tokens {
+		// If the token value isn't nothing (ie. it's something meaningful)
+		if tokens[token].TokenValue != "" {
+			/*
+				Once we've established that the current line has something
+				meaningful, we need to check if this is a token on the current
+				line of interest or a token on a line different from the one
+				that we last looked at. If the current line doesn't equal
+				cur_line (ie. we've encountered a new line of tokens).
+			*/
+			if tokens[token].LineNumber != cur_line {
+				/*
+					Reset the current token counter so that we accurately
+					number the tokens in the output.
+				*/
+				cur_token_number = 1
+				/*
+					Since we're working on a new line of code here, we print
+					out a header with the line number and the full line of code
+					for reference.
+				*/
+				// Print the token line number header
+				fmt.Printf(
+					utils.ColouriseGreen("\n\n[Line %d] "),
+					tokens[token].LineNumber,
+				)
+				fmt.Printf(
+					"%s\n\n",
+					tokens[token].FullLineOfCode,
+				)
+
+				/*
+					Update the cur_line with the line number of the current
+					token so that we can continue to track what line the last
+					token was from (in this case, the current token).
+				*/
+				cur_line = tokens[token].LineNumber
+				// Otherwise...
+			} else {
+				// Print a new blank line as a spacer for the next token
+				fmt.Println()
+			}
+			// Print out the current token counter value
+			fmt.Printf(
+				utils.ColouriseRed("  [Token %d]\n"),
+				cur_token_number,
+			)
+			// Print out a stylised token using a Token struct method
+			tokens[token].PrintPrettyToken()
+
+			// Increment the current line token counter
+			cur_token_number += 1
+		}
+	}
+}
+
+/*
+	The following Token{} slices are useful for testing purposes that model
+	ideal token arrangements for various statement calls.
+*/
 
 // A simple ask statement call
 var TEST_ASK = []Token{
@@ -533,6 +655,34 @@ var TEST_PAUSE = []Token{
 		LineNumber:           1,
 		TokenPosition:        "7",
 		TokenValue:           "3",
+		TokenType:            "string",
+		NonCommentLineNumber: 1,
+	},
+}
+
+// A simple run call
+var TEST_RUN = []Token{
+	{
+		FullLineOfCode:       "run \"../samples/write.apt\"",
+		LineNumber:           1,
+		TokenPosition:        "0",
+		TokenValue:           "",
+		TokenType:            "string",
+		NonCommentLineNumber: 1,
+	},
+	{
+		FullLineOfCode:       "run \"../samples/write.apt\"",
+		LineNumber:           1,
+		TokenPosition:        "1",
+		TokenValue:           "run",
+		TokenType:            "string",
+		NonCommentLineNumber: 1,
+	},
+	{
+		FullLineOfCode:       "run \"../samples/write.apt\"",
+		LineNumber:           1,
+		TokenPosition:        "5",
+		TokenValue:           "\"../samples/write.apt\"",
 		TokenType:            "string",
 		NonCommentLineNumber: 1,
 	},

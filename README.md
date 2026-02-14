@@ -107,6 +107,7 @@ The documentation is available in one of two places:
 1. [The project's homepage](https://bryanabsmith.com).
 2. Running the interpreter with the `-docs` flag (see above). This will deploy a local web server that will host the documentation on port 8000.
 
+**NOTE: THE LANGUAGE SYNTAX AND FUNCTIONALITY IS IN FLUX UNTIL DELCARED OTHERWISE.**
 
 ## Getting Involved
 The project is very much my own right now as a learning experience and as something that I'm designing for myself. I'm happy to accept any feedback but note that I may very well not adopt it. In addition to this project being a learning experience, I always want it to be fun so any suggestions for improvements or fixes will be done when I am happy to do so. Please don't take this as a resistance to ideas as I'm happy to take them on board. Rather, consider this a caution that if the suggestion detracts from the learning, fun, or personal value, I'm unlikely to take it on board.

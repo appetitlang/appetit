@@ -13,7 +13,7 @@
 
 #### Path Organisation
 * investigator - this deals with checks and errors throughout the code
-* parser - this deals with tokenising the lines of the script and delegating to the statements module
+* parser - this deals with tokenising the lines of the script and delegating to the statement functions
 * statements - this deals with executing functionality for the statements
 * tools - this houses miscellaneous tools and functions that are used throughout the interpreter
 * values - this deals with holding values for use across the interpreter ranging from the version number through to the struct that defines a token
@@ -25,7 +25,7 @@
 #### Naming
 * We don't follow Go's preference for exceptionally short variable names. Variables have descriptive names.
 * CapWords is used for functions (ie. every word is capitalised) to accord with Go conventions (capitalised functions are public) and readability. Being in a different case scheme relative to variables makes it easy to sight the differences.
-* Spellings conform to Australian English conventions. For instance, the `colourise` module is spelled correctly (ie. it's not colorize). This is non-negotiable to ensure consistency and predicatbility across the codebase.
+* Spellings conform to Australian English conventions. For instance, the `colourise` fucntions are spelled correctly (ie. it's not colorize). This is non-negotiable to ensure consistency and predicatbility across the codebase.
 
 #### Colouring Output
 * Ensure consistency with colourised output

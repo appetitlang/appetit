@@ -13,7 +13,7 @@ endif
 DPKG_ARCH = $(shell dpkg --print-architecture)
 
 # Thanks to https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications
-LD_FLAGS=-s -w -X 'main.BuildDate=$(shell date)'
+LD_FLAGS=-s -w -X 'appetit/parser.BuildDate=$(shell date)'
 
 # Build all binaries
 all: clean freebsd linux macos netbsd openbsd windows
@@ -33,6 +33,13 @@ freebsd: clean
 	@echo "\033[31m[FreeBSD] Building arm64 binary\033[0m"
 	@env GOOS=freebsd GOARCH=arm64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-freebsd-arm64-$(version)
 
+# Install the application
+install: me
+	@echo "\033[37m:: Installing binary to /usr/local/bin/...\033[0m"
+	@sudo mv ../dist/appetit /usr/local/bin/
+	@echo "\033[31mRemoving ../dist/ directory...\033[0m"
+	@rm -rf ../dist/
+
 # Build for Linux
 linux: clean
 	@echo "\033[33m[Linux] Building x86_64 binary\033[0m"
@@ -51,6 +58,11 @@ macos: clean
 	@echo "\033[36m[macOS/Darwin] Building universal binary\033[0m"
 	@lipo -create -output ../dist/appetit-darwin-universal-$(version) ../dist/appetit-darwin-amd64-$(version) ../dist/appetit-darwin-arm64-$(version)
 
+# Build for the platform you are on
+me: clean
+	@echo ":: Building binary for your platform"
+	@go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit
+
 # Build for NetBSD
 netbsd: clean
 	@echo "\033[35m[NetBSD] Building x86_64 binary\033[0m"
@@ -68,18 +80,6 @@ openbsd: clean
 	@env GOOS=openbsd GOARM=6 GOARCH=arm go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-openbsd-arm-$(version)
 	@echo "\033[32m[OpenBSD] Building arm64 binary\033[0m"
 	@env GOOS=openbsd GOARCH=arm64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-openbsd-arm64-$(version)
-
-# Build for Windows
-windows: clean
-	@echo "\033[34m[Windows] Building x86_64 binary\033[0m"
-	@env GOOS=windows GOARCH=amd64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-windows-amd64-$(version).exe
-	@echo "\033[34m[Windows] Building arm64 binary\033[0m"
-	@env GOOS=windows GOARCH=arm64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-windows-arm64-$(version).exe
-
-# Build for the platform you are on
-me: clean
-	@echo ":: Building binary for your platform"
-	@go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit
 
 # dpkg build for Debian based systems
 pkg_deb: me
@@ -103,13 +103,6 @@ pkg_macos: macos
 	@cp ../LICENCE ../dist/; cp ../packaging/macos_distribution.xml ../dist/
 	@cd ../dist/; productbuild --quiet --distribution macos_distribution.xml --resources . --package-path appetit.pkg appetit_$(version).pkg
 	@rm -rf ../dist/appetit_$(version)/; rm -rf ../dist/appetit.pkg; rm -rf ../dist/macos_distribution.xml; rm -rf ../dist/LICENCE
-
-# Install the application
-install: me
-	@echo "\033[37m:: Installing binary to /usr/local/bin/...\033[0m"
-	@sudo mv ../dist/appetit /usr/local/bin/
-	@echo "\033[31mRemoving ../dist/ directory...\033[0m"
-	@rm -rf ../dist/
 
 # This is for releases as it builds all the binaries, creates release archives, and a source archive
 release: all
@@ -149,3 +142,10 @@ source:
 test:
 	@go clean -testcache
 	@go test ./...
+
+# Build for Windows
+windows: clean
+	@echo "\033[34m[Windows] Building x86_64 binary\033[0m"
+	@env GOOS=windows GOARCH=amd64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-windows-amd64-$(version).exe
+	@echo "\033[34m[Windows] Building arm64 binary\033[0m"
+	@env GOOS=windows GOARCH=arm64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-windows-arm64-$(version).exe

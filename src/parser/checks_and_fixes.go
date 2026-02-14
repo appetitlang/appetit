@@ -1,5 +1,5 @@
 /*
-The checks and fixes modules houses parser functions that do two things:
+The checks and fixes houses parser functions that do two things:
   - Run checks on statement calls and tokens to make sure that they are
     conformant with the language
   - Run fixes on statement values to make sure that they are internally
@@ -128,7 +128,7 @@ path.
 */
 func CheckShebang(line string) (bool, bool) {
 	first_two_chars := line[0:2]
-	_, path_error := os.Stat(line[3:])
+	_, path_error := os.Stat(line[2:])
 
 	// If there is no valid shebang character but a valid interpreter path
 	if first_two_chars != "#!" && path_error == nil {
@@ -147,12 +147,10 @@ func CheckShebang(line string) (bool, bool) {
 }
 
 /*
-Check that something is a valid statement. Parameters include loc, the line
-of the script (if an error needs to be reported) and the value to check.
-Returns bool, true if value_name is a valid statement name.
-TODO: Remove loc parameter as it's not used
+Check that something is a valid statement. Parameters include value_name, the
+value to check. Returns bool, true if value_name is a valid statement name.
 */
-func CheckIsStatement(loc string, value_name string) bool {
+func CheckIsStatement(value_name string) bool {
 	// See if the value passed to this is a valid statement name
 	return slices.Contains(STATEMENT_NAMES, value_name)
 }

@@ -1,3 +1,6 @@
+/*
+Tests for the engine, largely for the Tokenise() function for each statement.
+*/
 package parser
 
 import (
@@ -242,6 +245,19 @@ func TestValidPauseCall(t *testing.T) {
 			"[pause stmt] Tokenisation failed, got %v, expected %v",
 			results,
 			TEST_PAUSE,
+		)
+	}
+}
+
+func TestValidRunCall(t *testing.T) {
+	results := Tokenise("run \"../samples/write.apt\"", 1, 1)
+	tokenisation_equal := reflect.DeepEqual(results, TEST_RUN)
+
+	if !tokenisation_equal {
+		t.Errorf(
+			"[run stmt] Tokenisation failed, got %v, expected %v",
+			results,
+			TEST_RUN,
 		)
 	}
 }

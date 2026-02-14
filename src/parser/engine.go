@@ -1,11 +1,11 @@
 /*
-The parser module deals with tokenising the script and delegating to the
-statement modules. This is home to only three functions:
+The engine deals with tokenising the script and delegating to the
+statement functions. This is home to only three functions:
   - Tokenise() - this will tokenise a line and return a line that has been
     tokenised.
   - Start() - this starts the process of executing the script or, where needed,
     tokenising empty lines to allow for clean execution.
-  - Call() - this executes the main functions in each of the statement modules.
+  - Call() - this executes the appropriate statement functions.
 */
 package parser
 
@@ -31,11 +31,10 @@ tokenise) and loc, the lines of code that we are working with where:
 Returns a slice of Tokens that represents a tokenised line where the first
 element is the line number and each subsequent element is a token in the
 line.
-TODO: Convert variadic loc parameter into set parameters as loc[0] appears to
-consistently be the line of code and loc[1] appears to consistently be the
-non-comment line of code. Why are these seperate?
 */
-func Tokenise(line_of_script string, loc ...int) []Token {
+func Tokenise(
+	line_of_script string,
+	line_number int, non_comment_line_number int) []Token {
 	// Set up a text scanner to tokenise the script
 	var ls scanner.Scanner
 	// Initialise against a line of the script passed
@@ -48,7 +47,7 @@ func Tokenise(line_of_script string, loc ...int) []Token {
 	// Catch errors with the tokeniser and handle them
 	tokeniser.Error = func(s *scanner.Scanner, msg string) {
 		// Call the utilss
-		ReportTokeniserErrors(msg, loc[0])
+		ReportTokeniserErrors(msg, line_number)
 	}
 
 	// Create a slice that houses tokens for each part of the line of code
@@ -56,11 +55,11 @@ func Tokenise(line_of_script string, loc ...int) []Token {
 	// Create the line of code token
 	loc_token := Token{
 		FullLineOfCode:       line_of_script,
-		LineNumber:           loc[0],
+		LineNumber:           line_number,
 		TokenPosition:        strconv.Itoa(tokeniser.Position.Column),
 		TokenValue:           "",
 		TokenType:            reflect.TypeOf(tokeniser.TokenText()).String(),
-		NonCommentLineNumber: loc[1],
+		NonCommentLineNumber: non_comment_line_number,
 	}
 	// Add the line of code to the tokenised line
 	tokenised_line = append(tokenised_line, loc_token)
@@ -70,15 +69,15 @@ func Tokenise(line_of_script string, loc ...int) []Token {
 		// Create a token
 		token := Token{
 			FullLineOfCode:       line_of_script,
-			LineNumber:           loc[0],
+			LineNumber:           line_number,
 			TokenPosition:        strconv.Itoa(tokeniser.Position.Column),
 			TokenValue:           tokeniser.TokenText(),
 			TokenType:            reflect.TypeOf(tokeniser.TokenText()).String(),
-			NonCommentLineNumber: loc[1],
+			NonCommentLineNumber: non_comment_line_number,
 		}
 		/*
 			Append the token to the slice of tokens that will be passed to
-			statement modules in the Call().
+			statement functions in the Call().
 		*/
 		tokenised_line = append(tokenised_line, token)
 	}
@@ -98,16 +97,8 @@ returns.
 func Start(lines []string, dev_mode bool) {
 	/*
 		Before we start parsing, set any reserved variables that require
-		"computation".
-	*/
-	/*
-		TODO: decide if this should be re-built with every execution so that
-		values such as dates and times are accurate as of each statement call.
-	*/
-	BuildReservedVariables()
-	/*
-		Do a quick check to make sure that the minver statement call, if
-		present, is the first language specific call.
+		"computation". Do a quick check to make sure that the minver statement
+		call, if present, is the first language specific call.
 	*/
 	valid_minver, message := CheckValidMinverLocationAndCount(lines)
 	// If it's not appropriately located in the script, error out
@@ -179,6 +170,11 @@ strings that contains the tokens. Returns nothing.
 */
 func Call(tokens []Token) {
 	/*
+		Build the list of reserved variables so that each statement call has
+		access to an up to date set of variables.
+	*/
+	BuildReservedVariables()
+	/*
 		This will catch empty lines as the slice will have a line number but no
 		other elements. So, if the number of tokens is greater than 1, we can
 		assume that the line is something that may require a statement call.
@@ -189,10 +185,6 @@ func Call(tokens []Token) {
 		// Get the statement name
 		stmt_name := tokens[1].TokenValue
 		// Create a map of statmements and their associated function calls
-		/*
-			TODO: Somewhere else so that it isn't perpetually created every
-			execution of the Call() function
-		*/
 		statement_map := map[string]func(){
 			"ask":             func() { Ask(tokens) },
 			"copydirectory":   func() { CopyPath(tokens) },
@@ -218,7 +210,7 @@ func Call(tokens []Token) {
 
 		/*
 			Here, we consolidate the keys from the statement_map map and set
-			the values.STATEMENT_NAMES to the list of keys. We only do this if
+			the STATEMENT_NAMES to the list of keys. We only do this if
 			the list is empty, helping to cut down how many times that this may
 			need to happen. Thanks to https://stackoverflow.com/q/21362950.
 		*/
@@ -231,14 +223,18 @@ func Call(tokens []Token) {
 			is particularly helpful for *nix users who might need or want to
 			run this without invoking the interpreter directly. We also check
 			that the shebang line points to a valid file.
-			TODO: make call on whether checking for a valid interpreter is too
-			aggressive.
 		*/
-		valid_shebang, valid_interpreter := CheckShebang(
+		valid_shebang, _ := CheckShebang(
 			tokens[0].FullLineOfCode)
 
-		//if tokens[0].FullLineOfCode[0:2] == "#!" {
-		if valid_shebang && valid_interpreter {
+		/*if !valid_interpreter {
+			Warning(
+				"The interpreter passed as a shebang does not exist.",
+				strconv.Itoa(tokens[0].LineNumber),
+			)
+		}*/
+
+		if valid_shebang {
 			/*
 				Set the SHEBANG_PRESENT value to true so that
 				MinVer() calls can ignore that the minver statement isn't on
@@ -248,10 +244,8 @@ func Call(tokens []Token) {
 			// Break out of the function call
 			return
 		} else {
-			valid_stmt := CheckIsStatement(
-				tokens[1].FullLineOfCode,
-				tokens[1].TokenValue,
-			)
+			//valid_stmt := CheckIsStatement(tokens[1].FullLineOfCode)
+			valid_stmt := CheckIsStatement(tokens[1].TokenValue)
 
 			if !valid_stmt {
 				// Get the line of the script

@@ -8,22 +8,15 @@ import (
 	"appetit/parser"
 	"appetit/utils"
 	_ "embed"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"runtime"
-	"runtime/debug"
 	"runtime/trace"
-	"strconv"
-	"strings"
 	"time"
 	"unsafe"
 )
-
-// This is set as the build date but this is changed with the Makefile
-var BuildDate string = "-development"
 
 /* Thanks to https://mblessed.hashnode.dev/go-embed-embed-your-html-frontend-
 in-golang for the embed info.
@@ -46,32 +39,6 @@ func DocsHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 /*
-Open up a script and produce a list of lines. The only parameter is the
-filename. This returns a slice of the lines.
-*/
-/*func OpenScript(filename string) []string {
-
-	// Read the file
-	script, err := os.ReadFile(filename)
-	// If the file couldn't be opened
-	if err != nil {
-		// Report the error
-		utils.Report(
-			"Unknown file: "+utils.ColouriseMagenta(filename)+".",
-			"n/a",
-			"n/a",
-			"n/a",
-		)
-		// Exit the script
-		os.Exit(0)
-	}
-	//fmt.Print(string(script))
-	//os.Exit(0)
-	// Return the lines of the script
-	return strings.Split(string(script), "\n")
-}*/
-
-/*
 Get memory stats. This takes no parameters and returns nothing. Thanks to
 https://reintech.io/blog/introduction-to-gos-runtime-package-memory-
 management-performance
@@ -84,8 +51,8 @@ func PrintDevInfo() {
 	fmt.Println(utils.ColouriseYellow("\n\nToken Summary"))
 	fmt.Printf(
 		utils.ColouriseCyan(":: Total Tokens (incl. line number tokens):")+
-			" %d",
-		len(parser.TOKEN_TREE),
+			" %s",
+		utils.CommaSeperator(float64(len(parser.TOKEN_TREE))),
 	)
 
 	// Get the size of a single token
@@ -94,33 +61,26 @@ func PrintDevInfo() {
 	memory_token_tree := uintptr(cap(parser.TOKEN_TREE)) * token_memory_size
 	fmt.Printf(
 		utils.ColouriseCyan("\n:: Total Memory Usage of TOKEN_TREE:")+
-			" %d bytes (single token: %d bytes)",
-		memory_token_tree,
-		token_memory_size,
+			" %s bytes",
+		utils.CommaSeperator(float64(memory_token_tree)),
 	)
 
 	// Print out memory info
 	fmt.Println(utils.ColouriseYellow("\n\nMemory Information"))
 	// Print out the allocated memory
 	fmt.Printf(
-		utils.ColouriseCyan(":: Allocated Memory: ")+
-			"%d bytes, %d kilobytes\n",
-		mem_stats.Alloc,
-		(mem_stats.Alloc / 1024),
+		utils.ColouriseCyan(":: Allocated Memory: ")+"%s bytes\n",
+		utils.CommaSeperator(float64(mem_stats.Alloc)),
 	)
 	// Print out the total allocated memory
 	fmt.Printf(
-		utils.ColouriseCyan(":: Total Allocated Memory: ")+
-			"%d bytes, %d kilobytes\n",
-		mem_stats.TotalAlloc,
-		(mem_stats.TotalAlloc / 1024),
+		utils.ColouriseCyan(":: Total Allocated Memory: ")+"%s bytes\n",
+		utils.CommaSeperator(float64(mem_stats.TotalAlloc)),
 	)
 	// Print out the memory requested from the OS
 	fmt.Printf(
-		utils.ColouriseCyan(":: Memory Requested: ")+
-			"%d bytes, %d kilobytes\n",
-		mem_stats.Sys,
-		(mem_stats.Sys / 1024),
+		utils.ColouriseCyan(":: Memory Requested: ")+"%s bytes\n",
+		utils.CommaSeperator(float64(mem_stats.Sys)),
 	)
 	// Print out the garbage collections
 	fmt.Printf(
@@ -133,6 +93,13 @@ func PrintDevInfo() {
 The main function. No parameters and no returns.
 */
 func main() {
+
+	// Get the version of the app
+	about_flag := flag.Bool(
+		"about",
+		false,
+		"Information about the interpreter.",
+	)
 
 	// Allow the user to execute system commands, defaults to false
 	allowexec_flag := flag.Bool(
@@ -182,12 +149,6 @@ func main() {
 		"verbose",
 		false,
 		"Verbose mode",
-	)
-	// Get the version of the app
-	about_flag := flag.Bool(
-		"about",
-		false,
-		"Information about the interpreter.",
 	)
 
 	// Parse the flags
@@ -250,57 +211,10 @@ func main() {
 
 	// If the create flag is passed...
 	if *create_template_flag != "" {
-		// Create the template with a minver and a shebang line
-		template_script := []byte("#!/usr/bin/appetit\nminver " +
-			strconv.Itoa(parser.LANG_VERSION) + "\n\n- Say hello to the " +
-			"world\nwriteln \"Hello World!\"\n",
+		utils.CreateTemplate(
+			*create_template_flag,
+			parser.LANG_VERSION,
 		)
-
-		// Dereference the *create_template_flag
-		file_name := *create_template_flag
-		// Get the user's home directory in case they pass a tilde
-		user_home, _ := os.UserHomeDir()
-		/* If they provide a tilde, convert the tilde to the user home
-		directory
-		*/
-		if strings.HasPrefix(file_name, "~") {
-			// Hold the corrected file name
-			file_name = user_home + file_name[1:]
-		}
-		// Create a write handler
-		write_handler, write_err := os.Create(file_name)
-		// If there was an error creating the file
-		if write_err != nil {
-			// Respond with an error
-			fmt.Println(
-				"There was an error creating the script at " +
-					*create_template_flag + ". Make sure that you can save a " +
-					"file in that location.",
-			)
-		}
-		// Defer the file closing
-		defer write_handler.Close()
-
-		// Write out the template
-		_, output_err := write_handler.Write(template_script)
-
-		// If there was an error writing the template to disk
-		if output_err != nil {
-			// Respond with an error
-			fmt.Println(
-				"There was an error creating the script at " +
-					*create_template_flag + ". Make sure that you can save a " +
-					"file in that location.",
-			)
-		}
-
-		// Report back that we're done
-		fmt.Println(
-			":: Created a script at " +
-				utils.ColouriseCyan(*create_template_flag),
-		)
-		// Abandon ship
-		os.Exit(0)
 	}
 
 	// If the docs flag is passed, serve up the docs
@@ -324,98 +238,12 @@ func main() {
 
 	// If the version flag is true, print version info
 	if *about_flag {
-		/* Set up the struct that will hold the JSON data for remotely checking
-		the current version.
-		*/
-		type RemoteDetails struct {
-			Version     int    `json:"version"`
-			Date        string `json:"date"`
-			Description string `json:"description"`
-		}
-		// Fetch the info about the current release
-		remote_response, remote_error := http.Get(
-			"https://bryanabsmith.com/appetit/version_info.json",
+		utils.About(
+			parser.LANG_NAME,
+			parser.LANG_VERSION,
+			parser.LANG_CODENAME,
+			parser.BuildDate,
 		)
-		// If there's an error getting the current version info, abandon ship
-		if remote_error != nil {
-			// Exit the app
-			os.Exit(0)
-		}
-		// Defer the remote handler close
-		defer remote_response.Body.Close()
-
-		// Set up a home for the remotely pulled information.
-		var remote_data RemoteDetails
-		// Decode the data and place it in the remote_data RemoteDetails
-		decode_error := json.NewDecoder(remote_response.Body).Decode(
-			&remote_data,
-		)
-		// If there was an error decoding the data, abandon ship
-		if decode_error != nil {
-			// Exit the app
-			os.Exit(0)
-		}
-
-		new_or_current_version := ""
-		/* If the remote file has a version number greater than the current
-		version, inform the user and give them some details.
-		*/
-		if remote_data.Version > parser.LANG_VERSION {
-			new_or_current_version = utils.ColouriseRed(
-				fmt.Sprintf(
-					"\n%s\nThere's a new version of Appetit "+
-						"available! Version %s is available, released %s. "+
-						"%s\n",
-					utils.ColouriseYellow("[New Version]"),
-					strconv.Itoa(remote_data.Version),
-					remote_data.Date,
-					remote_data.Description,
-				),
-			)
-			/* If the version information is the same, let them know that they are
-			running the most current version.
-			*/
-		} else if remote_data.Version == parser.LANG_VERSION {
-			new_or_current_version = utils.ColouriseGreen("You're up to date!")
-		}
-
-		// Get build info
-		build_info, _ := debug.ReadBuildInfo()
-		// Get the go information absent the first to characters which is go
-		go_version := build_info.GoVersion[2:]
-
-		/* Print out a pretty version of the version info. During testing, the
-		BuildDate variable will be "testing" and this is replaced with the
-		actual build date when the Makefile is run.
-		*/
-
-		bin_dir, _ := os.Executable()
-
-		fmt.Printf(
-			"%s\n%s\n\n%s\n%s%s\n\n%s\n%s%s\n%s%s\n%s%d\n\n%s\n%s%s\n%s%s\n",
-			utils.ColouriseMagenta(
-				parser.LANG_NAME+" "+
-					strconv.Itoa(int(parser.LANG_VERSION)),
-			),
-			new_or_current_version,
-			utils.ColouriseYellow("[Files]"),
-			utils.ColouriseCyan("Interpreter Path: "),
-			utils.ColouriseBlue(bin_dir),
-			utils.ColouriseYellow("[Platform]"),
-			utils.ColouriseCyan("Operating System: "),
-			runtime.GOOS,
-			utils.ColouriseCyan("Architecture: "),
-			runtime.GOARCH,
-			utils.ColouriseCyan("CPUs: "),
-			runtime.NumCPU(),
-			utils.ColouriseYellow("[Build]"),
-			utils.ColouriseCyan("Go Version: "),
-			go_version,
-			utils.ColouriseCyan("Build Date: "),
-			BuildDate,
-		)
-		// Exit the app
-		os.Exit(0)
 	}
 
 	// Set the output to verbose

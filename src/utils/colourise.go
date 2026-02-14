@@ -1,5 +1,6 @@
 /*
-The colourise module provides helpful functions for colouring a string.
+This provides utility functions for colouring a string. This should work in any
+shell that supports ANSI codes.
 */
 package utils
 

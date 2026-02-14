@@ -36,9 +36,9 @@ func TestCheckIsStatement(t *testing.T) {
 	invalid_statement := "RANDOM!"
 
 	// Get a response to the CheckIsStatement that should return true
-	valid_result := CheckIsStatement("1", valid_statement)
+	valid_result := CheckIsStatement(valid_statement)
 	// Get a response to the CheckIsStatement that should return false
-	invalid_result := CheckIsStatement("1", invalid_statement)
+	invalid_result := CheckIsStatement(invalid_statement)
 
 	// If a valid statement name returns false...
 	if !valid_result {

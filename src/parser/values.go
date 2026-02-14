@@ -1,8 +1,11 @@
 /*
-This module holds a collection of values that are referenced throughout the
+This holds a collection of values that are referenced throughout the
 parser. This includes:
 - Language name and version values (as consts)
--
+- Symbols and non-statement keywords used in the language
+- Mode settings (eg. are we running in dev mode?)
+- Token and variable information
+- Some other values that are necessary to track across the parser
 */
 package parser
 
@@ -28,6 +31,12 @@ The versioning system here is a simple integer based system where each version
 increment represents a new version. No semver or calver here.
 */
 const LANG_VERSION int = 1
+
+/*
+This is set as the build date but this is changed with the Makefile. The linker
+flags in the Makefile change this as a function of
+*/
+var BuildDate string = "-development"
 
 /*
 Code name for the language. This is named for capital cities in no particular

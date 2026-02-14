@@ -1,5 +1,5 @@
 /*
-The handler module provides error handling and reporting for language specific
+These functions provide error handling and reporting for language specific
 issues.
 */
 package parser
@@ -33,7 +33,7 @@ func Report(
 		Get the position but subtract one as we want to insert the error arrow
 		at the right place
 	*/
-	position += len(loc_title) - 1
+	position += len(loc_title)
 	// Set up the error arrow
 	error_pos_symbol := utils.ColouriseRed("^") // ⇈
 	// Print the error information
@@ -99,11 +99,11 @@ func ReportTokeniserErrors(message string, loc int) {
 		Parameters include the scanner and the message that gets reported.
 		Returns nothing.
 
-		TODO: more carefully account for some of the errors reported back by
-		scanner.Init(). See here: https://cs.opensource.google/go/go/+/refs/
-		// tags/go1.25.1:src/text/scanner/scanner.go;l=181. Find all the
-		s.error() calls. This is an ongoing to-do that is likely only to be
-		resolved by way of more testing and usage.
+		If scanner.Init() throws an error, this is the place to fix it.
+		See here: https://cs.opensource.google/go/go/+/refs/tags/go1.25.1:src/
+		text/scanner/scanner.go;l=181. Find all the s.error() calls. This is an
+		ongoing to-do that is likely only to be resolved by way of more testing
+		and usage.
 	*/
 	switch message {
 	// Catch an unterminated literal
@@ -154,10 +154,18 @@ func ReportTokeniserErrors(message string, loc int) {
 		*/
 		Report(
 			message+". Please report this error with the erroneous line "+
-				"of code as this isn't accounted for in the error checking.",
+				"of code as this isn't accounted for in the error checking."+
+				"It may be some time before you see this error message fixed"+
+				" in a release.",
 			strconv.Itoa(loc),
 			"n/a",
 			"n/a",
 		)
 	}
+}
+
+func Warning(warning string, line_number string) {
+	fmt.Println(utils.ColouriseYellow("\n[WARNING]"))
+	fmt.Println(utils.ColouriseMagenta(" Line Number: ") + line_number)
+	fmt.Println(warning)
 }

@@ -1,49 +1,44 @@
 package parser
 
 import (
+	"fmt"
 	"slices"
 	"testing"
 )
 
 /*
-This is a simple test to ensure that the CommaSeperator() function is working.
+Check to make sure that the CalculateValue() function (a) both correctly
+calculates maths expressions and; (b) ignores expressions that can't be
+calculated.
 */
-func TestCommaSeperator(t *testing.T) {
-	num_one := 1234567890
-	num_one_seperated := "1,234,567,890"
+func TestCalculateValue(t *testing.T) {
+	// Three sample expressions, the first two can be calculated, the last not
+	expression_one := "1+4"
+	expression_two := "(23+10)*3"
+	expression_three := fmt.Sprintf("%s v%d", LANG_NAME, LANG_VERSION)
 
-	num_two := 12345
-	num_two_seperated := "12,345"
+	// Calculate those expressions
+	calculated_one := CalculateValue("1", expression_one)
+	calculated_two := CalculateValue("1", expression_two)
+	calculated_three := CalculateValue("1", expression_three)
 
-	num_three := 123
-	num_three_seperated := "123"
-
-	result_one := CommaSeperator(float64(num_one))
-	result_two := CommaSeperator(float64(num_two))
-	result_three := CommaSeperator(float64(num_three))
-
-	if result_one != num_one_seperated {
-		t.Errorf(
-			"[CommaSeperator] Expected %s, got %s ",
-			num_one_seperated,
-			result_one,
-		)
+	// Do the checks and error out if need be
+	if calculated_one != "5" {
+		t.Errorf("[CalculateValue] Expected %s, got %s",
+			"5",
+			calculated_one)
 	}
 
-	if result_two != num_two_seperated {
-		t.Errorf(
-			"[CommaSeperator] Expected %s, got %s ",
-			num_two_seperated,
-			result_two,
-		)
+	if calculated_two != "99" {
+		t.Errorf("[CalculateValue] Expected %s, got %s",
+			"99",
+			calculated_two)
 	}
 
-	if result_three != num_three_seperated {
-		t.Errorf(
-			"[CommaSeperator] Expected %s, got %s ",
-			num_three_seperated,
-			result_three,
-		)
+	if calculated_three != expression_three {
+		t.Errorf("[CalculateValue] Expected %s, got %s",
+			expression_three,
+			calculated_three)
 	}
 }
 
