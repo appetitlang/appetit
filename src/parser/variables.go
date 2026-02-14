@@ -36,9 +36,11 @@ func CheckVariableExistence(var_name string) (bool, bool) {
 		// If the value is nothing, we have a variable but no value
 		if value == "" {
 			return true, false
+			// If the variable is present and has a value, return true for both
 		} else {
 			return true, true
 		}
+		// If we've gotten here, we can assume that the variable does not exist
 	} else {
 		return false, false
 	}
@@ -47,17 +49,19 @@ func CheckVariableExistence(var_name string) (bool, bool) {
 /*
 Create any values for built in reserved variables that require building.
 This addresses the empty ones in the VARIABLES map and updates those that
-require specific values for each statement call. No parameters and no returns.
+require specific values for each statement call. This does not update each
+variable's value each call, however, as checks are made to see if those values
+that won't change during runtime already have values. No parameters and no
+returns.
 */
 func BuildReservedVariables() {
-	/*
-		TODO: This function should only re-generate variables when and where
-		they need to be updated in "real time". This includes things like the
-		date and time but not something like the user name. This can be
-		resolved by checking for pre-existing values.
-	*/
+	// Check to see if the user reserved variable has a value
 	_, cur_user_value := CheckVariableExistence(
 		SYMBOL_RESERVED_VARIABLE_PREFIX + "user")
+	/*
+		If it doesn't, add one. If it doesn't, this condition won't be met so
+		the code will continue along.
+	*/
 	if !cur_user_value {
 		// Get the current user
 		cur_user, cur_user_error := user.Current()
@@ -91,40 +95,81 @@ func BuildReservedVariables() {
 	// Get the current time
 	time_now := time.Now()
 
-	// Get the time in hh-mm-ss in 24 hour format
+	/*
+		Get the time in hh-mm-ss in 24 hour format. This should be re-generated
+		every run of Call().
+	*/
 	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"time"] = fmt.Sprintf(
 		"%d-%d-%d", time_now.Hour(), time_now.Minute(), time_now.Second(),
 	)
 
-	// Get the time zone, ignoring the offset as this isn't needed
+	/*
+		Get the time zone, ignoring the offset as this isn't needed. This
+		should be re-generated every run of Call(). While it is unlikely that
+		someone will move between time zones or have the machine's time zone
+		change during execution, it is possible.
+	*/
+	//
 	time_zone, _ := time_now.Zone()
 
 	// Get the timezone
 	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"zone"] = time_zone
 
+	/*
+		Check to see if the hostname is set. This doesn't need to be
+		re-generated each call of the function.
+	*/
+	_, host_value := CheckVariableExistence(
+		SYMBOL_RESERVED_VARIABLE_PREFIX + "hostname")
 	// Get the hostname
-	host, err := os.Hostname()
-	// If there's no error, set the b_host to the hostname.
-	if err == nil {
-		VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"hostname"] = host
-	}
-	// Get the user home directory
-	home, err := os.UserHomeDir()
-	// If there's no error, set the b_home to the home directory.
-	if err == nil {
-		VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"home"] = home
+	if !host_value {
+		host, err := os.Hostname()
+		// If there's no error, set the b_host to the hostname.
+		if err == nil {
+			VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"hostname"] = host
+		}
 	}
 
-	// Get the working directory
-	wd, err := syscall.Getwd()
-	// If there's no error, set the b_wd to the working directory.
-	if err == nil {
-		VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"wd"] = wd
+	/*
+		Check if the user's home directory is already set. This won't need to
+		be re-set each time as this won't change.
+	*/
+	_, home_dir_value := CheckVariableExistence(
+		SYMBOL_RESERVED_VARIABLE_PREFIX + "home")
+
+	if !home_dir_value {
+		// Get the user home directory
+		home, err := os.UserHomeDir()
+		// If there's no error, set the b_home to the home directory.
+		if err == nil {
+			VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"home"] = home
+		}
 	}
 
-	/* House the ip address. This now improves on the old format which depended
-	both on an external network connection and the stability of Google's
-	public DNS service which is not something I want to depend on.
+	/*
+		Check to see if the working directory is set. For now, this doesn't
+		need to be updated; while future statements may allow for a change in
+		the working directory, this isn't true yet so we don't need to update
+		this each time.
+	*/
+	_, work_dir_value := CheckVariableExistence(
+		SYMBOL_RESERVED_VARIABLE_PREFIX + "wd")
+
+	if !work_dir_value {
+		// Get the working directory
+		wd, err := syscall.Getwd()
+		// If there's no error, set the b_wd to the working directory.
+		if err == nil {
+			VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"wd"] = wd
+		}
+	}
+
+	/*
+		House the ip address. This now improves on the old format which
+		depended both on an external network connection and the stability of
+		Google's public DNS service which is not something I want to depend on.
+
+		TODO: see if there is a more elegant way to get this.
 	*/
 	// Get the interfaces
 	ipaddrs, ipaddrs_err := net.InterfaceAddrs()
