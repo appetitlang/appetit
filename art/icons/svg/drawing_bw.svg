@@ -7,7 +7,7 @@
    viewBox="0 0 512 512"
    version="1.1"
    id="svg1"
-   inkscape:export-filename="bitmap.png"
+   inkscape:export-filename="../bw/icon512.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
@@ -92,12 +92,12 @@
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:48px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next';writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect5);display:inline;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"><tspan
        x="44.349609"
        y="525.06292"
-       id="tspan7"><tspan
+       id="tspan3"><tspan
          style="font-size:16px"
-         id="tspan5">.</tspan><tspan
+         id="tspan1">.</tspan><tspan
          dx="4.1600037 17.088013"
          style="font-size:32px"
-         id="tspan6">ap</tspan></tspan></text>
+         id="tspan2">ap</tspan></tspan></text>
   <text
      xml:space="preserve"
      id="text7"
@@ -105,5 +105,5 @@
      transform="matrix(1.0116904,0,0,1.0116904,405.56979,17.917727)"><tspan
        x="15.652344"
        y="464.41515"
-       id="tspan8">.ap</tspan></text>
+       id="tspan4">.ap</tspan></text>
 </svg>

@@ -1,4 +1,5 @@
 version = 1
+dev_version = "true"
 
 OS = $(shell uname)
 
@@ -12,8 +13,13 @@ endif
 
 DPKG_ARCH = $(shell dpkg --print-architecture)
 
-# Thanks to https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications
-LD_FLAGS=-s -w -X 'appetit/parser.BuildDate=$(shell date)'
+# If the dev_version is true, don't add a build date so that it remains "-development"
+ifeq ($(dev_version), "false")
+	# Thanks to https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications
+	LD_FLAGS=-s -w -X 'appetit/parser.BuildDate=$(shell date)'
+else
+	LD_FLAGS=-s -w
+endif
 
 # Build all binaries
 all: clean freebsd linux macos netbsd openbsd windows
@@ -104,39 +110,17 @@ pkg_macos: macos
 	@cd ../dist/; productbuild --quiet --distribution macos_distribution.xml --resources . --package-path appetit.pkg appetit_$(version).pkg
 	@rm -rf ../dist/appetit_$(version)/; rm -rf ../dist/appetit.pkg; rm -rf ../dist/macos_distribution.xml; rm -rf ../dist/LICENCE
 
-# This is for releases as it builds all the binaries, creates release archives, and a source archive
+# This is for releases as it builds all the binaries and a source archive
 release: all
-	@echo "\n\033[31m[Release: FreeBSD] Making release archive\033[0m"
-	@tar -cJf ../dist/appetit-freebsd-v$(version).tar.xz bin/appetit-freebsd-amd64-$(version) ../dist/appetit-freebsd-arm64-$(version) ../dist/appetit-freebsd-arm-$(version) LICENCE
-	@rm -rf ../dist/appetit-freebsd-amd64-$(version) ../dist/appetit-freebsd-arm64-$(version) ../dist/appetit-freebsd-arm-$(version)
-
-	@echo "\033[33m[Release: Linux] Making release archive\033[0m"
-	@tar -cJf ../dist/appetit-linux-v$(version).tar.xz ../dist/appetit-linux-amd64-$(version) ../dist/appetit-linux-arm64-$(version) ../dist/appetit-linux-arm-$(version) LICENCE
-	@rm -rf ../dist/appetit-linux-amd64-$(version) ../dist/appetit-linux-arm64-$(version) ../dist/appetit-linux-arm-$(version)
-
-	@echo "\033[36m[Release: macOS] Making release archive\033[0m"
-	@tar -cJf ../dist/appetit-macos-v$(version).tar.xz ../dist/appetit-darwin-amd64-$(version) ../dist/appetit-darwin-arm64-$(version) ../dist/appetit-darwin-universal-$(version) LICENCE
-	@rm -rf ../dist/appetit-darwin-amd64-$(version) ../dist/appetit-darwin-arm64-$(version) ../dist/appetit-darwin-universal-$(version)
-
-	@echo "\033[35m[Release: NetBSD] Making release archive\033[0m"
-	@tar -cJf ../dist/appetit-netbsd-v$(version).tar.xz ../dist/appetit-netbsd-amd64-$(version) ../dist/appetit-netbsd-arm64-$(version) ../dist/appetit-netbsd-arm-$(version) LICENCE
-	@rm -rf ../dist/appetit-netbsd-amd64-$(version) ../dist/appetit-netbsd-arm64-$(version) ../dist/appetit-netbsd-arm-$(version)
-
-	@echo "\033[32m[Release: OpenBSD] Making release archive\033[0m"
-	@tar -cJf ../dist/appetit-openbsd-v$(version).tar.xz ../dist/appetit-openbsd-amd64-$(version) ../dist/appetit-openbsd-arm64-$(version) ../dist/appetit-openbsd-arm-$(version) LICENCE
-	@rm -rf ../dist/appetit-openbsd-amd64-$(version) ../dist/appetit-openbsd-arm64-$(version) ../dist/appetit-openbsd-arm-$(version)
-
-	@echo "\033[34m[Release: Windows] Making release archive\033[0m"
-	@zip -q ../dist/appetit-windows-v$(version).zip ../dist/appetit-windows-amd64-$(version).exe ../dist/appetit-windows-arm64-$(version).exe LICENCE
-	@rm -rf ../dist/appetit-windows-amd64-$(version).exe ../dist/appetit-windows-arm64-$(version).exe
-
 	@$(MAKE) source
 
 # Make a source archive
 source:
 	@echo "\033[37m[Source] Making archive\033[0m"
+	@cp ../LICENCE .
 	@mkdir -p ../dist/
 	@tar --exclude=../dist/ -cJf ../dist/appetit-src-v$(version).tar.xz *
+	@rm -f LICENCE
 
 # Run the Go unit tests
 test:

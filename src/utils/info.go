@@ -73,19 +73,32 @@ func About(lang_name string, lang_ver int, lang_codename string, build_date stri
 	// Get the go information absent the first to characters which is go
 	go_version := build_info.GoVersion[2:]
 
+	header := ""
+	if build_date == "-development" {
+		header = fmt.Sprintf(
+			"%s %s (%s) %s",
+			lang_name,
+			strconv.Itoa(int(lang_ver)),
+			lang_codename,
+			ColouriseRed("DEVELOPMENT VERSION"),
+		)
+	} else {
+		header = fmt.Sprintf(
+			"%s %s (%s)",
+			lang_name,
+			strconv.Itoa(int(lang_ver)),
+			lang_codename,
+		)
+	}
 	/* Print out a pretty version of the version info. During testing, the
 	BuildDate variable will be "testing" and this is replaced with the
 	actual build date when the Makefile is run.
 	*/
-
 	bin_dir, _ := os.Executable()
 
 	fmt.Printf(
-		"%s %s\n%s\n\n%s\n%s%s\n\n%s\n%s%s\n%s%s\n%s%d\n\n%s\n%s%s\n%s%s\n",
-		ColouriseMagenta(
-			lang_name+" "+strconv.Itoa(int(lang_ver)),
-		),
-		ColouriseMagenta(lang_codename),
+		"%s\n%s\n\n%s\n%s\n%s\n\n%s\n%s%s\n%s%s\n%s%d\n\n%s\n%s%s\n%s%s\n",
+		header,
 		new_or_current_version,
 		ColouriseYellow("[Files]"),
 		ColouriseCyan("Interpreter Path: "),
