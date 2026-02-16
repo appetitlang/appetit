@@ -14,7 +14,9 @@ A simple "Hello World" with some variable substitution present.
 - [Licences](#licences)
 
 ## Principles and About
-Appetit is a solution to an already solved problem: scripting simple actions on a computer. However, this project has some key principles that differentiate it from some other projects. The project was started on 11/05/2025 and the first source release on GitHub (and to the world) was on 24/09/2025.
+Appetit is a solution to an already solved problem: scripting simple actions on a computer. However, this project has some key principles that differentiate it from some other projects.
+
+The project was started on 11/05/2025 and the first source release on GitHub (and to the world) was on 24/09/2025.
 
 **Language Design**
 - Everything in the language is a single line statement. Much like a recipe is a set of sequential instructions (hence the name of the language), an Appetit script is guided by single line instructions.
@@ -104,18 +106,26 @@ There are a handful of flags that are documented via the `-help` flag. More deta
 
 ## Language Syntax and Functionality
 The documentation is available in one of two places:
-1. [The project's homepage](https://bryanabsmith.com).
+1. [The project's homepage](https://bryanabsmith.com/appetit).
 2. Running the interpreter with the `-docs` flag (see above). This will deploy a local web server that will host the documentation on port 8000.
 
 **NOTE: THE LANGUAGE SYNTAX AND FUNCTIONALITY IS IN FLUX UNTIL DELCARED OTHERWISE.**
 
 ## Getting Involved
-The project is very much my own right now as a learning experience and as something that I'm designing for myself. I'm happy to accept any feedback but note that I may very well not adopt it. In addition to this project being a learning experience, I always want it to be fun so any suggestions for improvements or fixes will be done when I am happy to do so. Please don't take this as a resistance to ideas as I'm happy to take them on board. Rather, consider this a caution that if the suggestion detracts from the learning, fun, or personal value, I'm unlikely to take it on board.
+The project is very much my own right now as a learning experience and as something that I'm designing for myself. I'm happy to accept any feedback but note that I may very well not adopt it. In addition to this project being a learning experience, I always want it to be fun so any suggestions for improvements or fixes will be done when and where I am happy to do so. Please don't take this as a resistance to ideas as I'm happy to take them on board. Rather, consider this a caution that if the suggestion detracts from the learning, fun, or personal value I get from this project, I'm unlikely to take it on board.
 
 
 ## Licences
 
-### Everything but the art/icons/ folder
+### The art/ folder
+The icon bases were originally from the Tango Project which kindly released their icons into the public domain. Any versions of the code that you find with the Tango icons as the foundation are released into the public domain.
+
+The current icons are original creations. They are licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International licence. See the details of this here: https://creativecommons.org/licenses/by-nc-sa/4.0/. In short, you are free to share and adapt the icon as long as you provide proper attribution, do not use the icon for commercial purposes, and licence any adaptations under the same CC licence.
+
+### The docs/ folder
+Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International licence. See the details of this here: https://creativecommons.org/licenses/by-nc-sa/4.0/. In short, you are free to share and adapt the icon as long as you provide proper attribution, do not use the icon for commercial purposes, and licence any adaptations under the same CC licence.
+
+### The packaging/ and src/ folder
 Copyright 2025-2026 Bryan Smith.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -124,5 +134,5 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED “AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### The art/icons/ folder
-The icon bases here are from the [Tango Project](https://commons.wikimedia.org/wiki/Tango_icons) which kindly released their icons into the public domain. As a result, the icons for this project are also released into the public domain.
+### The samples/ folder
+Licensed under the CC0 1.0 Universal. See the details here: https://creativecommons.org/publicdomain/zero/1.0/. In short, this is waiving any copyright and putting the sample code in the public domain.
