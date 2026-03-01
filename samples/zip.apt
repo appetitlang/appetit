@@ -1,4 +1,4 @@
 minver 1
 
 - Archive a directory
-zipdirectory "#b_home/Downloads/" to "#b_home/Desktop/test.zip"
+zipdirectory "#b_home/Downloads/gobyexample" to "#b_home/Desktop/test.zip"

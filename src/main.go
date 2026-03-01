@@ -93,7 +93,6 @@ func PrintDevInfo() {
 The main function. No parameters and no returns.
 */
 func main() {
-
 	// Get the version of the app
 	about_flag := flag.Bool(
 		"about",

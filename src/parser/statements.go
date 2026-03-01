@@ -610,6 +610,25 @@ func Download(tokens []Token) {
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
 	loc := strconv.Itoa(tokens[0].LineNumber)
+
+	// Check the number of tokens and ensure that it's a proper amount
+	_, num_tokens_error := CheckValidNumberOfTokens(tokens, 4)
+	// If not a valid number of tokens, report an error
+	if num_tokens_error != nil {
+		Report(
+			"The "+utils.ColouriseCyan("download")+" statement needs "+
+				"to follow the form "+utils.ColouriseCyan("download")+" "+
+				utils.ColouriseGreen("\"[url]\"")+"to"+
+				utils.ColouriseGreen("\"[path]\"")+". An example of a "+
+				"working version might be "+utils.ColouriseCyan("download")+
+				utils.ColouriseGreen(" \"http://file.com/file.txt\"")+"to"+
+				utils.ColouriseGreen(" \"#b_home/file.txt\"")+".",
+			loc,
+			"n/a",
+			full_loc,
+		)
+	}
+
 	// Create a temp file to hold the download before it is moved into place
 	temp_file, temp_file_err := os.CreateTemp("", "appetit_dl_temp")
 	// Hold the file temporarily
@@ -943,8 +962,8 @@ func Exit(tokens []Token) {
 		Report(
 			"The "+utils.ColouriseCyan("exit")+" statement needs "+
 				"to follow the form:\n\n\t"+utils.ColouriseCyan("exit")+
-				"\n\nThere are no values that you can or need to pass which is "+
-				"most likely the cause here.\n\n"+
+				"\n\nThere are no values that you can or need to pass which "+
+				"is most likely the cause here.\n\n"+
 				"Your line of code looks like the following:\n\n\t"+
 				utils.ColouriseRed(full_loc)+"\n\n",
 			loc,
@@ -959,6 +978,95 @@ func Exit(tokens []Token) {
 	}
 	// Finally, exit
 	os.Exit(0)
+}
+
+/*
+log statement
+
+This will log a string to a file of the user's choosing as a helpful shorthand
+for tracking executions of a script. Returns nothing.
+*/
+func Log(tokens []Token) {
+	full_loc := tokens[0].FullLineOfCode
+
+	loc := strconv.Itoa(tokens[0].LineNumber)
+
+	_, num_tokens_error := CheckValidNumberOfTokens(tokens, 4)
+
+	if num_tokens_error != nil {
+		Report(
+			"The "+utils.ColouriseCyan("log")+" statement needs "+
+				"to follow the form "+utils.ColouriseCyan("log")+" "+
+				utils.ColouriseGreen("\"[path]\"")+"to"+
+				utils.ColouriseGreen("\"[path]\"")+". An example of a "+
+				"working version might be "+utils.ColouriseCyan("log")+
+				utils.ColouriseGreen(" \"The script is done\"")+"to"+
+				utils.ColouriseGreen(" \"script_log\"")+".",
+			loc,
+			"n/a",
+			full_loc,
+		)
+	}
+
+	action := tokens[3].TokenValue
+	if action != SYMBOL_ACTION {
+		Report(
+			"An inapportiate action symbol is used. You used "+
+				utils.ColouriseMagenta(action)+" when you need to use "+
+				utils.ColouriseMagenta(SYMBOL_ACTION)+".",
+			loc,
+			tokens[3].TokenPosition,
+			full_loc,
+		)
+	}
+
+	/* Get the output string, that is, the text that will be output to the log.
+	Further, fix the string.
+	*/
+	output_string := FixStringCombined(tokens[2].TokenValue)
+	/* Get a templated value, that is, a variable where values have been
+	substituted
+	*/
+	output_string = VariableTemplater(output_string)
+
+	// Get the file name
+	file_name := FixStringCombined(tokens[4].TokenValue)
+	/* Get a templated value, that is, a variable where values have been
+	substituted
+	*/
+	file_name = VariableTemplater(file_name)
+	// Open the log file and create it if it doesn't exist
+	file_handler, file_handler_error := os.OpenFile(
+		file_name+".log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	// If there's an error opening or creating the file...
+	if file_handler_error != nil {
+		Report(
+			"There was an error opening the file "+
+				utils.ColouriseCyan(file_name)+". Make sure that you can "+
+				"create a log file in this directory.",
+			loc,
+			tokens[4].TokenPosition,
+			full_loc,
+		)
+	}
+	// Defer the file handler close
+	defer file_handler.Close()
+
+	_, write_handler_error := file_handler.WriteString(output_string)
+	if write_handler_error != nil {
+		Report(
+			"There was an error writing to the file "+
+				utils.ColouriseCyan(file_name)+". Make sure that you can "+
+				"write to files in this directory.",
+			loc,
+			tokens[4].TokenPosition,
+			full_loc,
+		)
+	}
+
+	if MODE_VERBOSE {
+		fmt.Println("Wrote log file to " + file_name + ".log.")
+	}
 }
 
 /*
@@ -1761,12 +1869,13 @@ func ZipFromFile(tokens []Token) {
 /*
 zipdirectory statement
 
-Make a zip archive of a folder. The tokens are passed to get
-the origin, destination, and to ensure that the 'action' is appropriate.
-Returns nothing. Thanks to https://stackoverflow.com/a/63233911
+Make a zip archive of a file. The tokens are passed to get
+the origin, destination, and to ensure that the 'action' is appropriate. This
+is a modified version of this function (consider it version 2) as it migrates
+from a file path walker to the os.DirFS and zip writer AddFS() functions.
+Returns nothing.
 */
 func ZipFromPath(tokens []Token) {
-
 	// Get the full line of code
 	full_loc := tokens[0].FullLineOfCode
 	// Get the line of code
@@ -1776,15 +1885,15 @@ func ZipFromPath(tokens []Token) {
 	// If not a valid number of tokens, report an error
 	if err != nil {
 		Report(
-			"The "+utils.ColouriseCyan("zipdirectory")+" statement needs "+
-				"to follow the form "+utils.ColouriseCyan("zipdirectory")+" "+
+			"The "+utils.ColouriseCyan("zipfile")+" statement needs "+
+				"to follow the form "+utils.ColouriseCyan("zipfile")+" "+
 				utils.ColouriseGreen("\"[path]\"")+" to "+
 				utils.ColouriseGreen("\"[path]\"")+". A common issue is the "+
 				"use of an inappropriate action symbol ("+
 				utils.ColouriseMagenta(SYMBOL_ACTION)+"). An "+
 				"example of a working version might be "+
-				utils.ColouriseCyan("zipdirectory")+
-				utils.ColouriseGreen(" \"/Users/user/test_dir/\"")+" to "+
+				utils.ColouriseCyan("zipfile")+
+				utils.ColouriseGreen(" \"/Users/user/test_dir.txt\"")+" to "+
 				utils.ColouriseGreen(" \"test_dir.zip\"")+"\n\nLine of "+
 				"Code: "+utils.ColouriseMagenta(full_loc),
 			loc,
@@ -1823,156 +1932,36 @@ func ZipFromPath(tokens []Token) {
 	// If verbose mode is set, note that we're zipping a file
 	if MODE_VERBOSE {
 		fmt.Printf(
-			":: %s %s to %s...\n",
+			":: %s %s to %s...",
 			utils.ColouriseBlue("Zipping"),
 			utils.ColouriseGreen(source),
 			utils.ColouriseGreen(destination),
 		)
 	}
 
-	// Create the destination, ie. the zip file that will house our file
-	archive_name, archive_name_error := os.Create(destination)
-	// If there's an error with creating the archive, report it
-	if archive_name_error != nil {
+	// Create the archive file
+	archive_file, archive_file_error := os.Create(destination)
+	if archive_file_error != nil {
 		Report(
-			"The archive name you provided - "+
-				utils.ColouriseYellow(destination)+" - could "+
-				" not be created. Is it possible that you can't write to that "+
-				"path?",
+			"Error creating the archive at "+destination,
 			loc,
 			tokens[4].TokenPosition,
 			full_loc,
 		)
 	}
-	// Defer the closing of the archive
-	defer archive_name.Close()
+	defer archive_file.Close()
 
-	// Create a zip writer
-	zip_writer := zip.NewWriter(archive_name)
-	defer zip_writer.Close()
+	// Create an archive writer
+	archive_writer := zip.NewWriter(archive_file)
+	defer archive_writer.Close()
 
-	path_walker := func(path string, info os.FileInfo, err error) error {
-
-		// If verbose mode is set, note that we're zipping a file
-		if MODE_VERBOSE {
-			fmt.Printf(
-				":: %s %s...",
-				utils.ColouriseBlue("Adding"),
-				utils.ColouriseGreen(path),
-			)
-		}
-
-		// If there's an error walking the path, report it
-		if err != nil {
-			Report(
-				"There was an error traversing the  "+
-					utils.ColouriseYellow(path)+". Is it possible that "+
-					"you can't read from that path?",
-				loc,
-				tokens[2].TokenPosition,
-				full_loc,
-			)
-		}
-
-		/* If the object that we've encountered is a path, return nil to note
-		that we don't have an error but we don't want to do anything
-		*/
-		if info.IsDir() {
-			return nil
-		}
-
-		// Open up the file to prep it for addition to our zip file
-		file_path, file_path_error := os.Open(path)
-		// If there's an error opening our file, report it
-		if file_path_error != nil {
-			Report(
-				"There was an error opening  "+utils.ColouriseYellow(path)+
-					". Is it possible that you can't read from that path?",
-				loc,
-				tokens[2].TokenPosition,
-				full_loc,
-			)
-		}
-		// Defer the close of the file
-		defer file_path.Close()
-
-		/* Replace the home directory, where need be. By default, the whole
-		path is included, sometimes creating a needlessly complex set of
-		nested folders. This trims off what is considered a reasonable
-		number of folders (ie. the user home directory).
-		*/
-		path = strings.TrimPrefix(path, VARIABLES["b_home"])
-
-		/* To give the unzipped folder some nice naming, we want to get the
-		name of the destination zip file. So, we're going to split the name
-		and then get just the file name, independent of the zip extension.
-		*/
-		// Get the path to the destination and split it by the path separator
-		dest_split := strings.Split(destination, string(os.PathSeparator))
-		// Get just the file name
-		dest_name := dest_split[len(dest_split)-1]
-		// Split by the period
-		dest_name_split := strings.Split(dest_name, ".")
-		// Get the first part of the split (ie. the file name)
-		dest_name_root := dest_name_split[0]
-
-		// Create the file that will be compressed
-		zip_path := dest_name_root + string(os.PathSeparator) + path
-		file, file_error := zip_writer.Create(zip_path)
-		// If there's an error doing this, report it
-		if file_error != nil {
-			Report(
-				"There was an error creating the file:  "+
-					utils.ColouriseYellow(path)+". Is it possible that you "+
-					"can't write to that path?",
-				loc,
-				tokens[4].TokenPosition,
-				full_loc,
-			)
-		}
-
-		//file_path_parts := strings.Split(path, string(os.PathSeparator))
-		// Get the filename from the parts of the file path
-		//filename := file_path_parts[len(file_path_parts)-1]
-
-		// Copy over the file to the archive
-		bytes_written, bytes_error := io.Copy(file, file_path)
-		// If there was an error, report it
-		if bytes_error != nil {
-			Report(
-				"There was an error creating the file:  "+
-					utils.ColouriseYellow(path)+". Is it possible that you "+
-					"can't write to that path?",
-				loc,
-				tokens[4].TokenPosition,
-				full_loc,
-			)
-		}
-
-		// If verbose mode is set, note that we're zipping a file
-		if MODE_VERBOSE {
-			fmt.Printf(
-				":: done [%s bytes written]\n",
-				utils.ColouriseMagenta(strconv.Itoa(int(bytes_written))),
-			)
-		}
-
-		// Return nil as we can assume that we haven't hit any errors
-		return nil
-	}
-
-	// Walk the path and call the walker function above to do all the work
-	walker_error := filepath.Walk(source, path_walker)
-	/* If there was an issue reported above, report it but note that this
-	won't be called since it any errors will have been reported earlier.
-	This is here in case there's a change above in the walker function to
-	reporting errors instead.
-	*/
-	if walker_error != nil {
+	// Set a filesystem path to the source
+	archive_path := os.DirFS(source)
+	// Ad the filesystem path to the archive
+	archive_fs_error := archive_writer.AddFS(archive_path)
+	if archive_fs_error != nil {
 		Report(
-			"There was an error traversing the  "+
-				utils.ColouriseYellow(source)+". Is it possible that "+
-				"you can't read from that path?",
+			"Error adding path to the archive",
 			loc,
 			tokens[2].TokenPosition,
 			full_loc,

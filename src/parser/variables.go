@@ -74,14 +74,14 @@ func BuildReservedVariables() {
 	}
 
 	// Create a date
-	date := time.Now()
+	date_time := time.Now()
 
 	/*
 		Get the date in dd-mm-yyyy format. This should be re-generated every
 		run of Call().
 	*/
 	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"date_dmy"] = fmt.Sprintf(
-		"%d-%d-%d", date.Day(), date.Month(), date.Year(),
+		"%d-%d-%d", date_time.Day(), date_time.Month(), date_time.Year(),
 	)
 
 	/*
@@ -89,18 +89,15 @@ func BuildReservedVariables() {
 		run of Call().
 	*/
 	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"date_ymd"] = fmt.Sprintf(
-		"%d-%d-%d", date.Year(), date.Month(), date.Day(),
+		"%d-%d-%d", date_time.Year(), date_time.Month(), date_time.Day(),
 	)
-
-	// Get the current time
-	time_now := time.Now()
 
 	/*
 		Get the time in hh-mm-ss in 24 hour format. This should be re-generated
 		every run of Call().
 	*/
 	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"time"] = fmt.Sprintf(
-		"%d-%d-%d", time_now.Hour(), time_now.Minute(), time_now.Second(),
+		"%d-%d-%d", date_time.Hour(), date_time.Minute(), date_time.Second(),
 	)
 
 	/*
@@ -110,7 +107,7 @@ func BuildReservedVariables() {
 		change during execution, it is possible.
 	*/
 	//
-	time_zone, _ := time_now.Zone()
+	time_zone, _ := date_time.Zone()
 
 	// Get the timezone
 	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"zone"] = time_zone
@@ -165,11 +162,10 @@ func BuildReservedVariables() {
 	}
 
 	/*
-		House the ip address. This now improves on the old format which
-		depended both on an external network connection and the stability of
-		Google's public DNS service which is not something I want to depend on.
-
-		TODO: see if there is a more elegant way to get this.
+		House the ip address. This loops over addresses attached to network
+		interfaces. This is rather "fragile" in that it's very possible that
+		this block of code will not yield an expected result if and where there
+		are more than one network devices in use.
 	*/
 	// Get the interfaces
 	ipaddrs, ipaddrs_err := net.InterfaceAddrs()

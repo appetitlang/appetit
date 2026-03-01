@@ -162,6 +162,12 @@ func GetHumanVersionOS() string {
 	case "openbsd":
 		os = "OpenBSD"
 		version_command = "uname -r"
+	default:
+		/*
+			Break out of the check and return unknown if it's not one of the
+			officially supported platforms.
+		*/
+		return "Unknown OS"
 	}
 
 	// Split the version_command to prep it for the execution of the command

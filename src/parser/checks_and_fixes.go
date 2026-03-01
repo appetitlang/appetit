@@ -237,10 +237,10 @@ func CheckFileExists(file_name string) bool {
 }
 
 /*
-This is a helper function that consolidates some of the fixer functions
-above. This is done as the functions called here are often called together
-so this can cut down on repetition. Takes in a string, fixes it, and
-returns it.
+This is a helper function that consolidates FixStringQuotations() and
+FixStringEscapes() of the fixer functions above. This is done as the functions
+called here are often called together so this can cut down on repetition. Takes
+in a string, fixes it, and returns it.
 */
 func FixStringCombined(input string) string {
 	// Fix the quotations so that they are properly escaped

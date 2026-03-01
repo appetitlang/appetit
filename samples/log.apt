@@ -1,0 +1,8 @@
+minver 1
+
+- This will log out the completion of a write statement.
+- This is not exciting but this is just for demonstration anyway.
+
+writeln "Hello World!"
+- Log out that we're done with the time that we're done
+log "Task completed at #b_time" to "#b_home/log_sample"

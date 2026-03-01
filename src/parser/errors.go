@@ -47,7 +47,7 @@ func Report(
 		header.
 	*/
 	fmt.Printf("%s%s\n",
-		strings.Repeat(" ", position),
+		strings.Repeat(" ", position-1),
 		error_pos_symbol,
 	)
 	fmt.Println(utils.ColouriseRed("\n[Description]"))

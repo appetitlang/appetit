@@ -3,6 +3,8 @@
 ![Screenshot of Appetit](art/screenshot.png "Screenshot")
 A simple "Hello World" with some variable substitution present.
 
+Tests: 37/37 passing.
+
 ### Table of Contents
 - [Principles and About](#principles-and-about)
 - [Building](#building)

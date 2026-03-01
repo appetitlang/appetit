@@ -13,9 +13,10 @@ endif
 
 DPKG_ARCH = $(shell dpkg --print-architecture)
 
-# If the dev_version is true, don't add a build date so that it remains "-development"
+# If the dev_version is true, don't add a build date so that it remains
+# "-development". Thanks to https://www.digitalocean.com/community/tutorials/
+# using-ldflags-to-set-version-information-for-go-applications
 ifeq ($(dev_version), "false")
-	# Thanks to https://www.digitalocean.com/community/tutorials/using-ldflags-to-set-version-information-for-go-applications
 	LD_FLAGS=-s -w -X 'appetit/parser.BuildDate=$(shell date)'
 else
 	LD_FLAGS=-s -w
@@ -23,6 +24,11 @@ endif
 
 # Build all binaries
 all: clean freebsd linux macos netbsd openbsd windows
+
+# Benchmark function calls
+benchmark:
+	@go clean -testcache
+	@go test -bench=. ./... -benchmem
 
 # Clean up old builds/packaging and the Go cache
 clean:

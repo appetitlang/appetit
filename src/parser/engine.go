@@ -91,8 +91,8 @@ func Tokenise(
 
 /*
 Start executing commands in a script by passing the lines to the tokeniser
-and the Call() function. The only parameter is the lines of the script. No
-returns.
+and the Call() function. The first parameter is the lines of the script and the
+second parameter is a bool to set development mode. No returns.
 */
 func Start(lines []string, dev_mode bool) {
 	/*
@@ -194,6 +194,7 @@ func Call(tokens []Token) {
 			"download":        func() { Download(tokens) },
 			"execute":         func() { ExecuteCommand(tokens) },
 			"exit":            func() { Exit(tokens) },
+			"log":             func() { Log(tokens) },
 			"makedirectory":   func() { CreatePath(tokens) },
 			"makefile":        func() { MakeFile(tokens) },
 			"minver":          func() { MinVer(tokens) },
@@ -226,13 +227,6 @@ func Call(tokens []Token) {
 		*/
 		valid_shebang, _ := CheckShebang(
 			tokens[0].FullLineOfCode)
-
-		/*if !valid_interpreter {
-			Warning(
-				"The interpreter passed as a shebang does not exist.",
-				strconv.Itoa(tokens[0].LineNumber),
-			)
-		}*/
 
 		if valid_shebang {
 			/*
