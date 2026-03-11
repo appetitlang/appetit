@@ -6,6 +6,12 @@ writeln "Your cpu count is #b_cpu."
 
 writeln "The date in d/m/y format is #b_date_dmy."
 
+writeln "\tThe day is #b_date_day"
+
+writeln "\tThe month is #b_date_month"
+
+writeln "\tThe year is #b_date_year"
+
 writeln "The date in y/m/d format is #b_date_ymd."
 
 writeln "Your home directory is #b_home."
@@ -14,9 +20,17 @@ writeln "Your hostname is #b_hostname."
 
 writeln "Your IP address is #b_ipv4."
 
+writeln "Log timestamp is #b_logstamp"
+
 writeln "Your operating system is #b_os."
 
-writeln "The time is #b_time in timezone #b_zone."
+writeln "The time is #b_time_full in timezone #b_zone."
+
+writeln "\tThe hour is #b_time_hour"
+
+writeln "\tThe minutes is #b_time_minute"
+
+writeln "\tThe seconds is #b_time_seconds"
 
 writeln "Your temporary directory is #b_tempdir."
 

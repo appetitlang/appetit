@@ -1052,7 +1052,8 @@ func Log(tokens []Token) {
 	// Defer the file handler close
 	defer file_handler.Close()
 
-	_, write_handler_error := file_handler.WriteString(output_string)
+	// Write the log message with a trailing new line
+	_, write_handler_error := file_handler.WriteString(output_string + "\n")
 	if write_handler_error != nil {
 		Report(
 			"There was an error writing to the file "+

@@ -237,8 +237,8 @@ func CheckFileExists(file_name string) bool {
 }
 
 /*
-This is a helper function that consolidates FixStringQuotations() and
-FixStringEscapes() of the fixer functions above. This is done as the functions
+This is a helper function that consolidates FixStringQuotations(),
+FixStringEscapes(), and FixTabCharacters(). This is done as the functions
 called here are often called together so this can cut down on repetition. Takes
 in a string, fixes it, and returns it.
 */
@@ -280,6 +280,8 @@ func FixStringEscapes(input string) string {
 	fixed_string = strings.ReplaceAll(fixed_string, "\\n", "\n")
 	// Replace carriage returns with actual carriage returns
 	fixed_string = strings.ReplaceAll(fixed_string, "\\r", "\r")
+	// Replace tabs with actual tabs
+	fixed_string = strings.ReplaceAll(fixed_string, "\\t", "\t")
 	// Return the fixed_string
 	return fixed_string
 }

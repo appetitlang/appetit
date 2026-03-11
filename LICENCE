@@ -1,4 +1,4 @@
-Appetit Interpreter (everything but the icons)
+Appetit Interpreter (src/ and packaging/)
 
 Copyright 2025-2026 Bryan Smith.
 
@@ -9,6 +9,13 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED “AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-Icons (the art/icons/ folder)
+Art and Documentation (the art/ and docs/ folder)
 
-The icon bases here are from the Tango Project (https://commons.wikimedia.org/wiki/Tango_icons) which kindly released their icons into the public domain. As a result, the icons for this project are also released into the public domain.
+The icon bases were originally from the Tango Project which kindly released their icons into the public domain. Any versions of the code that you find with the Tango icons as the foundation are released into the public domain.
+
+The current icons are generated via Apple's Image Playground. They are licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International licence. See the details of this here: https://creativecommons.org/licenses/by-nc-sa/4.0/. In short, you are free to share and adapt the icon as long as you provide proper attribution, do not use the icon for commercial purposes, and licence any adaptations under the same CC licence.
+
+
+Sample Code (samples/)
+
+Public domain.

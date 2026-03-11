@@ -235,12 +235,15 @@ func Call(tokens []Token) {
 				the first line and is, instead, on the second line.
 			*/
 			SHEBANG_PRESENT = true
-			// Break out of the function call
+			/*
+				Break out of the function call as we know that we aren't
+				looking at a statement.
+			*/
 			return
 		} else {
-			//valid_stmt := CheckIsStatement(tokens[1].FullLineOfCode)
+			// Check if we have a valid statement
 			valid_stmt := CheckIsStatement(tokens[1].TokenValue)
-
+			// If it's not a valid statement
 			if !valid_stmt {
 				// Get the line of the script
 				loc := strconv.Itoa(tokens[0].LineNumber)

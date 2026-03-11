@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 	"runtime/trace"
 	"time"
@@ -261,8 +262,15 @@ func main() {
 		)
 	}
 
+	/*
+		Set the script name as a central value so that it can be accessed in
+		places such as the reserved variables. This, by default, includes the
+		full path to the script.
+	*/
+	parser.SCRIPT_NAME, _ = filepath.Abs(file_name[0])
+
 	// Prep the script by opening it and removing the comments
-	contents := parser.PrepScript(file_name[0])
+	contents := parser.PrepScript(parser.SCRIPT_NAME)
 
 	/* If the dev flag is set, run the script and report back developer
 	information.

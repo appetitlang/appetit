@@ -17,3 +17,6 @@ container.sh
 
 # Any trace files made during testing
 *.out
+
+# The nfpm config file. I'm not sure if I want to use this long term.
+nfpm.yaml

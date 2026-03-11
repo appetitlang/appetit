@@ -39,11 +39,11 @@ clean:
 # Build for FreeBSD
 freebsd: clean
 	@echo "\033[31m[FreeBSD] Building x86_64 binary\033[0m"
-	@env GOOS=freebsd GOARCH=amd64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-freebsd-amd64-$(version)
+	@env GOOS=freebsd GOARCH=amd64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-freebsd-amd64-$(version)
 	@echo "\033[31m[FreeBSD] Building armv6 binary\033[0m"
-	@env GOOS=freebsd GOARM=6 GOARCH=arm go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-freebsd-arm-$(version)
+	@env GOOS=freebsd GOARM=6 GOARCH=arm go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-freebsd-arm-$(version)
 	@echo "\033[31m[FreeBSD] Building arm64 binary\033[0m"
-	@env GOOS=freebsd GOARCH=arm64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-freebsd-arm64-$(version)
+	@env GOOS=freebsd GOARCH=arm64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-freebsd-arm64-$(version)
 
 # Install the application
 install: me
@@ -55,43 +55,43 @@ install: me
 # Build for Linux
 linux: clean
 	@echo "\033[33m[Linux] Building x86_64 binary\033[0m"
-	@env GOOS=linux GOARCH=amd64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-linux-amd64-$(version)
+	@env GOOS=linux GOARCH=amd64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-linux-amd64-$(version)
 	@echo "\033[33m[Linux] Building armv6 binary\033[0m"
-	@env GOOS=linux GOARM=6 GOARCH=arm go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-linux-arm-$(version)
+	@env GOOS=linux GOARM=6 GOARCH=arm go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-linux-arm-$(version)
 	@echo "\033[33m[Linux] Building arm64 binary\033[0m"
-	@env GOOS=linux GOARCH=arm64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-linux-arm64-$(version)
+	@env GOOS=linux GOARCH=arm64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-linux-arm64-$(version)
 
 # Build for macOS
 macos: clean
 	@echo "\033[36m[macOS/Darwin] Building x86_64 binary\033[0m"
-	@env GOOS=darwin GOARCH=amd64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-darwin-amd64-$(version)
+	@env GOOS=darwin GOARCH=amd64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-darwin-amd64-$(version)
 	@echo "\033[36m[macOS/Darwin] Building arm64 binary\033[0m"
-	@env GOOS=darwin GOARCH=arm64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-darwin-arm64-$(version)
+	@env GOOS=darwin GOARCH=arm64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-darwin-arm64-$(version)
 	@echo "\033[36m[macOS/Darwin] Building universal binary\033[0m"
 	@lipo -create -output ../dist/appetit-darwin-universal-$(version) ../dist/appetit-darwin-amd64-$(version) ../dist/appetit-darwin-arm64-$(version)
 
 # Build for the platform you are on
 me: clean
 	@echo ":: Building binary for your platform"
-	@go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit
+	@go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit
 
 # Build for NetBSD
 netbsd: clean
 	@echo "\033[35m[NetBSD] Building x86_64 binary\033[0m"
-	@env GOOS=netbsd GOARCH=amd64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-netbsd-amd64-$(version)
+	@env GOOS=netbsd GOARCH=amd64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-netbsd-amd64-$(version)
 	@echo "\033[35m[NetBSD] Building armv6 binary\033[0m"
-	@env GOOS=netbsd GOARM=6 GOARCH=arm go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-netbsd-arm-$(version)
+	@env GOOS=netbsd GOARM=6 GOARCH=arm go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-netbsd-arm-$(version)
 	@echo "\033[35m[NetBSD] Building arm64 binary\033[0m"
-	@env GOOS=netbsd GOARCH=arm64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-netbsd-arm64-$(version)
+	@env GOOS=netbsd GOARCH=arm64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-netbsd-arm64-$(version)
 
 # Build for OpenBSD
 openbsd: clean
 	@echo "\033[32m[OpenBSD] Building x86_64 binary\033[0m"
-	@env GOOS=openbsd GOARCH=amd64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-openbsd-amd64-$(version)
+	@env GOOS=openbsd GOARCH=amd64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-openbsd-amd64-$(version)
 	@echo "\033[32m[OpenBSD] Building armv6 binary\033[0m"
-	@env GOOS=openbsd GOARM=6 GOARCH=arm go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-openbsd-arm-$(version)
+	@env GOOS=openbsd GOARM=6 GOARCH=arm go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-openbsd-arm-$(version)
 	@echo "\033[32m[OpenBSD] Building arm64 binary\033[0m"
-	@env GOOS=openbsd GOARCH=arm64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-openbsd-arm64-$(version)
+	@env GOOS=openbsd GOARCH=arm64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-openbsd-arm64-$(version)
 
 # dpkg build for Debian based systems
 pkg_deb: me
@@ -115,9 +115,12 @@ pkg_macos: macos
 	@cp ../LICENCE ../dist/; cp ../packaging/macos_distribution.xml ../dist/
 	@cd ../dist/; productbuild --quiet --distribution macos_distribution.xml --resources . --package-path appetit.pkg appetit_$(version).pkg
 	@rm -rf ../dist/appetit_$(version)/; rm -rf ../dist/appetit.pkg; rm -rf ../dist/macos_distribution.xml; rm -rf ../dist/LICENCE
+	@rm -rf ../dist/appetit_$(version)/
+	@rm -rf ../dist/appetit-darwin-amd64-$(version)
+	@rm -rf ../dist/appetit-darwin-arm64-$(version)
 
 # This is for releases as it builds all the binaries and a source archive
-release: all
+release .NOTPARALLEL: all
 	@$(MAKE) source
 
 # Make a source archive
@@ -136,6 +139,6 @@ test:
 # Build for Windows
 windows: clean
 	@echo "\033[34m[Windows] Building x86_64 binary\033[0m"
-	@env GOOS=windows GOARCH=amd64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-windows-amd64-$(version).exe
+	@env GOOS=windows GOARCH=amd64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-windows-amd64-$(version).exe
 	@echo "\033[34m[Windows] Building arm64 binary\033[0m"
-	@env GOOS=windows GOARCH=arm64 go build -ldflags="$(LD_FLAGS)" -o ../dist/appetit-windows-arm64-$(version).exe
+	@env GOOS=windows GOARCH=arm64 go build -v -x -ldflags="$(LD_FLAGS)" -o ../dist/appetit-windows-arm64-$(version).exe

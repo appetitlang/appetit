@@ -44,6 +44,9 @@ order or pattern. Currently, this isn't in use.
 */
 const LANG_CODENAME = "Canberra"
 
+// Hold the name of the script
+var SCRIPT_NAME string
+
 /*
 	This section houses symbols and conjoining words in statements and for the
 	language. Anytime these need to be checked or worked with, they should be
@@ -112,6 +115,15 @@ var VARIABLES = map[string]string{
 		"%sdate_dmy",
 		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
 	fmt.Sprintf(
+		"%sdate_day",
+		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
+	fmt.Sprintf(
+		"%sdate_month",
+		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
+	fmt.Sprintf(
+		"%sdate_year",
+		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
+	fmt.Sprintf(
 		"%sdate_ymd",
 		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
 	fmt.Sprintf(
@@ -124,13 +136,28 @@ var VARIABLES = map[string]string{
 		"%sipv4",
 		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
 	fmt.Sprintf(
+		"%slogstamp",
+		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
+	fmt.Sprintf(
 		"%sos",
 		SYMBOL_RESERVED_VARIABLE_PREFIX): runtime.GOOS,
+	fmt.Sprintf(
+		"%sscriptname_full",
+		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
 	fmt.Sprintf(
 		"%stempdir",
 		SYMBOL_RESERVED_VARIABLE_PREFIX): os.TempDir(),
 	fmt.Sprintf(
-		"%stime",
+		"%stime_full",
+		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
+	fmt.Sprintf(
+		"%stime_hour",
+		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
+	fmt.Sprintf(
+		"%stime_minute",
+		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
+	fmt.Sprintf(
+		"%stime_seconds",
 		SYMBOL_RESERVED_VARIABLE_PREFIX): "",
 	fmt.Sprintf(
 		"%szone",

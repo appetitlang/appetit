@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"os/user"
+	"path/filepath"
 	"slices"
 	"strings"
 	"syscall"
@@ -75,13 +76,25 @@ func BuildReservedVariables() {
 
 	// Create a date
 	date_time := time.Now()
+	// Get the day
+	date_day := fmt.Sprintf("%02d", date_time.Day())
+	// Get the month
+	date_month := fmt.Sprintf("%02d", date_time.Month())
+	// Get the year
+	date_year := fmt.Sprintf("%02d", date_time.Year())
+	// Get the hour
+	time_hour := fmt.Sprintf("%02d", date_time.Hour())
+	// Get the minute
+	time_minute := fmt.Sprintf("%02d", date_time.Minute())
+	// Get the second
+	time_seconds := fmt.Sprintf("%02d", date_time.Second())
 
 	/*
 		Get the date in dd-mm-yyyy format. This should be re-generated every
 		run of Call().
 	*/
 	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"date_dmy"] = fmt.Sprintf(
-		"%d-%d-%d", date_time.Day(), date_time.Month(), date_time.Year(),
+		"%s-%s-%s", date_day, date_month, date_year,
 	)
 
 	/*
@@ -89,28 +102,96 @@ func BuildReservedVariables() {
 		run of Call().
 	*/
 	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"date_ymd"] = fmt.Sprintf(
-		"%d-%d-%d", date_time.Year(), date_time.Month(), date_time.Day(),
+		"%s-%s-%s", date_year, date_month, date_day,
+	)
+
+	// Set the date_day
+	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"date_day"] = fmt.Sprintf(
+		"%s", date_day,
+	)
+
+	// Set the date_month
+	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"date_month"] = fmt.Sprintf(
+		"%s", date_month,
+	)
+
+	// Set the date_year
+	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"date_year"] = fmt.Sprintf(
+		"%s", date_year,
 	)
 
 	/*
 		Get the time in hh-mm-ss in 24 hour format. This should be re-generated
 		every run of Call().
 	*/
-	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"time"] = fmt.Sprintf(
-		"%d-%d-%d", date_time.Hour(), date_time.Minute(), date_time.Second(),
+	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"time_full"] = fmt.Sprintf(
+		"%s-%s-%s", time_hour, time_minute, time_seconds,
+	)
+
+	// Set the date_day
+	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"time_hour"] = fmt.Sprintf(
+		"%s", time_hour,
+	)
+
+	// Set the date_month
+	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"time_minute"] = fmt.Sprintf(
+		"%s", time_minute,
+	)
+
+	// Set the date_year
+	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"time_seconds"] = fmt.Sprintf(
+		"%s", time_seconds,
 	)
 
 	/*
-		Get the time zone, ignoring the offset as this isn't needed. This
-		should be re-generated every run of Call(). While it is unlikely that
-		someone will move between time zones or have the machine's time zone
-		change during execution, it is possible.
+		Create the logstamp by combining the date_ymd and time reserved
+		variables.
 	*/
-	//
-	time_zone, _ := date_time.Zone()
+	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"logstamp"] = fmt.Sprintf(
+		"%s/%s/%s, %s:%s:%s",
+		date_year,
+		date_month,
+		date_day,
+		time_hour,
+		time_minute,
+		time_seconds,
+	)
 
-	// Get the timezone
-	VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"zone"] = time_zone
+	/*
+		Check to see if we've got the b_scriptname_full which also serves to
+		check if we have the b_scriptname_only variable set.
+	*/
+	_, cur_script_names := CheckVariableExistence(
+		SYMBOL_RESERVED_VARIABLE_PREFIX + "scriptname_full")
+
+	if !cur_script_names {
+		/*
+			This needs to be set here as it can't be set in the creation of the
+			VARIABLE map because that map is created before.
+		*/
+		VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"scriptname_full"] = SCRIPT_NAME
+		// Get just the file name
+		_, name_only := filepath.Split(SCRIPT_NAME)
+		VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"scriptname_only"] = name_only
+	}
+
+	_, cur_time_zone := CheckVariableExistence(
+		VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"zone"],
+	)
+
+	if !cur_time_zone {
+		/*
+			Get the time zone, ignoring the offset as this isn't needed. This
+			should be re-generated every run of Call(). While it is unlikely
+			that someone will move between time zones or have the machine's
+			time zone change during execution, it is possible.
+		*/
+		// Get the timezone
+		time_zone, _ := date_time.Zone()
+
+		// Get the timezone
+		VARIABLES[SYMBOL_RESERVED_VARIABLE_PREFIX+"zone"] = time_zone
+	}
 
 	/*
 		Check to see if the hostname is set. This doesn't need to be
